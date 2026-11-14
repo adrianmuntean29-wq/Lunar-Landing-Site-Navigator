@@ -6,7 +6,7 @@ Team: **Peaks of Light** (Adrian, Eren)
 
 An interactive 3D map of the lunar south pole. For any landing site and any date, it shows when the site has sunlight (power) and when it can see Earth (direct-to-Earth communications), computed from the terrain.
 
-> **Status at the start of the hackathon (Saturday morning):** we have a working prototype on **generated terrain** with **simplified** Sun and Earth positions (`index.html`). The weekend's work: replace the generated terrain with LOLA elevation data, replace the simplified positions with NASA ephemerides, and validate the results against NASA's official illumination maps.
+> **First step (Saturday morning, built at the event):** a first version of `index.html` on **generated terrain** with **simplified** Sun and Earth positions. The rest of the weekend: replace the generated terrain with LOLA elevation data, replace the simplified positions with NASA ephemerides, and validate the results against NASA's official illumination maps.
 
 ---
 
@@ -15,7 +15,7 @@ An interactive 3D map of the lunar south pole. For any landing site and any date
 1. [Deadlines and rules that can disqualify us](#1-deadlines-and-rules-that-can-disqualify-us)
 2. [The challenge and why we chose it](#2-the-challenge-and-why-we-chose-it)
 3. [The idea: what we are building](#3-the-idea-what-we-are-building)
-4. [The prototype so far](#4-the-prototype-so-far)
+4. [The first version](#4-the-first-version)
 5. [How the computation works](#5-how-the-computation-works)
 6. [NASA data we use](#6-nasa-data-we-use)
 7. [Weekend plan](#7-weekend-plan)
@@ -38,7 +38,7 @@ An interactive 3D map of the lunar south pole. For any landing site and any date
 - **We are a team of 2, so both of us must be on site for the whole judging session.** The rule requires two thirds of the team present; for 2 members the minimum is 2.
 - Each member must be in the correct Alba Iulia event team on the NASA platform and **must not be waitlisted**.
 - The project must **meaningfully use at least one NASA data resource** and answer the chosen challenge.
-- **We must not fabricate data or results.** The prototype's numbers come from generated terrain, so we never present them as real results (see section 10).
+- **We must not fabricate data or results.** The first version's numbers come from generated terrain, so we never present them as real results (see section 10).
 - Prior work is allowed, but we must show **concrete progress made during the weekend** and be transparent about sources and tools, including AI.
 
 **The jury** scores each of 5 criteria from 1 to 10, 20% each:
@@ -104,7 +104,7 @@ For any site picked on the map, the **navigator** answers three questions:
 2. What is the longest period without sunlight (how long must the batteries last)?
 3. On which days and hours are the power and communication windows open?
 
-**Example from the prototype** (generated terrain, so illustrative only, not real results):
+**Example from the first version** (generated terrain, so illustrative only, not real results):
 
 | Site | Sun | Earth | Both | Longest night |
 |---|---|---|---|---|
@@ -116,7 +116,7 @@ This is the story for the pitch: A is the best site for power, B for communicati
 
 ---
 
-## 4. The prototype so far
+## 4. The first version
 
 File: [`index.html`](index.html). A single file, no dependencies, no server. It opens directly in a browser.
 
@@ -152,7 +152,7 @@ A second page: a mission from Canada (Spaceport Nova Scotia) to the lunar south 
 
 ### Terrain
 - Computation grid: 257 × 257 points at 375 m spacing, i.e. 96 × 96 km. Only the central 48 × 48 km is displayed; the rest exists so that surrounding terrain can shadow the edges.
-- In the prototype the terrain is generated: a ~21 km crater near the pole (similar to Shackleton), a massif toward Earth (similar to Malapert), small craters and fractal noise.
+- In the first version the terrain is generated: a ~21 km crater near the pole (similar to Shackleton), a massif toward Earth (similar to Malapert), small craters and fractal noise.
 
 ### Each point's horizon
 For each point and each direction (64 directions for the map, 360 for candidate sites) we march across the terrain out to 46 km and keep the maximum elevation angle:
@@ -165,9 +165,9 @@ The `d² / (2·R)` term is the **Moon's curvature**: at 20 km, the terrain "drop
 
 Candidate sites have their panels and antenna on a **10 m mast**.
 
-### Sun and Earth (simplified in the prototype)
+### Sun and Earth (simplified in the first version)
 
-| Quantity | Prototype model |
+| Quantity | First-version model |
 |---|---|
 | Sun azimuth | full circle every 29.53 days (synodic month) |
 | Sun elevation at the pole | ±1.54° · sin(2π·t / 346.62 days) |
@@ -195,7 +195,7 @@ We sample the year every 3 hours (2,920 instants):
 ### Known limitations
 - Terrain beyond 46 km is not considered.
 - The 375 m resolution smooths small ridges; on real 20 m or 5 m data the results will change.
-- The prototype's ephemerides are simplified (see above).
+- The first version's ephemerides are simplified (see above).
 
 ---
 
@@ -294,7 +294,7 @@ The exact time is announced before judging: 3–5 minutes of pitch plus 1–3 mi
 3. **Solution (30 s).** *Peaks of Light*: an interactive 3D navigator that computes, from real LOLA terrain, when any site sees the Sun and the Earth.
 4. **Live demo (90 s).** Play time; compare the Shackleton rim with Malapert; tap a new site; show the horizon chart.
 5. **NASA data & validation (30 s).** LOLA elevation models, JPL ephemerides; our yearly illumination against NASA's official LRO illumination maps.
-6. **What we built this weekend (20 s).** Be explicit: the prototype existed on synthetic terrain; this weekend we connected real NASA data and validated it.
+6. **What we built this weekend (20 s).** Be explicit: we started on synthetic terrain on Saturday morning, then connected real NASA data and validated it.
 7. **Impact & next steps (20 s).** Mission planning, rover traverse planning, power and battery sizing, public outreach.
 
 **Likely jury questions**
@@ -331,13 +331,13 @@ The exact time is announced before judging: 3–5 minutes of pitch plus 1–3 mi
 
 The rules allow prior work as long as we declare it and show progress made during the weekend. We state it openly, in the pitch and in the submission:
 
-- **Before the event (6–13 November):** we chose the challenge and built the `index.html` prototype on **procedurally generated terrain** with **simplified** Sun and Earth positions. The prototype was built with the help of an AI assistant (Claude, by Anthropic).
-- **The prototype's numbers are not real results** and we do not present them as such. We use them only as an example in this document.
+- **Saturday 14 November, morning (at the event):** we built the first `index.html` version on **procedurally generated terrain** with **simplified** Sun and Earth positions, with the help of an AI assistant (Claude, by Anthropic).
+- **The first version's numbers are not real results** and we do not present them as such. We use them only as an example in this document.
 - **During the weekend:** connecting real NASA data (LOLA, ephemerides), validation against the official illumination maps, real sites, the English UI, the pitch and the submission. We log what we do with AI during the weekend in the table below.
 
 | What | Tool / source |
 |---|---|
-| Prototype, documentation | Claude (AI assistant) |
+| First version, documentation | Claude (AI assistant) |
 | English translation of the UI | Eren |
 | Mission simulator `mission.html` (trajectory, Δv and mass, Sun/Earth at real dates checked against JPL Horizons, best launch dates with Open-Meteo weather), 14 Nov | Claude (AI assistant); Adrian set the requirements and reviewed |
 | _to fill in during the weekend_ | |
