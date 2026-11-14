@@ -105,3 +105,19 @@ def test_regression_against_home_server(site, lat, lon, mast, expected):
     st = metrics.stats(metrics.site_series(m, sky, lat, lon, info["h0_m"], mast))
     assert abs(st["sun_pct"] - expected) < 0.1
     assert info["edge_rays"] == 0
+
+
+def test_calendar_limits_and_relay():
+    import windows
+    H = 24 * 10
+    sun_up = np.ones(H, bool)
+    sun_up[30:40] = False                      # a 10 h night on day 1
+    ser = dict(sun_frac=sun_up.astype(float), sun_up=sun_up, earth_up=np.zeros(H, bool))
+    margin = np.where(sun_up, 1.0, -1.0)
+    kw = dict(length_d=2, min_sun_pct=50, min_earth_pct=50, max_night_h=5, min_touchdown_deg=0, sun_margin=margin)
+    days = windows.calendar(ser, 0, 8, **kw)
+    assert len(days) == 8                                   # day 8 would run past the table end
+    assert days[0]["fails"] == ["earth", "night"]           # window 0-48 h holds the 10 h night
+    assert days[2]["fails"] == ["earth"]                    # window 48-96 h: no night
+    relay = windows.calendar(ser, 0, 8, relay=True, **kw)
+    assert relay[2]["pass_"] and relay[0]["fails"] == ["night"]
