@@ -1,0 +1,31 @@
+{
+ "generated_utc": "2026-11-14T17:21Z",
+ "versions": {
+  "dem": "LDEM_80S_20MPP_ADJ.TIF (PGDA 90, 2023-07-07), block mean of 5 x 5 pixels of 20 m",
+  "code": "07c5981+uncommitted"
+ },
+ "purpose": "3D view only (display); numbers come from the horizon masks in sites.json",
+ "site_id": "B",
+ "site_name": "Shackleton rim (S)",
+ "centre_lat": -89.7849,
+ "centre_lon_e": 203.97,
+ "site_x": -2649.84,
+ "site_y": -5960.04,
+ "nx": 500,
+ "ny": 500,
+ "pixel_m": 100.0,
+ "x_min": -27600.0,
+ "y_max": 19000.0,
+ "x_max": 22400.0,
+ "y_min": -31000.0,
+ "corner": "x_min/y_max are the outer edges of pixel (0,0); pixel centres sit half a pixel inside; the site is within 50 m of the tile centre on each axis, up to 71 m diagonally (tile edges on the 100 m grid of the DEM); place it with site_x, site_y",
+ "layout": "Float32 little-endian, row-major, row 0 = north edge (+y), NaN = no data",
+ "units": "metres above the 1737400 m sphere",
+ "crs": "+proj=stere +lat_0=-90 +lon_0=0 +k=1 +x_0=0 +y_0=0 +R=1737400 +units=m",
+ "axes": "+x toward 90 E, +y toward 0 E; lon = atan2(x, y)",
+ "h_min": -2865.6,
+ "h_max": 1957.8,
+ "nan_count": 18,
+ "dem_max_m": 7026.33,
+ "dem_max_note": "max of the full-resolution 80 m DEM (not this tile)"
+}

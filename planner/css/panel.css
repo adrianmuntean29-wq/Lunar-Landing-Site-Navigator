@@ -1,0 +1,178 @@
+/* panel.css: OWNER "right panel" chat. Style only things inside #panel.
+   Look (Eren 14 Nov, "less like AI"): an instrument panel, not a stack of cards. No boxes, thin rules between sections,
+   sentence-case headings, plain coloured glyphs, numbers right-aligned. Only base.css colour tokens (light theme can swap). */
+
+/* header */
+#panel .tabs{align-items:center;padding:10px 10px 10px 16px}
+#panel .tabs .vt{font:600 13px "IBM Plex Sans";color:var(--ink)}
+#panel .tabs .x{margin-left:auto;width:28px;height:28px;display:grid;place-items:center;font:400 18px/1 "IBM Plex Sans";color:var(--muted);background:none;border:0;border-radius:4px;cursor:pointer}
+#panel .tabs .x:hover{color:var(--ink);background:var(--panel2)}
+
+/* scroll body + view switch fade */
+#panel .scroll{overflow-y:auto;padding:4px 16px 16px;display:grid;gap:0;align-content:start;min-height:0;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+#panel .scroll > *{padding:14px 0;border-top:1px solid var(--line)}
+#panel .scroll > :first-child{border-top:0}
+#panel .scroll:not([hidden]){animation:pIn .15s ease-out}
+@keyframes pIn{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){#panel .scroll:not([hidden]){animation:none}}
+
+/* shared type */
+#panel .rl{margin:0;font-size:13px;line-height:1.5;color:var(--muted)}
+#panel .rl b{color:var(--ink)}
+#panel .note{font-size:12px;line-height:1.45;color:var(--muted);margin:0}
+#panel .sec h3{font:600 13px "IBM Plex Sans";color:var(--ink);margin:0 0 8px}
+
+/* site heading */
+#panel .sitepick{display:grid;gap:0;padding-top:10px}
+#panel .sitepick > span{font-size:12px;color:var(--muted)}
+#panel .sitepick h2{font:600 22px/1.2 "IBM Plex Sans";color:var(--ink);margin:0}
+#panel .sitepick small{font:500 12px "IBM Plex Mono";color:var(--muted)}
+
+/* sections: no boxes */
+#panel .blk{display:grid;gap:12px}
+#panel .blk h3{font:600 13px "IBM Plex Sans";color:var(--ink);margin:0}
+#panel .blk > h3{display:flex;align-items:baseline;cursor:pointer;user-select:none}
+#panel .blk h3 span{font:500 12px "IBM Plex Mono";color:var(--muted);margin-left:8px}
+#panel .blk h3 .siteName.plain{font:inherit;color:inherit;margin:0 4px}
+#panel .blk > h3 .chev{margin-left:auto;width:6px;height:6px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(45deg);align-self:center;opacity:0;transition:opacity .15s,transform .15s}
+#panel .blk > h3:hover .chev,#panel .blk > h3:focus-visible .chev,#panel .blk.shut > h3 .chev{opacity:1}
+#panel .blk.shut > h3 .chev{transform:rotate(-45deg)}
+#panel .blk.shut > :not(h3){display:none}
+#panel .blk > h3:focus-visible{outline:2px solid var(--earth);outline-offset:3px}
+
+/* verdict: the answer */
+#panel .verdict{display:grid;gap:4px}
+#panel .verdict .vn{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#panel .verdict .vn b{font:600 44px/1 "IBM Plex Sans";color:var(--go);font-variant-numeric:tabular-nums}
+#panel .verdict .vn span{font-size:14px;color:var(--ink)}
+#panel .verdict .share{height:3px;background:var(--line);margin:6px 0 4px}
+#panel .verdict .share i{display:block;height:100%;background:var(--go);transition:width .25s}
+#panel .verdict p{margin:0;font-size:13.5px;color:var(--muted)}
+#panel .verdict p b{color:var(--ink)}
+#panel .verdict small{font:500 11.5px "IBM Plex Mono";color:var(--muted)}
+#panel .verdict.none .vn b{color:var(--warn)}
+#panel .verdict.none .share i{background:var(--warn)}
+
+/* other missions */
+#panel .others{display:grid;gap:3px}
+#panel .others b{font-size:13px;font-weight:600;color:var(--ink)}
+#panel .others.warn b{color:var(--warn)}
+#panel .others p{margin:0;font-size:12.5px;color:var(--muted)}
+#panel .others small{font-size:11px;color:var(--muted)}
+
+/* Sun / Earth status lines: plain glyphs */
+#panel .stline{display:grid;grid-template-columns:18px 1fr;gap:10px;align-items:baseline}
+#panel .stline .ic{font-size:15px;line-height:1;text-align:center}
+#panel .stline.off .ic{color:var(--muted)}
+#panel .sunc{color:var(--sun)} #panel .earthc{color:var(--earth)}
+#panel .stline b{display:block;font-size:15px;font-weight:600;color:var(--ink)}
+#panel .stline small{display:block;color:var(--muted);font-size:12.5px;line-height:1.4}
+#panel .stline small.ht{font:500 11.5px "IBM Plex Mono";margin-top:2px}
+
+/* Orbit facts */
+#panel .facts{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px}
+#panel .facts > div{display:grid;gap:2px;align-content:start}
+#panel .facts > div:first-child{grid-column:1/-1}
+#panel .facts span{font-size:12px;color:var(--muted)}
+#panel .facts b{font:600 18px "IBM Plex Sans";color:var(--ink);font-variant-numeric:tabular-nums}
+#panel .facts > div:first-child b{font-size:20px}
+#panel .facts small{font-size:12px;line-height:1.4;color:var(--muted)}
+
+/* Ground Level: mast switch, 14-day strip, next darkness */
+#panel .f2.gm{margin-top:2px}
+#panel .strip{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;gap:6px 10px;align-items:center}
+#panel .strip canvas{grid-column:2;grid-row:1/3;width:100%;height:44px;border-radius:4px}
+#panel .strip .sl{grid-column:1;display:grid;font-size:12px;line-height:1.15;min-width:50px}
+#panel .strip .sl b{font:600 15px "IBM Plex Sans";color:var(--ink)}
+#panel .ticks{display:flex;justify-content:space-between;font:500 10.5px "IBM Plex Mono";color:var(--muted);margin:-6px 0 0 60px}
+#panel .dark{margin:0;font-size:14.5px;line-height:1.45;color:var(--muted)}
+#panel .dark b{color:var(--ink)}
+
+/* Moon view: selected-site card */
+#panel .gnums{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#panel .gnums > div{display:grid;gap:2px;align-content:start}
+#panel .gnums span{font-size:12px;color:var(--muted)}
+#panel .gnums b{font:600 22px "IBM Plex Sans";color:var(--go);font-variant-numeric:tabular-nums}
+#panel .gnums > div + div b{color:var(--psr)}
+#panel .gnums small{font-size:11.5px;color:var(--muted)}
+#panel .gmis{display:grid;gap:3px}
+#panel .gmis b{font-size:13px;font-weight:600;line-height:1.4;color:var(--ink)}
+#panel .gmis.warn b{color:var(--warn)}
+#panel .gmis small{font-size:11px;color:var(--muted);opacity:.75}
+#panel .go{display:flex;justify-content:center;gap:8px;font:600 13.5px "IBM Plex Sans";color:var(--bg);background:var(--ink);border:0;border-radius:4px;padding:10px 14px;cursor:pointer;transition:filter .15s}
+#panel .go:hover{filter:brightness(1.1)}
+#panel .go:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+#panel .go span{transition:transform .15s}
+#panel .go:hover span{transform:translateX(3px)}
+
+/* mission presets */
+#panel .kind{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#panel .kind button{text-align:left;font:600 13px "IBM Plex Sans";color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:9px 11px;cursor:pointer;transition:border-color .15s}
+#panel .kind button:hover{border-color:var(--muted)}
+#panel .kind button small{display:block;font-weight:400;font-size:11.5px;color:var(--muted);margin-top:2px}
+#panel .kind button[aria-pressed=true]{border-color:var(--ink)}
+
+/* sliders */
+#panel .slr{display:grid;gap:6px}
+#panel .slr .t{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--muted)}
+#panel .slr .t b{color:var(--ink);font:600 13px "IBM Plex Mono"}
+#panel .slr input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;background:transparent;margin:0;cursor:pointer}
+#panel .slr input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(to right,var(--earth) var(--p,50%),var(--line) var(--p,50%))}
+#panel .slr input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--ink);margin-top:-6px;border:0;box-shadow:0 0 0 4px color-mix(in srgb,var(--earth) 30%,transparent);transition:box-shadow .15s}
+#panel .slr input[type=range]:hover::-webkit-slider-thumb,#panel .slr input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 6px color-mix(in srgb,var(--earth) 40%,transparent)}
+#panel .slr input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--line)}
+#panel .slr input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--earth)}
+#panel .slr input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--ink);border:0;box-shadow:0 0 0 4px color-mix(in srgb,var(--earth) 30%,transparent)}
+#panel .slr input:disabled{opacity:.35;cursor:not-allowed}
+#panel .chk2{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;line-height:1.4;color:var(--muted);cursor:pointer}
+#panel .chk2 input{accent-color:var(--earth);margin-top:2px}
+
+/* segmented choices (mast, shadow) */
+#panel .f2{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 10px;font-size:13px;color:var(--muted)}
+#panel .seg{border-radius:4px}
+#panel .seg button{padding:4px 10px}
+#panel .seg button:hover{color:var(--ink)}
+#panel .seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+
+/* why days fail */
+#panel .why{display:grid;gap:10px}
+#panel .why .r{display:grid;grid-template-columns:1fr auto;gap:5px 8px;font-size:12.5px;color:var(--muted)}
+#panel .why .r b{text-align:right;color:var(--ink);font:600 12.5px "IBM Plex Mono"}
+#panel .why .bar2{grid-column:1/-1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+#panel .why .bar2 i{display:block;height:100%;border-radius:3px}
+
+/* folded explanations */
+#panel .how{font-size:12.5px;line-height:1.5;color:var(--muted);padding:2px 4px}
+#panel .how summary{cursor:pointer;color:var(--muted);font-size:12.5px;list-style:none;display:flex;align-items:center;gap:6px}
+#panel .how summary::-webkit-details-marker{display:none}
+#panel .how summary::before{content:"+";width:10px;font:500 13px "IBM Plex Mono"}
+#panel .how[open] summary::before{content:"−"}
+#panel .how summary:hover{color:var(--ink)}
+#panel .how p{margin:8px 0 0}
+
+/* compare sites */
+#panel .sitelist{display:grid;gap:8px}
+#panel .sitecard{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:10px 12px;display:grid;gap:6px;cursor:pointer;transition:border-color .15s}
+#panel .sitecard:hover{border-color:var(--muted)}
+#panel .sitecard.sel{border-color:var(--ink)}
+#panel .sitecard .n{display:flex;justify-content:space-between;align-items:baseline;font-weight:600;font-size:15px}
+#panel .sitecard .n .mono{font-size:12.5px;color:var(--go)}
+#panel .sitecard .q{font-size:11.5px;line-height:1.45;color:var(--muted)}
+#panel .sitecard .nums{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font:600 12.5px "IBM Plex Mono"}
+#panel .sitecard .nums span{color:var(--muted);font:500 10px "IBM Plex Mono";letter-spacing:.04em;display:block;margin-bottom:1px}
+#panel .sitecard.out{opacity:.5}
+#panel .addspot{display:flex;gap:6px;align-items:end;font-size:12px;color:var(--muted)}
+#panel .addspot input{width:90px;font:500 12.5px "IBM Plex Mono";color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:5px 6px}
+#panel .prov{font:500 11.5px "IBM Plex Mono";color:var(--muted);line-height:1.7}
+#panel .prov a{color:var(--earth)}
+/* custom landing spot: approximate label + (i), form messages */
+#panel .apx{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font:500 12px "IBM Plex Mono";color:#E8B04A}
+#panel .apx[hidden]{display:none}
+#panel .addspot .btn[hidden]{display:none}
+#panel .sMsg{margin-top:6px} #panel .sMsg.err{color:var(--bad)}
+#panel .sitelist .subh{font:500 12px "IBM Plex Mono";color:#E8B04A;margin:10px 0 4px}
+/* site kind tag (where each point comes from; core site.kind) */
+#panel .kindtag{display:inline-block;justify-self:start;font:500 10.5px "IBM Plex Mono";font-style:normal;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 5px;margin:2px 0;vertical-align:2px}
+#panel .kindtag:empty{display:none}
+#panel .kindtag.hist{color:#F2876B;border-color:rgba(242,135,107,.5)}
+#panel .ub{color:#E8B04A} #panel .sitecard .q .info-wrap{vertical-align:-3px}

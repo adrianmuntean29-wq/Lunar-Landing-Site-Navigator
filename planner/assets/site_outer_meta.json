@@ -1,0 +1,17 @@
+{
+ "nx": 512,
+ "ny": 512,
+ "pixel_m": 1187.5,
+ "x_min": -304000.0,
+ "y_max": 304000.0,
+ "x_max": 304000.0,
+ "y_min": -304000.0,
+ "source": "LDEM_80S_80MPP_ADJ.TIF (PGDA 90), area mean of 80 m pixels",
+ "purpose": "Landing Site view background (display only)",
+ "layout": "Float32 little-endian, row-major, row 0 = north edge (+y), NaN = no data",
+ "units": "metres above the 1737400 m sphere",
+ "axes": "+x toward 90 E, +y toward 0 E",
+ "h_min": -7080.2509765625,
+ "h_max": 6967.708984375,
+ "nan": 0
+}
