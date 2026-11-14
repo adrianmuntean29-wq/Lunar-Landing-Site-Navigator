@@ -1,0 +1,24 @@
+{
+ "generated_utc": "2026-11-14T12:23Z",
+ "versions": {
+  "dem": "LDEM_80S_80MPP_ADJ.TIF (PGDA 90, 2023-07-07), block mean of 80 m pixels",
+  "code": "b6af83d+uncommitted"
+ },
+ "purpose": "approximate horizon masks at clicked spots (label: approximate, 640 m terrain)",
+ "nx": 950,
+ "ny": 950,
+ "pixel_m": 640.0,
+ "x_min": -304000.0,
+ "y_max": 304000.0,
+ "x_max": 304000.0,
+ "y_min": -304000.0,
+ "corner": "x_min/y_max are the outer edges of pixel (0,0); pixel centres sit half a pixel inside",
+ "layout": "Float32 little-endian, row-major, row 0 = north edge (+y), NaN = no data",
+ "units": "metres above the 1737400 m sphere",
+ "crs": "+proj=stere +lat_0=-90 +lon_0=0 +k=1 +x_0=0 +y_0=0 +R=1737400 +units=m",
+ "axes": "+x toward 90 E, +y toward 0 E; lon = atan2(x, y)",
+ "h_min": -7242.5,
+ "h_max": 7006.6,
+ "dem_max_m": 7026.33,
+ "dem_max_note": "max of the full-resolution 80 m DEM (not this grid); use it for the auto-stop bound"
+}
