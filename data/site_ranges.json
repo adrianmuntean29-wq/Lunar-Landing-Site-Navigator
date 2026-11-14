@@ -1,0 +1,3290 @@
+{
+ "generated_utc": "2026-11-14T17:35Z",
+ "versions": {
+  "code": "07c5981+uncommitted",
+  "note": "same DEM, ephemeris and rules as sites.json"
+ },
+ "method": "2 m mast, 2027-01-01..2031-12-31 hourly; 25 points per site: centre + 8 at 25 m + 16 at 50 m (polar stereographic metres); min/median/max over the 25; no slope filter",
+ "sites": [
+  {
+   "id": "A",
+   "name": "Connecting Ridge (C1)",
+   "lat": -89.4505,
+   "lon_e": 222.84,
+   "centre": {
+    "r_m": 0.0,
+    "lat": -89.4505,
+    "lon_e": 222.84,
+    "ground_m": 1957.3,
+    "edge_rays": 0,
+    "sun_pct": 85.59,
+    "earth_pct": 58.55,
+    "both_pct": 50.32,
+    "longest_night_h": 146.0
+   },
+   "range_50m": {
+    "sun_pct": {
+     "min": 40.1,
+     "median": 81.95,
+     "max": 86.02
+    },
+    "earth_pct": {
+     "min": 40.79,
+     "median": 58.55,
+     "max": 58.57
+    },
+    "both_pct": {
+     "min": 13.0,
+     "median": 47.91,
+     "max": 50.74
+    },
+    "longest_night_h": {
+     "min": 135.0,
+     "median": 224.0,
+     "max": 618.0
+    }
+   },
+   "best_lit": {
+    "r_m": 25.0,
+    "lat": -89.451324,
+    "lon_e": 222.836755,
+    "ground_m": 1957.4,
+    "edge_rays": 0,
+    "sun_pct": 86.02,
+    "earth_pct": 58.55,
+    "both_pct": 50.66,
+    "longest_night_h": 137.0
+   },
+   "points": [
+    {
+     "r_m": 0.0,
+     "lat": -89.4505,
+     "lon_e": 222.84,
+     "ground_m": 1957.3,
+     "edge_rays": 0,
+     "sun_pct": 85.59,
+     "earth_pct": 58.55,
+     "both_pct": 50.32,
+     "longest_night_h": 146.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.451104,
+     "lon_e": 222.898516,
+     "ground_m": 1957.1,
+     "edge_rays": 0,
+     "sun_pct": 85.54,
+     "earth_pct": 58.56,
+     "both_pct": 50.16,
+     "longest_night_h": 142.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.451324,
+     "lon_e": 222.836755,
+     "ground_m": 1957.4,
+     "edge_rays": 0,
+     "sun_pct": 86.02,
+     "earth_pct": 58.55,
+     "both_pct": 50.66,
+     "longest_night_h": 137.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.45106,
+     "lon_e": 222.776902,
+     "ground_m": 1957.4,
+     "edge_rays": 0,
+     "sun_pct": 85.91,
+     "earth_pct": 58.55,
+     "both_pct": 50.74,
+     "longest_night_h": 138.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.450468,
+     "lon_e": 222.754102,
+     "ground_m": 1957.1,
+     "edge_rays": 0,
+     "sun_pct": 85.18,
+     "earth_pct": 58.55,
+     "both_pct": 50.3,
+     "longest_night_h": 147.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.449895,
+     "lon_e": 222.781613,
+     "ground_m": 1956.3,
+     "edge_rays": 0,
+     "sun_pct": 81.95,
+     "earth_pct": 57.74,
+     "both_pct": 47.91,
+     "longest_night_h": 250.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.449676,
+     "lon_e": 222.843235,
+     "ground_m": 1957.1,
+     "edge_rays": 0,
+     "sun_pct": 84.97,
+     "earth_pct": 58.56,
+     "both_pct": 49.84,
+     "longest_night_h": 157.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.449939,
+     "lon_e": 222.902969,
+     "ground_m": 1956.7,
+     "edge_rays": 0,
+     "sun_pct": 83.43,
+     "earth_pct": 58.56,
+     "both_pct": 48.62,
+     "longest_night_h": 179.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.45053,
+     "lon_e": 222.925907,
+     "ground_m": 1956.5,
+     "edge_rays": 0,
+     "sun_pct": 82.41,
+     "earth_pct": 58.57,
+     "both_pct": 47.53,
+     "longest_night_h": 219.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.451708,
+     "lon_e": 222.95716,
+     "ground_m": 1956.0,
+     "edge_rays": 0,
+     "sun_pct": 80.31,
+     "earth_pct": 58.56,
+     "both_pct": 45.24,
+     "longest_night_h": 250.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.452046,
+     "lon_e": 222.899929,
+     "ground_m": 1957.0,
+     "edge_rays": 0,
+     "sun_pct": 85.73,
+     "earth_pct": 58.56,
+     "both_pct": 50.31,
+     "longest_night_h": 135.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.452148,
+     "lon_e": 222.833501,
+     "ground_m": 1956.8,
+     "edge_rays": 0,
+     "sun_pct": 85.54,
+     "earth_pct": 58.55,
+     "both_pct": 50.32,
+     "longest_night_h": 135.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.451998,
+     "lon_e": 222.76807,
+     "ground_m": 1956.6,
+     "edge_rays": 0,
+     "sun_pct": 85.18,
+     "earth_pct": 58.55,
+     "both_pct": 50.25,
+     "longest_night_h": 138.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.45162,
+     "lon_e": 222.713676,
+     "ground_m": 1956.5,
+     "edge_rays": 0,
+     "sun_pct": 84.54,
+     "earth_pct": 58.55,
+     "both_pct": 50.16,
+     "longest_night_h": 165.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.451071,
+     "lon_e": 222.678625,
+     "ground_m": 1956.5,
+     "edge_rays": 0,
+     "sun_pct": 81.91,
+     "earth_pct": 58.04,
+     "both_pct": 49.42,
+     "longest_night_h": 308.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.450435,
+     "lon_e": 222.668215,
+     "ground_m": 1956.0,
+     "edge_rays": 0,
+     "sun_pct": 76.0,
+     "earth_pct": 56.19,
+     "both_pct": 45.48,
+     "longest_night_h": 306.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.44981,
+     "lon_e": 222.683948,
+     "ground_m": 1954.2,
+     "edge_rays": 0,
+     "sun_pct": 51.28,
+     "earth_pct": 43.69,
+     "both_pct": 21.59,
+     "longest_night_h": 595.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.44929,
+     "lon_e": 222.723354,
+     "ground_m": 1953.5,
+     "edge_rays": 0,
+     "sun_pct": 40.1,
+     "earth_pct": 40.79,
+     "both_pct": 13.0,
+     "longest_night_h": 618.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.448954,
+     "lon_e": 222.780407,
+     "ground_m": 1955.3,
+     "edge_rays": 0,
+     "sun_pct": 71.66,
+     "earth_pct": 52.3,
+     "both_pct": 37.87,
+     "longest_night_h": 264.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.448852,
+     "lon_e": 222.846461,
+     "ground_m": 1956.2,
+     "edge_rays": 0,
+     "sun_pct": 80.02,
+     "earth_pct": 58.56,
+     "both_pct": 46.55,
+     "longest_night_h": 224.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.449001,
+     "lon_e": 222.911539,
+     "ground_m": 1954.7,
+     "edge_rays": 0,
+     "sun_pct": 66.6,
+     "earth_pct": 58.56,
+     "both_pct": 37.21,
+     "longest_night_h": 499.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.449378,
+     "lon_e": 222.96581,
+     "ground_m": 1954.2,
+     "edge_rays": 0,
+     "sun_pct": 58.38,
+     "earth_pct": 58.56,
+     "both_pct": 31.86,
+     "longest_night_h": 494.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.449925,
+     "lon_e": 223.001038,
+     "ground_m": 1954.5,
+     "edge_rays": 0,
+     "sun_pct": 62.91,
+     "earth_pct": 58.56,
+     "both_pct": 34.69,
+     "longest_night_h": 441.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.45056,
+     "lon_e": 223.011824,
+     "ground_m": 1954.4,
+     "edge_rays": 0,
+     "sun_pct": 62.55,
+     "earth_pct": 58.56,
+     "both_pct": 34.21,
+     "longest_night_h": 438.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.451186,
+     "lon_e": 222.996443,
+     "ground_m": 1955.2,
+     "edge_rays": 0,
+     "sun_pct": 70.67,
+     "earth_pct": 58.56,
+     "both_pct": 38.65,
+     "longest_night_h": 432.0
+    }
+   ],
+   "secs": 40
+  },
+  {
+   "id": "B",
+   "name": "Shackleton rim (S)",
+   "lat": -89.7849,
+   "lon_e": 203.97,
+   "centre": {
+    "r_m": 0.0,
+    "lat": -89.7849,
+    "lon_e": 203.97,
+    "ground_m": 1737.3,
+    "edge_rays": 0,
+    "sun_pct": 83.42,
+    "earth_pct": 56.97,
+    "both_pct": 47.16,
+    "longest_night_h": 216.0
+   },
+   "range_50m": {
+    "sun_pct": {
+     "min": 44.76,
+     "median": 77.6,
+     "max": 83.42
+    },
+    "earth_pct": {
+     "min": 44.84,
+     "median": 56.96,
+     "max": 56.98
+    },
+    "both_pct": {
+     "min": 21.34,
+     "median": 42.53,
+     "max": 47.16
+    },
+    "longest_night_h": {
+     "min": 189.0,
+     "median": 280.0,
+     "max": 656.0
+    }
+   },
+   "best_lit": {
+    "r_m": 0.0,
+    "lat": -89.7849,
+    "lon_e": 203.97,
+    "ground_m": 1737.3,
+    "edge_rays": 0,
+    "sun_pct": 83.42,
+    "earth_pct": 56.97,
+    "both_pct": 47.16,
+    "longest_night_h": 216.0
+   },
+   "points": [
+    {
+     "r_m": 0.0,
+     "lat": -89.7849,
+     "lon_e": 203.97,
+     "ground_m": 1737.3,
+     "edge_rays": 0,
+     "sun_pct": 83.42,
+     "earth_pct": 56.97,
+     "both_pct": 47.16,
+     "longest_night_h": 216.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.785653,
+     "lon_e": 204.05953,
+     "ground_m": 1735.9,
+     "edge_rays": 0,
+     "sun_pct": 82.06,
+     "earth_pct": 56.97,
+     "both_pct": 45.93,
+     "longest_night_h": 189.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.785669,
+     "lon_e": 203.89091,
+     "ground_m": 1736.0,
+     "edge_rays": 0,
+     "sun_pct": 81.97,
+     "earth_pct": 56.96,
+     "both_pct": 46.0,
+     "longest_night_h": 212.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.785234,
+     "lon_e": 203.769021,
+     "ground_m": 1735.0,
+     "edge_rays": 0,
+     "sun_pct": 76.5,
+     "earth_pct": 56.96,
+     "both_pct": 43.54,
+     "longest_night_h": 283.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.784603,
+     "lon_e": 203.765304,
+     "ground_m": 1736.0,
+     "edge_rays": 0,
+     "sun_pct": 81.29,
+     "earth_pct": 56.97,
+     "both_pct": 45.73,
+     "longest_night_h": 219.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.784146,
+     "lon_e": 203.881095,
+     "ground_m": 1737.1,
+     "edge_rays": 0,
+     "sun_pct": 83.3,
+     "earth_pct": 56.96,
+     "both_pct": 47.08,
+     "longest_night_h": 214.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.78413,
+     "lon_e": 204.048526,
+     "ground_m": 1736.2,
+     "edge_rays": 0,
+     "sun_pct": 81.06,
+     "earth_pct": 56.97,
+     "both_pct": 45.24,
+     "longest_night_h": 244.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.784564,
+     "lon_e": 204.170354,
+     "ground_m": 1735.8,
+     "edge_rays": 0,
+     "sun_pct": 79.82,
+     "earth_pct": 56.98,
+     "both_pct": 44.08,
+     "longest_night_h": 246.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -89.785194,
+     "lon_e": 204.17526,
+     "ground_m": 1736.2,
+     "edge_rays": 0,
+     "sun_pct": 82.15,
+     "earth_pct": 56.98,
+     "both_pct": 45.84,
+     "longest_night_h": 197.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.786406,
+     "lon_e": 204.149692,
+     "ground_m": 1734.7,
+     "edge_rays": 0,
+     "sun_pct": 77.51,
+     "earth_pct": 56.97,
+     "both_pct": 41.72,
+     "longest_night_h": 236.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.786548,
+     "lon_e": 203.981354,
+     "ground_m": 1734.4,
+     "edge_rays": 0,
+     "sun_pct": 78.98,
+     "earth_pct": 56.96,
+     "both_pct": 44.15,
+     "longest_night_h": 220.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.786438,
+     "lon_e": 203.81125,
+     "ground_m": 1732.6,
+     "edge_rays": 0,
+     "sun_pct": 62.75,
+     "earth_pct": 56.95,
+     "both_pct": 38.43,
+     "longest_night_h": 332.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.786092,
+     "lon_e": 203.665812,
+     "ground_m": 1729.8,
+     "edge_rays": 0,
+     "sun_pct": 49.44,
+     "earth_pct": 56.27,
+     "both_pct": 29.94,
+     "longest_night_h": 378.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.785565,
+     "lon_e": 203.567419,
+     "ground_m": 1727.6,
+     "edge_rays": 0,
+     "sun_pct": 47.11,
+     "earth_pct": 54.26,
+     "both_pct": 27.23,
+     "longest_night_h": 378.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.784936,
+     "lon_e": 203.530854,
+     "ground_m": 1727.4,
+     "edge_rays": 0,
+     "sun_pct": 45.94,
+     "earth_pct": 49.43,
+     "both_pct": 24.28,
+     "longest_night_h": 379.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.784303,
+     "lon_e": 203.561174,
+     "ground_m": 1729.5,
+     "edge_rays": 0,
+     "sun_pct": 44.76,
+     "earth_pct": 44.84,
+     "both_pct": 21.34,
+     "longest_night_h": 388.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.783761,
+     "lon_e": 203.653241,
+     "ground_m": 1733.6,
+     "edge_rays": 0,
+     "sun_pct": 50.45,
+     "earth_pct": 49.06,
+     "both_pct": 24.18,
+     "longest_night_h": 387.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.783392,
+     "lon_e": 203.792808,
+     "ground_m": 1736.3,
+     "edge_rays": 0,
+     "sun_pct": 81.16,
+     "earth_pct": 56.93,
+     "both_pct": 45.98,
+     "longest_night_h": 262.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.783252,
+     "lon_e": 203.958818,
+     "ground_m": 1736.2,
+     "edge_rays": 0,
+     "sun_pct": 79.92,
+     "earth_pct": 56.97,
+     "both_pct": 45.16,
+     "longest_night_h": 290.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.78336,
+     "lon_e": 204.126494,
+     "ground_m": 1734.9,
+     "edge_rays": 0,
+     "sun_pct": 61.19,
+     "earth_pct": 56.88,
+     "both_pct": 33.32,
+     "longest_night_h": 656.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.783702,
+     "lon_e": 204.270826,
+     "ground_m": 1734.4,
+     "edge_rays": 0,
+     "sun_pct": 54.11,
+     "earth_pct": 56.94,
+     "both_pct": 29.28,
+     "longest_night_h": 640.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.784225,
+     "lon_e": 204.370081,
+     "ground_m": 1734.2,
+     "edge_rays": 0,
+     "sun_pct": 55.5,
+     "earth_pct": 56.98,
+     "both_pct": 29.67,
+     "longest_night_h": 621.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.784851,
+     "lon_e": 204.408973,
+     "ground_m": 1734.8,
+     "edge_rays": 0,
+     "sun_pct": 68.72,
+     "earth_pct": 56.97,
+     "both_pct": 35.83,
+     "longest_night_h": 397.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.785486,
+     "lon_e": 204.381081,
+     "ground_m": 1735.6,
+     "edge_rays": 0,
+     "sun_pct": 77.6,
+     "earth_pct": 56.97,
+     "both_pct": 41.5,
+     "longest_night_h": 280.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -89.786032,
+     "lon_e": 204.290122,
+     "ground_m": 1735.5,
+     "edge_rays": 0,
+     "sun_pct": 78.8,
+     "earth_pct": 56.97,
+     "both_pct": 42.53,
+     "longest_night_h": 221.0
+    }
+   ],
+   "secs": 39
+  },
+  {
+   "id": "C",
+   "name": "de Gerlache rim (GR1)",
+   "lat": -88.6952,
+   "lon_e": 291.7154,
+   "centre": {
+    "r_m": 0.0,
+    "lat": -88.6952,
+    "lon_e": 291.7154,
+    "ground_m": 1778.7,
+    "edge_rays": 0,
+    "sun_pct": 47.28,
+    "earth_pct": 56.81,
+    "both_pct": 28.61,
+    "longest_night_h": 651.0
+   },
+   "range_50m": {
+    "sun_pct": {
+     "min": 36.42,
+     "median": 47.59,
+     "max": 63.16
+    },
+    "earth_pct": {
+     "min": 50.79,
+     "median": 57.02,
+     "max": 60.67
+    },
+    "both_pct": {
+     "min": 19.06,
+     "median": 28.61,
+     "max": 40.37
+    },
+    "longest_night_h": {
+     "min": 319.0,
+     "median": 598.0,
+     "max": 2102.0
+    }
+   },
+   "best_lit": {
+    "r_m": 50.0,
+    "lat": -88.696349,
+    "lon_e": 291.663462,
+    "ground_m": 1780.5,
+    "edge_rays": 0,
+    "sun_pct": 63.16,
+    "earth_pct": 59.49,
+    "both_pct": 40.37,
+    "longest_night_h": 558.0
+   },
+   "points": [
+    {
+     "r_m": 0.0,
+     "lat": -88.6952,
+     "lon_e": 291.7154,
+     "ground_m": 1778.7,
+     "edge_rays": 0,
+     "sun_pct": 47.28,
+     "earth_pct": 56.81,
+     "both_pct": 28.61,
+     "longest_night_h": 651.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.694895,
+     "lon_e": 291.749024,
+     "ground_m": 1778.2,
+     "edge_rays": 0,
+     "sun_pct": 43.33,
+     "earth_pct": 56.32,
+     "both_pct": 26.01,
+     "longest_night_h": 674.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.695526,
+     "lon_e": 291.748661,
+     "ground_m": 1777.7,
+     "edge_rays": 0,
+     "sun_pct": 40.0,
+     "earth_pct": 57.02,
+     "both_pct": 25.08,
+     "longest_night_h": 697.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.695966,
+     "lon_e": 291.728802,
+     "ground_m": 1777.8,
+     "edge_rays": 0,
+     "sun_pct": 39.1,
+     "earth_pct": 57.59,
+     "both_pct": 25.17,
+     "longest_night_h": 2102.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.695957,
+     "lon_e": 291.701081,
+     "ground_m": 1779.3,
+     "edge_rays": 0,
+     "sun_pct": 54.09,
+     "earth_pct": 58.61,
+     "both_pct": 33.52,
+     "longest_night_h": 643.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.695505,
+     "lon_e": 291.68176,
+     "ground_m": 1779.7,
+     "edge_rays": 0,
+     "sun_pct": 58.31,
+     "earth_pct": 57.77,
+     "both_pct": 36.51,
+     "longest_night_h": 584.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.694874,
+     "lon_e": 291.682156,
+     "ground_m": 1779.3,
+     "edge_rays": 0,
+     "sun_pct": 54.48,
+     "earth_pct": 56.2,
+     "both_pct": 33.39,
+     "longest_night_h": 592.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.694434,
+     "lon_e": 291.702014,
+     "ground_m": 1778.5,
+     "edge_rays": 0,
+     "sun_pct": 46.15,
+     "earth_pct": 54.75,
+     "both_pct": 27.45,
+     "longest_night_h": 622.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.694443,
+     "lon_e": 291.729702,
+     "ground_m": 1778.1,
+     "edge_rays": 0,
+     "sun_pct": 42.34,
+     "earth_pct": 54.85,
+     "both_pct": 24.86,
+     "longest_night_h": 664.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.694589,
+     "lon_e": 291.782633,
+     "ground_m": 1779.3,
+     "edge_rays": 0,
+     "sun_pct": 51.25,
+     "earth_pct": 57.77,
+     "both_pct": 30.41,
+     "longest_night_h": 357.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.695222,
+     "lon_e": 291.787797,
+     "ground_m": 1779.0,
+     "edge_rays": 0,
+     "sun_pct": 52.02,
+     "earth_pct": 59.08,
+     "both_pct": 31.23,
+     "longest_night_h": 369.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.695851,
+     "lon_e": 291.781939,
+     "ground_m": 1778.2,
+     "edge_rays": 0,
+     "sun_pct": 47.59,
+     "earth_pct": 59.27,
+     "both_pct": 29.08,
+     "longest_night_h": 395.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.696381,
+     "lon_e": 291.765936,
+     "ground_m": 1777.8,
+     "edge_rays": 0,
+     "sun_pct": 43.37,
+     "earth_pct": 59.63,
+     "both_pct": 27.77,
+     "longest_night_h": 1867.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.696732,
+     "lon_e": 291.74222,
+     "ground_m": 1778.2,
+     "edge_rays": 0,
+     "sun_pct": 43.79,
+     "earth_pct": 60.03,
+     "both_pct": 28.16,
+     "longest_night_h": 1351.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.696849,
+     "lon_e": 291.714407,
+     "ground_m": 1779.1,
+     "edge_rays": 0,
+     "sun_pct": 51.1,
+     "earth_pct": 60.56,
+     "both_pct": 31.03,
+     "longest_night_h": 418.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.696714,
+     "lon_e": 291.686746,
+     "ground_m": 1780.3,
+     "edge_rays": 0,
+     "sun_pct": 62.91,
+     "earth_pct": 60.67,
+     "both_pct": 40.1,
+     "longest_night_h": 319.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.696349,
+     "lon_e": 291.663462,
+     "ground_m": 1780.5,
+     "edge_rays": 0,
+     "sun_pct": 63.16,
+     "earth_pct": 59.49,
+     "both_pct": 40.37,
+     "longest_night_h": 558.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.695809,
+     "lon_e": 291.648104,
+     "ground_m": 1780.3,
+     "edge_rays": 0,
+     "sun_pct": 61.42,
+     "earth_pct": 58.11,
+     "both_pct": 38.9,
+     "longest_night_h": 555.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.695176,
+     "lon_e": 291.643006,
+     "ground_m": 1780.1,
+     "edge_rays": 0,
+     "sun_pct": 59.32,
+     "earth_pct": 56.71,
+     "both_pct": 36.96,
+     "longest_night_h": 553.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.694547,
+     "lon_e": 291.648928,
+     "ground_m": 1779.1,
+     "edge_rays": 0,
+     "sun_pct": 52.74,
+     "earth_pct": 54.69,
+     "both_pct": 31.82,
+     "longest_night_h": 578.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.694018,
+     "lon_e": 291.664955,
+     "ground_m": 1778.3,
+     "edge_rays": 0,
+     "sun_pct": 45.77,
+     "earth_pct": 52.71,
+     "both_pct": 26.11,
+     "longest_night_h": 598.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.693668,
+     "lon_e": 291.688643,
+     "ground_m": 1777.8,
+     "edge_rays": 0,
+     "sun_pct": 39.02,
+     "earth_pct": 51.22,
+     "both_pct": 20.94,
+     "longest_night_h": 644.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.693551,
+     "lon_e": 291.71639,
+     "ground_m": 1777.7,
+     "edge_rays": 0,
+     "sun_pct": 36.42,
+     "earth_pct": 50.79,
+     "both_pct": 19.06,
+     "longest_night_h": 655.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.693685,
+     "lon_e": 291.743987,
+     "ground_m": 1778.2,
+     "edge_rays": 0,
+     "sun_pct": 40.3,
+     "earth_pct": 52.56,
+     "both_pct": 22.04,
+     "longest_night_h": 659.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.69405,
+     "lon_e": 291.767247,
+     "ground_m": 1779.0,
+     "edge_rays": 0,
+     "sun_pct": 48.18,
+     "earth_pct": 55.68,
+     "both_pct": 27.68,
+     "longest_night_h": 347.0
+    }
+   ],
+   "secs": 38
+  },
+  {
+   "id": "D",
+   "name": "Malapert massif (MP1)",
+   "lat": -85.9756,
+   "lon_e": 357.8876,
+   "centre": {
+    "r_m": 0.0,
+    "lat": -85.9756,
+    "lon_e": 357.8876,
+    "ground_m": 4970.1,
+    "edge_rays": 7,
+    "sun_pct": 71.97,
+    "earth_pct": 64.51,
+    "both_pct": 43.78,
+    "longest_night_h": 349.0
+   },
+   "range_50m": {
+    "sun_pct": {
+     "min": 50.16,
+     "median": 71.44,
+     "max": 76.16
+    },
+    "earth_pct": {
+     "min": 54.68,
+     "median": 62.89,
+     "max": 73.81
+    },
+    "both_pct": {
+     "min": 28.18,
+     "median": 41.0,
+     "max": 53.17
+    },
+    "longest_night_h": {
+     "min": 284.0,
+     "median": 349.0,
+     "max": 627.0
+    }
+   },
+   "best_lit": {
+    "r_m": 50.0,
+    "lat": -85.97566,
+    "lon_e": 357.91105,
+    "ground_m": 4971.4,
+    "edge_rays": 7,
+    "sun_pct": 76.16,
+    "earth_pct": 71.27,
+    "both_pct": 51.42,
+    "longest_night_h": 285.0
+   },
+   "points": [
+    {
+     "r_m": 0.0,
+     "lat": -85.9756,
+     "lon_e": 357.8876,
+     "ground_m": 4970.1,
+     "edge_rays": 7,
+     "sun_pct": 71.97,
+     "earth_pct": 64.51,
+     "both_pct": 43.78,
+     "longest_night_h": 349.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.974777,
+     "lon_e": 357.888032,
+     "ground_m": 4971.8,
+     "edge_rays": 7,
+     "sun_pct": 73.66,
+     "earth_pct": 66.64,
+     "both_pct": 45.89,
+     "longest_night_h": 284.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.97504,
+     "lon_e": 357.896195,
+     "ground_m": 4972.5,
+     "edge_rays": 7,
+     "sun_pct": 75.94,
+     "earth_pct": 70.87,
+     "both_pct": 50.96,
+     "longest_night_h": 284.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.97563,
+     "lon_e": 357.899325,
+     "ground_m": 4971.6,
+     "edge_rays": 7,
+     "sun_pct": 76.04,
+     "earth_pct": 69.89,
+     "both_pct": 50.22,
+     "longest_night_h": 285.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.976203,
+     "lon_e": 357.895586,
+     "ground_m": 4969.2,
+     "edge_rays": 7,
+     "sun_pct": 72.91,
+     "earth_pct": 63.3,
+     "both_pct": 43.58,
+     "longest_night_h": 360.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.976423,
+     "lon_e": 357.887167,
+     "ground_m": 4967.4,
+     "edge_rays": 7,
+     "sun_pct": 57.69,
+     "earth_pct": 58.14,
+     "both_pct": 33.97,
+     "longest_night_h": 620.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.97616,
+     "lon_e": 357.879002,
+     "ground_m": 4967.3,
+     "edge_rays": 7,
+     "sun_pct": 56.03,
+     "earth_pct": 58.03,
+     "both_pct": 33.3,
+     "longest_night_h": 621.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.97557,
+     "lon_e": 357.875875,
+     "ground_m": 4968.9,
+     "edge_rays": 7,
+     "sun_pct": 61.01,
+     "earth_pct": 60.2,
+     "both_pct": 36.64,
+     "longest_night_h": 624.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.974997,
+     "lon_e": 357.879616,
+     "ground_m": 4970.7,
+     "edge_rays": 7,
+     "sun_pct": 68.94,
+     "earth_pct": 62.89,
+     "both_pct": 41.0,
+     "longest_night_h": 356.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.973954,
+     "lon_e": 357.888465,
+     "ground_m": 4973.4,
+     "edge_rays": 7,
+     "sun_pct": 73.43,
+     "earth_pct": 69.72,
+     "both_pct": 47.8,
+     "longest_night_h": 284.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.974103,
+     "lon_e": 357.897369,
+     "ground_m": 4973.5,
+     "edge_rays": 7,
+     "sun_pct": 74.74,
+     "earth_pct": 73.36,
+     "both_pct": 51.92,
+     "longest_night_h": 284.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.974479,
+     "lon_e": 357.904788,
+     "ground_m": 4972.9,
+     "edge_rays": 7,
+     "sun_pct": 75.58,
+     "earth_pct": 73.81,
+     "both_pct": 53.17,
+     "longest_night_h": 284.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.975026,
+     "lon_e": 357.909593,
+     "ground_m": 4972.2,
+     "edge_rays": 7,
+     "sun_pct": 75.96,
+     "earth_pct": 72.57,
+     "both_pct": 52.36,
+     "longest_night_h": 285.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.97566,
+     "lon_e": 357.91105,
+     "ground_m": 4971.4,
+     "edge_rays": 7,
+     "sun_pct": 76.16,
+     "earth_pct": 71.27,
+     "both_pct": 51.42,
+     "longest_night_h": 285.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.976286,
+     "lon_e": 357.908937,
+     "ground_m": 4970.0,
+     "edge_rays": 7,
+     "sun_pct": 75.81,
+     "earth_pct": 68.44,
+     "both_pct": 48.9,
+     "longest_night_h": 285.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.976806,
+     "lon_e": 357.903575,
+     "ground_m": 4968.1,
+     "edge_rays": 7,
+     "sun_pct": 72.05,
+     "earth_pct": 59.7,
+     "both_pct": 41.0,
+     "longest_night_h": 305.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.977144,
+     "lon_e": 357.895778,
+     "ground_m": 4966.5,
+     "edge_rays": 7,
+     "sun_pct": 61.54,
+     "earth_pct": 55.42,
+     "both_pct": 34.81,
+     "longest_night_h": 615.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.977246,
+     "lon_e": 357.886735,
+     "ground_m": 4965.3,
+     "edge_rays": 7,
+     "sun_pct": 56.49,
+     "earth_pct": 54.68,
+     "both_pct": 31.47,
+     "longest_night_h": 616.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.977097,
+     "lon_e": 357.877823,
+     "ground_m": 4964.9,
+     "edge_rays": 7,
+     "sun_pct": 53.84,
+     "earth_pct": 55.77,
+     "both_pct": 30.57,
+     "longest_night_h": 617.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.976721,
+     "lon_e": 357.870402,
+     "ground_m": 4965.3,
+     "edge_rays": 7,
+     "sun_pct": 52.84,
+     "earth_pct": 55.71,
+     "both_pct": 29.99,
+     "longest_night_h": 619.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.976173,
+     "lon_e": 357.865601,
+     "ground_m": 4966.0,
+     "edge_rays": 7,
+     "sun_pct": 50.16,
+     "earth_pct": 55.01,
+     "both_pct": 28.18,
+     "longest_night_h": 623.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.975539,
+     "lon_e": 357.86415,
+     "ground_m": 4967.8,
+     "edge_rays": 7,
+     "sun_pct": 54.07,
+     "earth_pct": 56.92,
+     "both_pct": 31.57,
+     "longest_night_h": 626.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.974914,
+     "lon_e": 357.86627,
+     "ground_m": 4970.0,
+     "edge_rays": 7,
+     "sun_pct": 61.73,
+     "earth_pct": 59.86,
+     "both_pct": 36.66,
+     "longest_night_h": 627.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.974393,
+     "lon_e": 357.871635,
+     "ground_m": 4971.5,
+     "edge_rays": 7,
+     "sun_pct": 68.85,
+     "earth_pct": 62.58,
+     "both_pct": 40.49,
+     "longest_night_h": 313.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.974056,
+     "lon_e": 357.879428,
+     "ground_m": 4972.7,
+     "edge_rays": 7,
+     "sun_pct": 71.44,
+     "earth_pct": 65.48,
+     "both_pct": 43.57,
+     "longest_night_h": 284.0
+    }
+   ],
+   "secs": 38
+  },
+  {
+   "id": "E",
+   "name": "Leibnitz beta plateau (Site20v2)",
+   "lat": -85.480995,
+   "lon_e": 29.566051,
+   "centre": {
+    "r_m": 0.0,
+    "lat": -85.480995,
+    "lon_e": 29.566051,
+    "ground_m": 6184.1,
+    "edge_rays": 0,
+    "sun_pct": 73.76,
+    "earth_pct": 76.47,
+    "both_pct": 53.31,
+    "longest_night_h": 274.0
+   },
+   "range_50m": {
+    "sun_pct": {
+     "min": 55.33,
+     "median": 71.52,
+     "max": 75.32
+    },
+    "earth_pct": {
+     "min": 64.25,
+     "median": 73.16,
+     "max": 84.8
+    },
+    "both_pct": {
+     "min": 36.56,
+     "median": 49.73,
+     "max": 57.59
+    },
+    "longest_night_h": {
+     "min": 252.0,
+     "median": 342.0,
+     "max": 455.0
+    }
+   },
+   "best_lit": {
+    "r_m": 50.0,
+    "lat": -85.481807,
+    "lon_e": 29.547873,
+    "ground_m": 6182.8,
+    "edge_rays": 0,
+    "sun_pct": 75.32,
+    "earth_pct": 76.5,
+    "both_pct": 54.44,
+    "longest_night_h": 252.0
+   },
+   "points": [
+    {
+     "r_m": 0.0,
+     "lat": -85.480995,
+     "lon_e": 29.566051,
+     "ground_m": 6184.1,
+     "edge_rays": 0,
+     "sun_pct": 73.76,
+     "earth_pct": 76.47,
+     "both_pct": 53.31,
+     "longest_night_h": 274.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.480279,
+     "lon_e": 29.560897,
+     "ground_m": 6184.5,
+     "edge_rays": 0,
+     "sun_pct": 70.91,
+     "earth_pct": 78.26,
+     "both_pct": 52.24,
+     "longest_night_h": 408.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.480202,
+     "lon_e": 29.568831,
+     "ground_m": 6184.4,
+     "edge_rays": 0,
+     "sun_pct": 69.47,
+     "earth_pct": 75.86,
+     "both_pct": 49.45,
+     "longest_night_h": 428.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.480589,
+     "lon_e": 29.575137,
+     "ground_m": 6184.4,
+     "edge_rays": 0,
+     "sun_pct": 72.64,
+     "earth_pct": 74.78,
+     "both_pct": 51.15,
+     "longest_night_h": 284.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.481214,
+     "lon_e": 29.576122,
+     "ground_m": 6183.4,
+     "edge_rays": 0,
+     "sun_pct": 72.58,
+     "earth_pct": 73.16,
+     "both_pct": 49.8,
+     "longest_night_h": 292.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.481711,
+     "lon_e": 29.571207,
+     "ground_m": 6182.7,
+     "edge_rays": 0,
+     "sun_pct": 73.15,
+     "earth_pct": 72.22,
+     "both_pct": 49.37,
+     "longest_night_h": 293.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.481788,
+     "lon_e": 29.56327,
+     "ground_m": 6182.9,
+     "edge_rays": 0,
+     "sun_pct": 74.34,
+     "earth_pct": 72.75,
+     "both_pct": 50.54,
+     "longest_night_h": 275.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.481401,
+     "lon_e": 29.556963,
+     "ground_m": 6183.6,
+     "edge_rays": 0,
+     "sun_pct": 74.71,
+     "earth_pct": 76.67,
+     "both_pct": 54.09,
+     "longest_night_h": 264.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.480776,
+     "lon_e": 29.555981,
+     "ground_m": 6184.4,
+     "edge_rays": 0,
+     "sun_pct": 74.26,
+     "earth_pct": 80.0,
+     "both_pct": 56.61,
+     "longest_night_h": 399.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.479563,
+     "lon_e": 29.555744,
+     "ground_m": 6185.0,
+     "edge_rays": 0,
+     "sun_pct": 65.3,
+     "earth_pct": 81.1,
+     "both_pct": 50.05,
+     "longest_night_h": 403.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.479361,
+     "lon_e": 29.563482,
+     "ground_m": 6184.7,
+     "edge_rays": 0,
+     "sun_pct": 59.07,
+     "earth_pct": 77.49,
+     "both_pct": 43.48,
+     "longest_night_h": 426.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.479408,
+     "lon_e": 29.57161,
+     "ground_m": 6184.4,
+     "edge_rays": 0,
+     "sun_pct": 55.33,
+     "earth_pct": 72.34,
+     "both_pct": 38.09,
+     "longest_night_h": 443.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.479696,
+     "lon_e": 29.578893,
+     "ground_m": 6184.0,
+     "edge_rays": 0,
+     "sun_pct": 56.94,
+     "earth_pct": 68.94,
+     "both_pct": 36.56,
+     "longest_night_h": 455.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.480182,
+     "lon_e": 29.584222,
+     "ground_m": 6183.9,
+     "edge_rays": 0,
+     "sun_pct": 66.88,
+     "earth_pct": 69.35,
+     "both_pct": 43.54,
+     "longest_night_h": 320.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.480792,
+     "lon_e": 29.586787,
+     "ground_m": 6183.5,
+     "edge_rays": 0,
+     "sun_pct": 69.62,
+     "earth_pct": 69.4,
+     "both_pct": 45.37,
+     "longest_night_h": 327.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.481433,
+     "lon_e": 29.586195,
+     "ground_m": 6182.8,
+     "edge_rays": 0,
+     "sun_pct": 70.99,
+     "earth_pct": 69.75,
+     "both_pct": 46.31,
+     "longest_night_h": 326.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.482007,
+     "lon_e": 29.582535,
+     "ground_m": 6181.5,
+     "edge_rays": 0,
+     "sun_pct": 70.15,
+     "earth_pct": 68.58,
+     "both_pct": 45.14,
+     "longest_night_h": 351.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.482427,
+     "lon_e": 29.576365,
+     "ground_m": 6180.5,
+     "edge_rays": 0,
+     "sun_pct": 69.16,
+     "earth_pct": 64.8,
+     "both_pct": 42.08,
+     "longest_night_h": 374.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.482629,
+     "lon_e": 29.568622,
+     "ground_m": 6180.3,
+     "edge_rays": 0,
+     "sun_pct": 71.52,
+     "earth_pct": 64.25,
+     "both_pct": 42.56,
+     "longest_night_h": 342.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.482582,
+     "lon_e": 29.560488,
+     "ground_m": 6180.9,
+     "edge_rays": 0,
+     "sun_pct": 73.95,
+     "earth_pct": 67.32,
+     "both_pct": 45.93,
+     "longest_night_h": 287.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.482293,
+     "lon_e": 29.553202,
+     "ground_m": 6181.9,
+     "edge_rays": 0,
+     "sun_pct": 75.07,
+     "earth_pct": 71.31,
+     "both_pct": 49.73,
+     "longest_night_h": 265.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.481807,
+     "lon_e": 29.547873,
+     "ground_m": 6182.8,
+     "edge_rays": 0,
+     "sun_pct": 75.32,
+     "earth_pct": 76.5,
+     "both_pct": 54.44,
+     "longest_night_h": 252.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.481197,
+     "lon_e": 29.545314,
+     "ground_m": 6183.0,
+     "edge_rays": 0,
+     "sun_pct": 72.82,
+     "earth_pct": 77.3,
+     "both_pct": 52.84,
+     "longest_night_h": 399.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.480557,
+     "lon_e": 29.545911,
+     "ground_m": 6184.2,
+     "edge_rays": 0,
+     "sun_pct": 71.83,
+     "earth_pct": 83.58,
+     "both_pct": 57.32,
+     "longest_night_h": 390.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.479983,
+     "lon_e": 29.549574,
+     "ground_m": 6185.2,
+     "edge_rays": 9,
+     "sun_pct": 70.94,
+     "earth_pct": 84.8,
+     "both_pct": 57.59,
+     "longest_night_h": 389.0
+    }
+   ],
+   "secs": 37
+  },
+  {
+   "id": "F",
+   "name": "de Gerlache rim 2 (SL2)",
+   "lat": -88.394084,
+   "lon_e": 291.375386,
+   "centre": {
+    "r_m": 0.0,
+    "lat": -88.394084,
+    "lon_e": 291.375386,
+    "ground_m": 1515.1,
+    "edge_rays": 0,
+    "sun_pct": 71.24,
+    "earth_pct": 62.08,
+    "both_pct": 44.88,
+    "longest_night_h": 332.0
+   },
+   "range_50m": {
+    "sun_pct": {
+     "min": 54.23,
+     "median": 64.42,
+     "max": 71.46
+    },
+    "earth_pct": {
+     "min": 58.31,
+     "median": 62.07,
+     "max": 62.08
+    },
+    "both_pct": {
+     "min": 31.51,
+     "median": 39.07,
+     "max": 44.95
+    },
+    "longest_night_h": {
+     "min": 332.0,
+     "median": 391.0,
+     "max": 648.0
+    }
+   },
+   "best_lit": {
+    "r_m": 25.0,
+    "lat": -88.393316,
+    "lon_e": 291.364671,
+    "ground_m": 1515.7,
+    "edge_rays": 6,
+    "sun_pct": 71.46,
+    "earth_pct": 62.08,
+    "both_pct": 44.95,
+    "longest_night_h": 332.0
+   },
+   "points": [
+    {
+     "r_m": 0.0,
+     "lat": -88.394084,
+     "lon_e": 291.375386,
+     "ground_m": 1515.1,
+     "edge_rays": 0,
+     "sun_pct": 71.24,
+     "earth_pct": 62.08,
+     "both_pct": 44.88,
+     "longest_night_h": 332.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.393783,
+     "lon_e": 291.40277,
+     "ground_m": 1514.4,
+     "edge_rays": 1,
+     "sun_pct": 67.76,
+     "earth_pct": 62.08,
+     "both_pct": 41.18,
+     "longest_night_h": 375.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.394414,
+     "lon_e": 291.402339,
+     "ground_m": 1513.8,
+     "edge_rays": 0,
+     "sun_pct": 66.59,
+     "earth_pct": 62.07,
+     "both_pct": 40.11,
+     "longest_night_h": 393.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.394852,
+     "lon_e": 291.386111,
+     "ground_m": 1513.2,
+     "edge_rays": 0,
+     "sun_pct": 64.42,
+     "earth_pct": 62.07,
+     "both_pct": 38.85,
+     "longest_night_h": 391.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.394839,
+     "lon_e": 291.363594,
+     "ground_m": 1513.1,
+     "edge_rays": 0,
+     "sun_pct": 63.38,
+     "earth_pct": 61.93,
+     "both_pct": 39.07,
+     "longest_night_h": 357.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.394384,
+     "lon_e": 291.347991,
+     "ground_m": 1514.0,
+     "edge_rays": 0,
+     "sun_pct": 69.7,
+     "earth_pct": 62.02,
+     "both_pct": 43.41,
+     "longest_night_h": 332.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.393753,
+     "lon_e": 291.348444,
+     "ground_m": 1515.1,
+     "edge_rays": 0,
+     "sun_pct": 71.33,
+     "earth_pct": 62.08,
+     "both_pct": 44.85,
+     "longest_night_h": 332.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.393316,
+     "lon_e": 291.364671,
+     "ground_m": 1515.7,
+     "edge_rays": 6,
+     "sun_pct": 71.46,
+     "earth_pct": 62.08,
+     "both_pct": 44.95,
+     "longest_night_h": 332.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -88.393329,
+     "lon_e": 291.387167,
+     "ground_m": 1514.8,
+     "edge_rays": 0,
+     "sun_pct": 68.82,
+     "earth_pct": 62.08,
+     "both_pct": 42.26,
+     "longest_night_h": 343.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.393482,
+     "lon_e": 291.430144,
+     "ground_m": 1512.7,
+     "edge_rays": 6,
+     "sun_pct": 57.06,
+     "earth_pct": 62.07,
+     "both_pct": 32.2,
+     "longest_night_h": 524.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.394116,
+     "lon_e": 291.434201,
+     "ground_m": 1512.9,
+     "edge_rays": 4,
+     "sun_pct": 60.18,
+     "earth_pct": 62.07,
+     "both_pct": 34.42,
+     "longest_night_h": 525.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.394744,
+     "lon_e": 291.429303,
+     "ground_m": 1512.3,
+     "edge_rays": 0,
+     "sun_pct": 58.68,
+     "earth_pct": 62.06,
+     "both_pct": 33.61,
+     "longest_night_h": 541.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.395272,
+     "lon_e": 291.416188,
+     "ground_m": 1512.1,
+     "edge_rays": 0,
+     "sun_pct": 58.68,
+     "earth_pct": 62.07,
+     "both_pct": 33.96,
+     "longest_night_h": 553.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.395619,
+     "lon_e": 291.396847,
+     "ground_m": 1511.8,
+     "edge_rays": 0,
+     "sun_pct": 56.71,
+     "earth_pct": 62.06,
+     "both_pct": 33.53,
+     "longest_night_h": 603.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.395732,
+     "lon_e": 291.37423,
+     "ground_m": 1511.9,
+     "edge_rays": 0,
+     "sun_pct": 56.54,
+     "earth_pct": 61.57,
+     "both_pct": 34.2,
+     "longest_night_h": 648.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.395594,
+     "lon_e": 291.35179,
+     "ground_m": 1512.4,
+     "edge_rays": 0,
+     "sun_pct": 60.92,
+     "earth_pct": 61.32,
+     "both_pct": 38.54,
+     "longest_night_h": 332.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.395226,
+     "lon_e": 291.332952,
+     "ground_m": 1513.0,
+     "edge_rays": 0,
+     "sun_pct": 62.17,
+     "earth_pct": 60.49,
+     "both_pct": 39.26,
+     "longest_night_h": 332.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.394684,
+     "lon_e": 291.320587,
+     "ground_m": 1513.2,
+     "edge_rays": 0,
+     "sun_pct": 61.09,
+     "earth_pct": 58.31,
+     "both_pct": 38.04,
+     "longest_night_h": 600.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.394051,
+     "lon_e": 291.316573,
+     "ground_m": 1514.1,
+     "edge_rays": 0,
+     "sun_pct": 69.4,
+     "earth_pct": 59.94,
+     "both_pct": 43.02,
+     "longest_night_h": 395.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.393423,
+     "lon_e": 291.321513,
+     "ground_m": 1515.2,
+     "edge_rays": 0,
+     "sun_pct": 71.28,
+     "earth_pct": 62.08,
+     "both_pct": 44.8,
+     "longest_night_h": 332.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.392895,
+     "lon_e": 291.334645,
+     "ground_m": 1515.9,
+     "edge_rays": 4,
+     "sun_pct": 71.45,
+     "earth_pct": 62.08,
+     "both_pct": 44.91,
+     "longest_night_h": 332.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.392549,
+     "lon_e": 291.353966,
+     "ground_m": 1515.7,
+     "edge_rays": 9,
+     "sun_pct": 71.33,
+     "earth_pct": 62.08,
+     "both_pct": 44.95,
+     "longest_night_h": 332.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.392436,
+     "lon_e": 291.376539,
+     "ground_m": 1514.7,
+     "edge_rays": 6,
+     "sun_pct": 65.6,
+     "earth_pct": 62.08,
+     "both_pct": 38.97,
+     "longest_night_h": 467.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.392573,
+     "lon_e": 291.398938,
+     "ground_m": 1513.6,
+     "edge_rays": 4,
+     "sun_pct": 58.21,
+     "earth_pct": 62.08,
+     "both_pct": 33.21,
+     "longest_night_h": 496.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -88.392941,
+     "lon_e": 291.41776,
+     "ground_m": 1512.9,
+     "edge_rays": 5,
+     "sun_pct": 54.23,
+     "earth_pct": 62.08,
+     "both_pct": 31.51,
+     "longest_night_h": 519.0
+    }
+   ],
+   "secs": 23
+  },
+  {
+   "id": "G",
+   "name": "Nobile rim 1 (Site06)",
+   "lat": -85.275953,
+   "lon_e": 36.94585,
+   "centre": {
+    "r_m": 0.0,
+    "lat": -85.275953,
+    "lon_e": 36.94585,
+    "ground_m": 6778.2,
+    "edge_rays": 0,
+    "sun_pct": 68.28,
+    "earth_pct": 70.33,
+    "both_pct": 47.38,
+    "longest_night_h": 327.0
+   },
+   "range_50m": {
+    "sun_pct": {
+     "min": 52.36,
+     "median": 66.84,
+     "max": 68.28
+    },
+    "earth_pct": {
+     "min": 58.0,
+     "median": 69.95,
+     "max": 70.5
+    },
+    "both_pct": {
+     "min": 33.06,
+     "median": 46.12,
+     "max": 47.38
+    },
+    "longest_night_h": {
+     "min": 325.0,
+     "median": 338.0,
+     "max": 492.0
+    }
+   },
+   "best_lit": {
+    "r_m": 0.0,
+    "lat": -85.275953,
+    "lon_e": 36.94585,
+    "ground_m": 6778.2,
+    "edge_rays": 0,
+    "sun_pct": 68.28,
+    "earth_pct": 70.33,
+    "both_pct": 47.38,
+    "longest_night_h": 327.0
+   },
+   "points": [
+    {
+     "r_m": 0.0,
+     "lat": -85.275953,
+     "lon_e": 36.94585,
+     "ground_m": 6778.2,
+     "edge_rays": 0,
+     "sun_pct": 68.28,
+     "earth_pct": 70.33,
+     "both_pct": 47.38,
+     "longest_night_h": 327.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.275295,
+     "lon_e": 36.939844,
+     "ground_m": 6778.0,
+     "edge_rays": 0,
+     "sun_pct": 67.75,
+     "earth_pct": 70.24,
+     "both_pct": 46.74,
+     "longest_night_h": 333.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.275138,
+     "lon_e": 36.94725,
+     "ground_m": 6777.8,
+     "edge_rays": 0,
+     "sun_pct": 66.6,
+     "earth_pct": 69.98,
+     "both_pct": 45.98,
+     "longest_night_h": 349.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.275458,
+     "lon_e": 36.953836,
+     "ground_m": 6777.9,
+     "edge_rays": 0,
+     "sun_pct": 66.97,
+     "earth_pct": 69.95,
+     "both_pct": 46.34,
+     "longest_night_h": 351.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.276068,
+     "lon_e": 36.955745,
+     "ground_m": 6777.2,
+     "edge_rays": 0,
+     "sun_pct": 66.84,
+     "earth_pct": 69.92,
+     "both_pct": 46.32,
+     "longest_night_h": 352.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.276611,
+     "lon_e": 36.951858,
+     "ground_m": 6776.4,
+     "edge_rays": 0,
+     "sun_pct": 67.24,
+     "earth_pct": 69.94,
+     "both_pct": 46.56,
+     "longest_night_h": 335.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.276768,
+     "lon_e": 36.94445,
+     "ground_m": 6777.1,
+     "edge_rays": 0,
+     "sun_pct": 68.01,
+     "earth_pct": 70.32,
+     "both_pct": 47.25,
+     "longest_night_h": 325.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.276448,
+     "lon_e": 36.937862,
+     "ground_m": 6777.7,
+     "edge_rays": 0,
+     "sun_pct": 68.1,
+     "earth_pct": 70.49,
+     "both_pct": 47.33,
+     "longest_night_h": 329.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -85.275838,
+     "lon_e": 36.935955,
+     "ground_m": 6778.2,
+     "edge_rays": 0,
+     "sun_pct": 68.1,
+     "earth_pct": 70.5,
+     "both_pct": 47.23,
+     "longest_night_h": 332.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.274637,
+     "lon_e": 36.93384,
+     "ground_m": 6778.0,
+     "edge_rays": 0,
+     "sun_pct": 66.19,
+     "earth_pct": 70.12,
+     "both_pct": 45.25,
+     "longest_night_h": 337.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.274359,
+     "lon_e": 36.940866,
+     "ground_m": 6777.7,
+     "edge_rays": 0,
+     "sun_pct": 64.44,
+     "earth_pct": 69.82,
+     "both_pct": 44.12,
+     "longest_night_h": 338.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.274323,
+     "lon_e": 36.948649,
+     "ground_m": 6777.6,
+     "edge_rays": 0,
+     "sun_pct": 63.56,
+     "earth_pct": 69.61,
+     "both_pct": 43.54,
+     "longest_night_h": 344.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.274535,
+     "lon_e": 36.956008,
+     "ground_m": 6777.4,
+     "edge_rays": 0,
+     "sun_pct": 62.67,
+     "earth_pct": 69.46,
+     "both_pct": 43.08,
+     "longest_night_h": 359.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.274963,
+     "lon_e": 36.961821,
+     "ground_m": 6777.6,
+     "edge_rays": 0,
+     "sun_pct": 63.45,
+     "earth_pct": 69.53,
+     "both_pct": 43.89,
+     "longest_night_h": 363.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.275542,
+     "lon_e": 36.965204,
+     "ground_m": 6777.0,
+     "edge_rays": 0,
+     "sun_pct": 63.64,
+     "earth_pct": 69.49,
+     "both_pct": 44.43,
+     "longest_night_h": 373.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.276183,
+     "lon_e": 36.965641,
+     "ground_m": 6776.3,
+     "edge_rays": 0,
+     "sun_pct": 63.24,
+     "earth_pct": 69.48,
+     "both_pct": 44.4,
+     "longest_night_h": 384.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.27679,
+     "lon_e": 36.963065,
+     "ground_m": 6775.0,
+     "edge_rays": 0,
+     "sun_pct": 60.16,
+     "earth_pct": 67.84,
+     "both_pct": 42.01,
+     "longest_night_h": 420.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.277268,
+     "lon_e": 36.957867,
+     "ground_m": 6773.5,
+     "edge_rays": 0,
+     "sun_pct": 52.36,
+     "earth_pct": 58.0,
+     "both_pct": 33.06,
+     "longest_night_h": 492.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.277547,
+     "lon_e": 36.950838,
+     "ground_m": 6774.0,
+     "edge_rays": 0,
+     "sun_pct": 60.74,
+     "earth_pct": 60.78,
+     "both_pct": 38.18,
+     "longest_night_h": 469.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.277583,
+     "lon_e": 36.943049,
+     "ground_m": 6775.0,
+     "edge_rays": 0,
+     "sun_pct": 67.05,
+     "earth_pct": 69.92,
+     "both_pct": 46.32,
+     "longest_night_h": 330.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.27737,
+     "lon_e": 36.935686,
+     "ground_m": 6776.1,
+     "edge_rays": 0,
+     "sun_pct": 67.55,
+     "earth_pct": 70.42,
+     "both_pct": 46.97,
+     "longest_night_h": 329.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.276942,
+     "lon_e": 36.929873,
+     "ground_m": 6776.2,
+     "edge_rays": 1,
+     "sun_pct": 67.37,
+     "earth_pct": 70.45,
+     "both_pct": 46.73,
+     "longest_night_h": 336.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.276363,
+     "lon_e": 36.926493,
+     "ground_m": 6776.3,
+     "edge_rays": 0,
+     "sun_pct": 64.53,
+     "earth_pct": 70.37,
+     "both_pct": 43.78,
+     "longest_night_h": 362.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.275722,
+     "lon_e": 36.926061,
+     "ground_m": 6777.6,
+     "edge_rays": 2,
+     "sun_pct": 66.97,
+     "earth_pct": 70.5,
+     "both_pct": 46.12,
+     "longest_night_h": 337.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -85.275116,
+     "lon_e": 36.928641,
+     "ground_m": 6778.1,
+     "edge_rays": 0,
+     "sun_pct": 67.15,
+     "earth_pct": 70.39,
+     "both_pct": 46.12,
+     "longest_night_h": 336.0
+    }
+   ],
+   "secs": 19
+  },
+  {
+   "id": "H",
+   "name": "Haworth (Haworth box)",
+   "lat": -86.37249,
+   "lon_e": 336.685177,
+   "centre": {
+    "r_m": 0.0,
+    "lat": -86.37249,
+    "lon_e": 336.685177,
+    "ground_m": 2825.0,
+    "edge_rays": 32,
+    "sun_pct": 60.81,
+    "earth_pct": 52.56,
+    "both_pct": 31.27,
+    "longest_night_h": 463.0
+   },
+   "range_50m": {
+    "sun_pct": {
+     "min": 53.38,
+     "median": 59.43,
+     "max": 61.49
+    },
+    "earth_pct": {
+     "min": 48.2,
+     "median": 52.16,
+     "max": 56.08
+    },
+    "both_pct": {
+     "min": 26.33,
+     "median": 30.04,
+     "max": 32.9
+    },
+    "longest_night_h": {
+     "min": 442.0,
+     "median": 472.0,
+     "max": 565.0
+    }
+   },
+   "best_lit": {
+    "r_m": 50.0,
+    "lat": -86.370843,
+    "lon_e": 336.685547,
+    "ground_m": 2828.2,
+    "edge_rays": 47,
+    "sun_pct": 61.49,
+    "earth_pct": 55.55,
+    "both_pct": 32.9,
+    "longest_night_h": 455.0
+   },
+   "points": [
+    {
+     "r_m": 0.0,
+     "lat": -86.37249,
+     "lon_e": 336.685177,
+     "ground_m": 2825.0,
+     "edge_rays": 32,
+     "sun_pct": 60.81,
+     "earth_pct": 52.56,
+     "both_pct": 31.27,
+     "longest_night_h": 463.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -86.371734,
+     "lon_e": 336.690328,
+     "ground_m": 2826.5,
+     "edge_rays": 36,
+     "sun_pct": 60.18,
+     "earth_pct": 52.53,
+     "both_pct": 30.8,
+     "longest_night_h": 467.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -86.372186,
+     "lon_e": 336.697272,
+     "ground_m": 2825.8,
+     "edge_rays": 22,
+     "sun_pct": 59.21,
+     "earth_pct": 50.89,
+     "both_pct": 29.78,
+     "longest_night_h": 478.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -86.372816,
+     "lon_e": 336.697133,
+     "ground_m": 2824.5,
+     "edge_rays": 21,
+     "sun_pct": 58.95,
+     "earth_pct": 50.61,
+     "both_pct": 29.82,
+     "longest_night_h": 499.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -86.373255,
+     "lon_e": 336.689988,
+     "ground_m": 2823.7,
+     "edge_rays": 30,
+     "sun_pct": 60.24,
+     "earth_pct": 51.55,
+     "both_pct": 30.75,
+     "longest_night_h": 480.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -86.373246,
+     "lon_e": 336.680024,
+     "ground_m": 2823.5,
+     "edge_rays": 35,
+     "sun_pct": 61.32,
+     "earth_pct": 52.86,
+     "both_pct": 31.76,
+     "longest_night_h": 461.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -86.372794,
+     "lon_e": 336.67308,
+     "ground_m": 2823.0,
+     "edge_rays": 32,
+     "sun_pct": 59.7,
+     "earth_pct": 52.38,
+     "both_pct": 30.06,
+     "longest_night_h": 460.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -86.372164,
+     "lon_e": 336.673223,
+     "ground_m": 2824.1,
+     "edge_rays": 34,
+     "sun_pct": 59.49,
+     "earth_pct": 52.88,
+     "both_pct": 30.04,
+     "longest_night_h": 455.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -86.371725,
+     "lon_e": 336.680368,
+     "ground_m": 2825.9,
+     "edge_rays": 41,
+     "sun_pct": 60.57,
+     "earth_pct": 53.6,
+     "both_pct": 31.22,
+     "longest_night_h": 456.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.370977,
+     "lon_e": 336.695477,
+     "ground_m": 2827.9,
+     "edge_rays": 30,
+     "sun_pct": 58.56,
+     "earth_pct": 51.76,
+     "both_pct": 29.24,
+     "longest_night_h": 473.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.371342,
+     "lon_e": 336.703841,
+     "ground_m": 2827.4,
+     "edge_rays": 16,
+     "sun_pct": 57.12,
+     "earth_pct": 49.8,
+     "both_pct": 27.83,
+     "longest_night_h": 487.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.371881,
+     "lon_e": 336.709366,
+     "ground_m": 2826.2,
+     "edge_rays": 5,
+     "sun_pct": 54.79,
+     "earth_pct": 48.4,
+     "both_pct": 26.51,
+     "longest_night_h": 520.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.372513,
+     "lon_e": 336.71121,
+     "ground_m": 2825.0,
+     "edge_rays": 0,
+     "sun_pct": 54.77,
+     "earth_pct": 48.57,
+     "both_pct": 27.11,
+     "longest_night_h": 547.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.373142,
+     "lon_e": 336.709091,
+     "ground_m": 2823.3,
+     "edge_rays": 0,
+     "sun_pct": 53.38,
+     "earth_pct": 48.2,
+     "both_pct": 26.33,
+     "longest_night_h": 565.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.373671,
+     "lon_e": 336.703329,
+     "ground_m": 2822.6,
+     "edge_rays": 15,
+     "sun_pct": 56.83,
+     "earth_pct": 49.65,
+     "both_pct": 28.81,
+     "longest_night_h": 521.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.374021,
+     "lon_e": 336.694801,
+     "ground_m": 2822.0,
+     "edge_rays": 27,
+     "sun_pct": 58.59,
+     "earth_pct": 50.7,
+     "both_pct": 29.92,
+     "longest_night_h": 501.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.374137,
+     "lon_e": 336.684807,
+     "ground_m": 2821.2,
+     "edge_rays": 33,
+     "sun_pct": 58.83,
+     "earth_pct": 50.81,
+     "both_pct": 29.91,
+     "longest_night_h": 494.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.374003,
+     "lon_e": 336.674868,
+     "ground_m": 2820.9,
+     "edge_rays": 36,
+     "sun_pct": 59.07,
+     "earth_pct": 51.34,
+     "both_pct": 29.91,
+     "longest_night_h": 486.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.373638,
+     "lon_e": 336.666501,
+     "ground_m": 2820.9,
+     "edge_rays": 40,
+     "sun_pct": 59.43,
+     "earth_pct": 52.16,
+     "both_pct": 30.04,
+     "longest_night_h": 472.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.373098,
+     "lon_e": 336.66098,
+     "ground_m": 2821.4,
+     "edge_rays": 39,
+     "sun_pct": 59.43,
+     "earth_pct": 52.98,
+     "both_pct": 30.13,
+     "longest_night_h": 461.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.372466,
+     "lon_e": 336.659145,
+     "ground_m": 2822.4,
+     "edge_rays": 39,
+     "sun_pct": 58.51,
+     "earth_pct": 53.55,
+     "both_pct": 29.38,
+     "longest_night_h": 448.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.371838,
+     "lon_e": 336.661272,
+     "ground_m": 2824.4,
+     "edge_rays": 47,
+     "sun_pct": 60.66,
+     "earth_pct": 55.31,
+     "both_pct": 31.85,
+     "longest_night_h": 443.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.371309,
+     "lon_e": 336.667037,
+     "ground_m": 2826.0,
+     "edge_rays": 47,
+     "sun_pct": 61.38,
+     "earth_pct": 56.08,
+     "both_pct": 32.78,
+     "longest_night_h": 442.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.370959,
+     "lon_e": 336.675561,
+     "ground_m": 2827.1,
+     "edge_rays": 47,
+     "sun_pct": 60.95,
+     "earth_pct": 55.89,
+     "both_pct": 32.44,
+     "longest_night_h": 447.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -86.370843,
+     "lon_e": 336.685547,
+     "ground_m": 2828.2,
+     "edge_rays": 47,
+     "sun_pct": 61.49,
+     "earth_pct": 55.55,
+     "both_pct": 32.9,
+     "longest_night_h": 455.0
+    }
+   ],
+   "secs": 23
+  },
+  {
+   "id": "I",
+   "name": "Nobile rim 2 (DM2)",
+   "lat": -84.055542,
+   "lon_e": 59.248651,
+   "centre": {
+    "r_m": 0.0,
+    "lat": -84.055542,
+    "lon_e": 59.248651,
+    "ground_m": 1457.7,
+    "edge_rays": 98,
+    "sun_pct": 52.58,
+    "earth_pct": 79.45,
+    "both_pct": 41.83,
+    "longest_night_h": 364.0
+   },
+   "range_50m": {
+    "sun_pct": {
+     "min": 50.65,
+     "median": 52.36,
+     "max": 52.75
+    },
+    "earth_pct": {
+     "min": 71.37,
+     "median": 79.4,
+     "max": 80.38
+    },
+    "both_pct": {
+     "min": 36.76,
+     "median": 41.83,
+     "max": 42.44
+    },
+    "longest_night_h": {
+     "min": 364.0,
+     "median": 364.0,
+     "max": 382.0
+    }
+   },
+   "best_lit": {
+    "r_m": 50.0,
+    "lat": -84.057136,
+    "lon_e": 59.25256,
+    "ground_m": 1460.0,
+    "edge_rays": 89,
+    "sun_pct": 52.75,
+    "earth_pct": 77.49,
+    "both_pct": 40.85,
+    "longest_night_h": 364.0
+   },
+   "points": [
+    {
+     "r_m": 0.0,
+     "lat": -84.055542,
+     "lon_e": 59.248651,
+     "ground_m": 1457.7,
+     "edge_rays": 98,
+     "sun_pct": 52.58,
+     "earth_pct": 79.45,
+     "both_pct": 41.83,
+     "longest_night_h": 364.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.055122,
+     "lon_e": 59.241828,
+     "ground_m": 1457.9,
+     "edge_rays": 103,
+     "sun_pct": 52.46,
+     "earth_pct": 80.29,
+     "both_pct": 42.23,
+     "longest_night_h": 364.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.054745,
+     "lon_e": 59.246697,
+     "ground_m": 1456.3,
+     "edge_rays": 99,
+     "sun_pct": 52.31,
+     "earth_pct": 79.72,
+     "both_pct": 41.84,
+     "longest_night_h": 364.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.054835,
+     "lon_e": 59.25271,
+     "ground_m": 1455.3,
+     "edge_rays": 89,
+     "sun_pct": 52.18,
+     "earth_pct": 74.68,
+     "both_pct": 39.12,
+     "longest_night_h": 367.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.05534,
+     "lon_e": 59.256346,
+     "ground_m": 1455.5,
+     "edge_rays": 89,
+     "sun_pct": 51.99,
+     "earth_pct": 72.93,
+     "both_pct": 38.2,
+     "longest_night_h": 370.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.055962,
+     "lon_e": 59.255474,
+     "ground_m": 1457.2,
+     "edge_rays": 89,
+     "sun_pct": 52.51,
+     "earth_pct": 76.0,
+     "both_pct": 40.01,
+     "longest_night_h": 368.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.056339,
+     "lon_e": 59.250605,
+     "ground_m": 1459.0,
+     "edge_rays": 95,
+     "sun_pct": 52.73,
+     "earth_pct": 78.88,
+     "both_pct": 41.62,
+     "longest_night_h": 364.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.056249,
+     "lon_e": 59.244591,
+     "ground_m": 1460.0,
+     "edge_rays": 104,
+     "sun_pct": 52.71,
+     "earth_pct": 80.34,
+     "both_pct": 42.43,
+     "longest_night_h": 364.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.055744,
+     "lon_e": 59.240956,
+     "ground_m": 1459.6,
+     "edge_rays": 104,
+     "sun_pct": 52.72,
+     "earth_pct": 80.34,
+     "both_pct": 42.44,
+     "longest_night_h": 364.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.054701,
+     "lon_e": 59.235007,
+     "ground_m": 1457.7,
+     "edge_rays": 104,
+     "sun_pct": 52.06,
+     "earth_pct": 80.3,
+     "both_pct": 41.95,
+     "longest_night_h": 364.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.054224,
+     "lon_e": 59.239153,
+     "ground_m": 1456.5,
+     "edge_rays": 103,
+     "sun_pct": 52.32,
+     "earth_pct": 80.25,
+     "both_pct": 42.13,
+     "longest_night_h": 364.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.053948,
+     "lon_e": 59.244744,
+     "ground_m": 1455.0,
+     "edge_rays": 103,
+     "sun_pct": 52.25,
+     "earth_pct": 80.2,
+     "both_pct": 42.04,
+     "longest_night_h": 364.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.053915,
+     "lon_e": 59.250929,
+     "ground_m": 1453.8,
+     "edge_rays": 97,
+     "sun_pct": 52.21,
+     "earth_pct": 79.22,
+     "both_pct": 41.46,
+     "longest_night_h": 364.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.054129,
+     "lon_e": 59.256768,
+     "ground_m": 1453.2,
+     "edge_rays": 89,
+     "sun_pct": 51.89,
+     "earth_pct": 76.2,
+     "both_pct": 39.72,
+     "longest_night_h": 371.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.054558,
+     "lon_e": 59.261372,
+     "ground_m": 1452.8,
+     "edge_rays": 89,
+     "sun_pct": 50.65,
+     "earth_pct": 71.98,
+     "both_pct": 36.82,
+     "longest_night_h": 381.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.055137,
+     "lon_e": 59.26404,
+     "ground_m": 1453.7,
+     "edge_rays": 89,
+     "sun_pct": 51.01,
+     "earth_pct": 71.37,
+     "both_pct": 36.76,
+     "longest_night_h": 382.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.055778,
+     "lon_e": 59.264366,
+     "ground_m": 1455.4,
+     "edge_rays": 89,
+     "sun_pct": 52.08,
+     "earth_pct": 72.1,
+     "both_pct": 37.81,
+     "longest_night_h": 373.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.056383,
+     "lon_e": 59.262299,
+     "ground_m": 1457.5,
+     "edge_rays": 89,
+     "sun_pct": 52.57,
+     "earth_pct": 75.35,
+     "both_pct": 39.71,
+     "longest_night_h": 370.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.05686,
+     "lon_e": 59.258153,
+     "ground_m": 1458.7,
+     "edge_rays": 89,
+     "sun_pct": 52.7,
+     "earth_pct": 75.31,
+     "both_pct": 39.72,
+     "longest_night_h": 367.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.057136,
+     "lon_e": 59.25256,
+     "ground_m": 1460.0,
+     "edge_rays": 89,
+     "sun_pct": 52.75,
+     "earth_pct": 77.49,
+     "both_pct": 40.85,
+     "longest_night_h": 364.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.057169,
+     "lon_e": 59.246372,
+     "ground_m": 1460.9,
+     "edge_rays": 98,
+     "sun_pct": 52.75,
+     "earth_pct": 79.4,
+     "both_pct": 41.87,
+     "longest_night_h": 364.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.056955,
+     "lon_e": 59.24053,
+     "ground_m": 1461.4,
+     "edge_rays": 105,
+     "sun_pct": 52.73,
+     "earth_pct": 80.38,
+     "both_pct": 42.42,
+     "longest_night_h": 364.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.056526,
+     "lon_e": 59.235926,
+     "ground_m": 1461.1,
+     "edge_rays": 105,
+     "sun_pct": 52.62,
+     "earth_pct": 80.38,
+     "both_pct": 42.37,
+     "longest_night_h": 364.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.055947,
+     "lon_e": 59.23326,
+     "ground_m": 1460.2,
+     "edge_rays": 104,
+     "sun_pct": 52.36,
+     "earth_pct": 80.36,
+     "both_pct": 42.16,
+     "longest_night_h": 364.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.055306,
+     "lon_e": 59.232937,
+     "ground_m": 1459.1,
+     "edge_rays": 104,
+     "sun_pct": 52.13,
+     "earth_pct": 80.34,
+     "both_pct": 41.98,
+     "longest_night_h": 364.0
+    }
+   ],
+   "secs": 21
+  },
+  {
+   "id": "J",
+   "name": "IM-2 Athena target",
+   "lat": -84.78,
+   "lon_e": 29.13,
+   "centre": {
+    "r_m": 0.0,
+    "lat": -84.78,
+    "lon_e": 29.13,
+    "ground_m": 5312.6,
+    "edge_rays": 0,
+    "sun_pct": 44.82,
+    "earth_pct": 92.24,
+    "both_pct": 41.72,
+    "longest_night_h": 459.0
+   },
+   "range_50m": {
+    "sun_pct": {
+     "min": 44.79,
+     "median": 44.83,
+     "max": 44.86
+    },
+    "earth_pct": {
+     "min": 92.18,
+     "median": 92.26,
+     "max": 92.34
+    },
+    "both_pct": {
+     "min": 41.68,
+     "median": 41.72,
+     "max": 41.78
+    },
+    "longest_night_h": {
+     "min": 459.0,
+     "median": 459.0,
+     "max": 459.0
+    }
+   },
+   "best_lit": {
+    "r_m": 50.0,
+    "lat": -84.778563,
+    "lon_e": 29.121198,
+    "ground_m": 5311.8,
+    "edge_rays": 0,
+    "sun_pct": 44.86,
+    "earth_pct": 92.29,
+    "both_pct": 41.78,
+    "longest_night_h": 459.0
+   },
+   "points": [
+    {
+     "r_m": 0.0,
+     "lat": -84.78,
+     "lon_e": 29.13,
+     "ground_m": 5312.6,
+     "edge_rays": 0,
+     "sun_pct": 44.82,
+     "earth_pct": 92.24,
+     "both_pct": 41.72,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.779281,
+     "lon_e": 29.125599,
+     "ground_m": 5312.1,
+     "edge_rays": 0,
+     "sun_pct": 44.83,
+     "earth_pct": 92.26,
+     "both_pct": 41.74,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.779209,
+     "lon_e": 29.132472,
+     "ground_m": 5312.3,
+     "edge_rays": 0,
+     "sun_pct": 44.83,
+     "earth_pct": 92.3,
+     "both_pct": 41.76,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.779599,
+     "lon_e": 29.137899,
+     "ground_m": 5312.4,
+     "edge_rays": 0,
+     "sun_pct": 44.81,
+     "earth_pct": 92.26,
+     "both_pct": 41.72,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.780225,
+     "lon_e": 29.138699,
+     "ground_m": 5312.6,
+     "edge_rays": 0,
+     "sun_pct": 44.8,
+     "earth_pct": 92.24,
+     "both_pct": 41.71,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.780719,
+     "lon_e": 29.134403,
+     "ground_m": 5313.1,
+     "edge_rays": 0,
+     "sun_pct": 44.82,
+     "earth_pct": 92.22,
+     "both_pct": 41.71,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.780791,
+     "lon_e": 29.127527,
+     "ground_m": 5313.2,
+     "edge_rays": 0,
+     "sun_pct": 44.84,
+     "earth_pct": 92.23,
+     "both_pct": 41.71,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.7804,
+     "lon_e": 29.1221,
+     "ground_m": 5312.8,
+     "edge_rays": 0,
+     "sun_pct": 44.84,
+     "earth_pct": 92.23,
+     "both_pct": 41.7,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 25.0,
+     "lat": -84.779775,
+     "lon_e": 29.121302,
+     "ground_m": 5312.4,
+     "edge_rays": 0,
+     "sun_pct": 44.84,
+     "earth_pct": 92.25,
+     "both_pct": 41.72,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.778563,
+     "lon_e": 29.121198,
+     "ground_m": 5311.8,
+     "edge_rays": 0,
+     "sun_pct": 44.86,
+     "earth_pct": 92.29,
+     "both_pct": 41.78,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.778366,
+     "lon_e": 29.127912,
+     "ground_m": 5311.6,
+     "edge_rays": 0,
+     "sun_pct": 44.85,
+     "earth_pct": 92.31,
+     "both_pct": 41.78,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.778417,
+     "lon_e": 29.134944,
+     "ground_m": 5311.7,
+     "edge_rays": 0,
+     "sun_pct": 44.84,
+     "earth_pct": 92.34,
+     "both_pct": 41.78,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.77871,
+     "lon_e": 29.141224,
+     "ground_m": 5311.9,
+     "edge_rays": 0,
+     "sun_pct": 44.82,
+     "earth_pct": 92.34,
+     "both_pct": 41.77,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.779199,
+     "lon_e": 29.145796,
+     "ground_m": 5312.1,
+     "edge_rays": 0,
+     "sun_pct": 44.8,
+     "earth_pct": 92.3,
+     "both_pct": 41.72,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.77981,
+     "lon_e": 29.147964,
+     "ground_m": 5312.5,
+     "edge_rays": 0,
+     "sun_pct": 44.79,
+     "earth_pct": 92.28,
+     "both_pct": 41.71,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.78045,
+     "lon_e": 29.147398,
+     "ground_m": 5313.0,
+     "edge_rays": 0,
+     "sun_pct": 44.8,
+     "earth_pct": 92.29,
+     "both_pct": 41.73,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.781021,
+     "lon_e": 29.144183,
+     "ground_m": 5313.4,
+     "edge_rays": 0,
+     "sun_pct": 44.81,
+     "earth_pct": 92.22,
+     "both_pct": 41.72,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.781437,
+     "lon_e": 29.138807,
+     "ground_m": 5313.6,
+     "edge_rays": 0,
+     "sun_pct": 44.82,
+     "earth_pct": 92.2,
+     "both_pct": 41.7,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.781634,
+     "lon_e": 29.132089,
+     "ground_m": 5313.5,
+     "edge_rays": 0,
+     "sun_pct": 44.82,
+     "earth_pct": 92.18,
+     "both_pct": 41.68,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.781583,
+     "lon_e": 29.125053,
+     "ground_m": 5313.4,
+     "edge_rays": 0,
+     "sun_pct": 44.82,
+     "earth_pct": 92.2,
+     "both_pct": 41.69,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.78129,
+     "lon_e": 29.118771,
+     "ground_m": 5313.2,
+     "edge_rays": 0,
+     "sun_pct": 44.83,
+     "earth_pct": 92.25,
+     "both_pct": 41.71,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.780801,
+     "lon_e": 29.114199,
+     "ground_m": 5312.7,
+     "edge_rays": 0,
+     "sun_pct": 44.83,
+     "earth_pct": 92.26,
+     "both_pct": 41.71,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.78019,
+     "lon_e": 29.112034,
+     "ground_m": 5312.3,
+     "edge_rays": 0,
+     "sun_pct": 44.83,
+     "earth_pct": 92.26,
+     "both_pct": 41.7,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.77955,
+     "lon_e": 29.112605,
+     "ground_m": 5312.0,
+     "edge_rays": 0,
+     "sun_pct": 44.84,
+     "earth_pct": 92.25,
+     "both_pct": 41.72,
+     "longest_night_h": 459.0
+    },
+    {
+     "r_m": 50.0,
+     "lat": -84.778978,
+     "lon_e": 29.115823,
+     "ground_m": 5311.9,
+     "edge_rays": 0,
+     "sun_pct": 44.86,
+     "earth_pct": 92.26,
+     "both_pct": 41.75,
+     "longest_night_h": 459.0
+    }
+   ],
+   "secs": 18
+  }
+ ]
+}

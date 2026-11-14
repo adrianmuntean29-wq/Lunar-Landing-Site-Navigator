@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>South Pole Navigator</title>
+<!-- OWNER: coordinator. The three areas fill their own container; do not add area markup here. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<script>/* theme before first paint: ?theme=light|dark, else the saved choice */try{var q=new URLSearchParams(location.search).get("theme"),t=q||localStorage.getItem("spn-theme");if(t==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/scene.css">
+<link rel="stylesheet" href="css/panel.css">
+<link rel="stylesheet" href="css/drawer.css">
+</head>
+<body>
+<div class="app">
+  <header class="top" id="top">
+    <span class="brand">SOUTH POLE NAVIGATOR</span>
+    <!-- time, play, speed and the Sun/Earth status live in the bottom panel (Eren 2026-11-14 ~16:05) -->
+    <span class="sp"></span>
+    <span class="tag" id="tMast">MAST 2 M</span>
+    <span class="k">DRAFT · REAL LOLA + HORIZONS</span>
+    <button class="btn" id="themeBtn" type="button" aria-pressed="false" title="Switch to a light theme (better on projectors)">LIGHT</button>
+    <button class="btn toggle" id="panelBtn" type="button" aria-controls="panel" aria-expanded="true">DETAILS ▸</button>
+  </header>
+  <div class="body" id="body">
+    <section class="stage">
+      <div id="scene"></div>                <!-- scene.js (Moon simulation chat) -->
+      <div class="drawer" id="drawer"></div> <!-- drawer.js (bottom panel chat) -->
+    </section>
+    <aside class="panel" id="panel"></aside> <!-- panel.js (right panel chat) -->
+  </div>
+</div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script src="js/core.js"></script>
+<script src="js/missions.js"></script>   <!-- missions chat; App.ready waits for Missions.load() -->
+<script src="js/shell.js"></script>
+<script src="js/panel.js"></script>
+<script src="js/drawer.js"></script>
+<script type="module" src="js/scene.js"></script>
+</body>
+</html>

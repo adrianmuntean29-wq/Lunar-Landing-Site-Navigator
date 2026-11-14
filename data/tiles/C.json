@@ -1,0 +1,31 @@
+{
+ "generated_utc": "2026-11-14T17:21Z",
+ "versions": {
+  "dem": "LDEM_80S_20MPP_ADJ.TIF (PGDA 90, 2023-07-07), block mean of 5 x 5 pixels of 20 m",
+  "code": "07c5981+uncommitted"
+ },
+ "purpose": "3D view only (display); numbers come from the horizon masks in sites.json",
+ "site_id": "C",
+ "site_name": "de Gerlache rim (GR1)",
+ "centre_lat": -88.6952,
+ "centre_lon_e": 291.7154,
+ "site_x": -36759.63,
+ "site_y": 14639.88,
+ "nx": 500,
+ "ny": 500,
+ "pixel_m": 100.0,
+ "x_min": -61800.0,
+ "y_max": 39600.0,
+ "x_max": -11800.0,
+ "y_min": -10400.0,
+ "corner": "x_min/y_max are the outer edges of pixel (0,0); pixel centres sit half a pixel inside; the site is within 50 m of the tile centre on each axis, up to 71 m diagonally (tile edges on the 100 m grid of the DEM); place it with site_x, site_y",
+ "layout": "Float32 little-endian, row-major, row 0 = north edge (+y), NaN = no data",
+ "units": "metres above the 1737400 m sphere",
+ "crs": "+proj=stere +lat_0=-90 +lon_0=0 +k=1 +x_0=0 +y_0=0 +R=1737400 +units=m",
+ "axes": "+x toward 90 E, +y toward 0 E; lon = atan2(x, y)",
+ "h_min": -2446.6,
+ "h_max": 1812.1,
+ "nan_count": 0,
+ "dem_max_m": 7026.33,
+ "dem_max_note": "max of the full-resolution 80 m DEM (not this tile)"
+}
