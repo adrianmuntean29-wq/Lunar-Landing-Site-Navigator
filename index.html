@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Peaks of Light · NASA Space Apps 2026 Alba Iulia · prototip pre-eveniment: teren generat, poziții simplificate Soare/Pământ -->
+<title>Navigator Polul Sud</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Saira+Condensed:wght@500;600;700&display=swap">
+<style>
+/* Layout: instrument console. A dark 3D viewport on the left, a telemetry rail (site cards, horizon chart, year timeline) on the right; one column on phones. */
+:root{
+  --bg:#ECEFF1; --panel:#F7F8F9; --ink:#14181D; --muted:#58616B; --line:#D3D8DD;
+  --sun:#9A5A0B; --sun-fill:#E9A23B; --earth:#1D5AA6; --earth-fill:#4C8EDC;
+  --sky:#E1E6EB; --ground:#8D9198;
+  --space:#05070A; --space-ink:#E4E8EC; --space-muted:#8F99A5; --space-veil:rgba(5,7,10,.74);
+  --focus:#1D5AA6;
+  --f-display:"Saira Condensed","Arial Narrow","Roboto Condensed",sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1115; --panel:#141A20; --ink:#E6E9EC; --muted:#98A1AB; --line:#262D35;
+    --sun:#F2B65E; --earth:#86B6EE; --sky:#18202A; --ground:#454B53; --focus:#86B6EE;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1115; --panel:#141A20; --ink:#E6E9EC; --muted:#98A1AB; --line:#262D35;
+  --sun:#F2B65E; --earth:#86B6EE; --sky:#18202A; --ground:#454B53; --focus:#86B6EE;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.app{max-width:1320px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:22px 44px;display:grid;gap:20px}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 28px}
+.top > div{min-width:0}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+h1{font-family:var(--f-display);font-weight:600;font-size:clamp(32px,4.6vw,50px);line-height:.98;letter-spacing:.005em;margin:0;text-wrap:balance}
+.lede{max-width:64ch;margin:10px 0 0;color:var(--muted)}
+.badge{font-family:var(--f-mono);font-size:12px;line-height:1.4;border:1px solid var(--line);padding:6px 10px;border-radius:3px;color:var(--muted);margin:0;max-width:34ch}
+h2{font-family:var(--f-display);font-weight:600;font-size:21px;line-height:1.1;letter-spacing:.01em;margin:0;text-wrap:balance}
+.caption{font-size:13px;color:var(--muted);margin:0;line-height:1.45}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:20px;align-items:start}
+@media (max-width:1020px){.layout{grid-template-columns:minmax(0,1fr)}}
+.stage{min-width:0;display:grid;gap:12px}
+
+.viewport{position:relative;height:clamp(400px,66vh,680px);background:var(--space);border-radius:6px;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+@media (max-width:600px){.viewport{height:58vh;min-height:360px}}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;outline:none}
+#gl:active{cursor:grabbing}
+#gl:focus-visible{box-shadow:inset 0 0 0 2px var(--earth-fill)}
+.labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.mk{position:absolute;left:0;top:0;width:0;height:0;will-change:transform}
+.pin .stem{position:absolute;left:-.5px;top:-24px;width:1px;height:24px;background:var(--space-ink);opacity:.75}
+.pin .dot{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:var(--space-ink)}
+.pin .tag{position:absolute;left:0;top:-24px;transform:translate(-50%,-100%);pointer-events:auto;font:600 12px/1.2 var(--f-mono);color:var(--space);background:var(--space-ink);border:0;border-radius:3px;padding:3px 7px;cursor:pointer;white-space:nowrap}
+.pin.sel .tag{box-shadow:0 0 0 2px var(--space),0 0 0 3.5px var(--space-ink)}
+.pin .tag:focus-visible{outline:2px solid var(--earth-fill);outline-offset:2px}
+.geo{font:500 11px/1 var(--f-mono);color:var(--space-muted);white-space:nowrap}
+.geo span{position:absolute;left:6px;top:-5px}
+.geo i{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border:1px solid var(--space-muted);border-radius:50%}
+.sky{font:600 11.5px/1.2 var(--f-mono);white-space:nowrap}
+.sky i{position:absolute;left:-7px;top:-7px;width:14px;height:14px;border-radius:50%;border:2px solid currentColor;background:currentColor}
+.sky span{position:absolute;left:12px;top:-8px;color:var(--space-ink);background:var(--space-veil);padding:1px 5px;border-radius:2px}
+.sky.flip span{left:auto;right:12px}
+.sky.sun{color:var(--sun-fill)}
+.sky.earth{color:var(--earth-fill)}
+.sky.blocked i{background:transparent}
+.sky.blocked span{color:var(--space-muted)}
+.status{position:absolute;left:max(12px, env(safe-area-inset-left, 0px));top:12px;font:500 12px/1.3 var(--f-mono);color:var(--space-ink);background:var(--space-veil);border:1px solid rgba(228,232,236,.16);padding:6px 9px;border-radius:3px}
+.status b{font-weight:600;color:var(--sun-fill)}
+.legend{position:absolute;left:12px;bottom:12px;right:12px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font:500 11.5px/1.3 var(--f-mono);color:var(--space-ink);pointer-events:none}
+.legend > span{display:inline-flex;align-items:center;gap:6px;background:var(--space-veil);padding:4px 7px;border-radius:2px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:2px}
+.sw.lit{background:#9A9893}
+.sw.dark{background:#0C1016;box-shadow:inset 0 0 0 1px rgba(228,232,236,.3)}
+.grad{display:inline-block;width:84px;height:9px;border-radius:2px}
+.grad.sun{background:linear-gradient(90deg,#090B0F,#9E5C1A 50%,#FFE194)}
+.grad.earth{background:linear-gradient(90deg,#090B0F,#2154A8 50%,#B3E0FF)}
+.nogl{position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;color:var(--space-ink);font-size:14px}
+
+.controls{display:grid;gap:10px}
+.timebar{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px}
+.play{width:42px;height:42px;border-radius:50%;border:1px solid var(--ink);background:var(--ink);color:var(--bg);display:grid;place-items:center;cursor:pointer}
+.play svg{width:16px;height:16px;fill:currentColor}
+.play:focus-visible,.seg button:focus-visible,select:focus-visible,input:focus-visible,.site:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+input[type=range]{width:100%;accent-color:var(--ink);margin:0;min-width:0}
+output{font:500 13px/1.2 var(--f-mono);font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+#tOut{min-width:9.5ch;text-align:right}
+.opts{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--panel)}
+.seg button{font:500 13px/1 var(--f-body);color:var(--ink);background:transparent;border:0;padding:9px 12px;cursor:pointer;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.seg button:disabled{color:var(--muted);cursor:progress}
+.opt{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.opt input[type=range]{width:110px}
+select{font:500 13px var(--f-body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:6px 8px}
+.readout{margin:0;font:500 13px/1.5 var(--f-mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.readout .s{color:var(--sun)}
+.readout .e{color:var(--earth)}
+.readout .m{color:var(--muted)}
+
+.rail{min-width:0;display:grid;gap:22px}
+.block{display:grid;gap:10px;min-width:0}
+.block-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px}
+.sites{display:grid;gap:8px}
+.site{display:grid;grid-template-columns:30px minmax(0,1fr);gap:4px 10px;text-align:left;width:100%;font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:10px 12px;cursor:pointer}
+.site[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.site-id{grid-row:span 2;width:26px;height:26px;display:grid;place-items:center;border-radius:3px;background:var(--ink);color:var(--bg);font:600 13px var(--f-mono)}
+.site-name{font-weight:600;font-size:14.5px;line-height:1.25}
+.site-note{display:block;font-size:12.5px;color:var(--muted);font-weight:400;margin-top:1px}
+.stats{grid-column:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.4fr);gap:8px;margin-top:6px}
+.st{display:grid;gap:2px;min-width:0}
+.st-k{font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-v{font:600 15px/1.1 var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.st-v.sun{color:var(--sun)}
+.st-v.earth{color:var(--earth)}
+.bar{height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar b{display:block;height:100%}
+.bar.sun b{background:var(--sun-fill)}
+.bar.earth b{background:var(--earth-fill)}
+canvas.chart{width:100%;display:block}
+#horizon{height:210px}
+
+.notes{border-top:1px solid var(--line);padding-top:18px;display:grid;gap:12px}
+.notes dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 24px;margin:0}
+@media (max-width:760px){.notes dl{grid-template-columns:minmax(0,1fr)}}
+.notes dt{font:600 12px/1.3 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.notes dd{margin:0;font-size:14px;max-width:60ch}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div>
+      <p class="eyebrow">NASA Space Apps 2026 · Lunar Landing Site Navigator</p>
+      <h1>Navigator Polul Sud</h1>
+      <p class="lede">La polul sud al Lunii, Soarele se rotește la 1–2° deasupra orizontului, iar Pământul urcă și coboară lângă orizont. Relieful decide unde ai energie și unde ai legătură cu Pământul.</p>
+    </div>
+    <p class="badge">Demo: teren generat și poziții simplificate pentru Soare și Pământ</p>
+  </header>
+
+  <main class="layout">
+    <section class="stage" aria-label="Harta 3D">
+      <div class="viewport" id="viewport">
+        <canvas id="gl" tabindex="0" aria-label="Relief 3D al zonei polului sud lunar. Trage ca să rotești, folosește săgețile de la tastatură sau atinge terenul ca să alegi un loc."></canvas>
+        <div class="labels" id="labels"></div>
+        <div class="status" id="status" role="status">Calculez umbrele… <b>0%</b></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="controls">
+        <div class="timebar">
+          <button class="play" id="play" type="button" aria-label="Pornește simularea">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path id="playIcon" d="M4 2.5v11l9-5.5z"/></svg>
+          </button>
+          <input id="t" type="range" min="0" max="365" step="0.05" value="80" aria-label="Ziua din an">
+          <output id="tOut" for="t">Ziua 80,0</output>
+        </div>
+        <div class="opts">
+          <div class="seg" role="group" aria-label="Ce arată harta">
+            <button type="button" data-mode="0" aria-pressed="true">Lumina acum</button>
+            <button type="button" data-mode="1" aria-pressed="false" disabled>Soare pe an</button>
+            <button type="button" data-mode="2" aria-pressed="false" disabled>Pământ pe an</button>
+          </div>
+          <label class="opt" for="speed">Viteză
+            <select id="speed">
+              <option value="1">1 zi/s</option>
+              <option value="3" selected>3 zile/s</option>
+              <option value="10">10 zile/s</option>
+              <option value="30">30 zile/s</option>
+            </select>
+          </label>
+          <label class="opt" for="exag">Relief
+            <input id="exag" type="range" min="1" max="5" step="0.5" value="2.5">
+            <output id="exagOut" for="exag">×2,5</output>
+          </label>
+        </div>
+        <p class="readout" id="readout"></p>
+        <p class="caption">Trage ca să rotești, ciupește sau folosește rotița pentru zoom, atinge terenul ca să adaugi un loc nou.</p>
+      </div>
+    </section>
+
+    <aside class="rail">
+      <section class="block">
+        <div class="block-head">
+          <h2>Locuri candidate</h2>
+          <p class="caption">Panouri și antenă pe catarg de 10 m</p>
+        </div>
+        <div class="sites" id="sites"></div>
+      </section>
+      <section class="block">
+        <h2>Orizontul văzut din <span id="hName">A</span></h2>
+        <canvas class="chart" id="horizon"></canvas>
+        <p class="caption">Gri: relieful din jur. Banda galbenă: pe unde trece Soarele într-un an. Dreptunghiul albastru: zona în care oscilează Pământul. 0° pe axa de jos înseamnă direcția Pământului.</p>
+      </section>
+      <section class="block">
+        <h2>Un an, zi cu zi</h2>
+        <canvas class="chart" id="timeline"></canvas>
+        <p class="caption">Galben: cât din zi are Soare. Albastru: cât din zi se vede Pământul. Atinge banda ca să sari la acea zi.</p>
+      </section>
+    </aside>
+  </main>
+
+  <section class="notes" aria-label="Ce e simulat">
+    <h2>Ce e simulat aici și ce ar folosi versiunea de concurs</h2>
+    <dl>
+      <div><dt>Relief</dt><dd>Generat: un crater de 21 km lângă pol și un masiv spre Pământ, pe o hartă de 48 × 48 km. Versiunea reală ar folosi modelele de relief LOLA (Moon Trek, PDS).</dd></div>
+      <div><dt>Soare și Pământ</dt><dd>Mișcări simplificate: Soarele face un cerc complet la 29,5 zile și urcă sau coboară cu ±1,54° într-un an; Pământul oscilează cu ±6,7° pe verticală și ±7,9° pe orizontală. Versiunea reală ar folosi efemeridele NASA SPICE.</dd></div>
+      <div><dt>Calcul</dt><dd>Orizontul fiecărui punct e calculat în 64 de direcții (360 pentru locurile candidate), până la 46 km distanță, cu curbura Lunii inclusă. Același calcul merge pe date reale.</dd></div>
+    </dl>
+  </section>
+</div>
+
+<script>
+(function(){
+'use strict';
+var DEG = Math.PI/180, R_MOON = 1737.4, INV2R = 1/(2*R_MOON);
+var N = 129, NV = N*N, BIG_N = 257, OFF = 64, CELL = 0.375, HALF = 24, HALF_BIG = 48;
+var NAZ = 64, MAX_D = 46, SUN_R = 0.267, EARTH_R = 0.95;
+var SYN = 29.530589, DRAC_Y = 346.62, DRAC_M = 27.2122, ANOM_M = 27.5545;
+var MAST = 0.010, GROUND = 0.002, YEAR = 365, SPD = 8, MEAN_S = 730;
+
+function $(s){ return document.querySelector(s); }
+function num(v, d){ return v.toFixed(d).replace('.', ','); }
+function sgn(v, d){ return (v < 0 ? '−' : '+') + num(Math.abs(v), d); }
+function clamp(v, a, b){ return v < a ? a : v > b ? b : v; }
+
+/* ---------- terrain ---------- */
+function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+var rand = mulberry32(1114);
+var LAT = new Float32Array(65536);
+for (var q = 0; q < LAT.length; q++) LAT[q] = rand()*2 - 1;
+function vnoise(x, y){
+  var xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+  var u = xf*xf*(3 - 2*xf), v = yf*yf*(3 - 2*yf);
+  var a = LAT[((yi & 255) << 8) | (xi & 255)], b = LAT[((yi & 255) << 8) | ((xi + 1) & 255)];
+  var c = LAT[(((yi + 1) & 255) << 8) | (xi & 255)], d = LAT[(((yi + 1) & 255) << 8) | ((xi + 1) & 255)];
+  var ab = a + (b - a)*u, cd = c + (d - c)*u;
+  return ab + (cd - ab)*v;
+}
+function fbm(x, y, oct){
+  var s = 0, amp = 1, f = 1, n = 0;
+  for (var o = 0; o < oct; o++){ s += amp*vnoise(x*f + o*17.3, y*f - o*9.1); n += amp; amp *= 0.5; f *= 2.02; }
+  return s/n;
+}
+var MAIN = {x:-1.6, z:1.2, R:10.4, depth:3.4, rim:1.25};
+var MASSIF = {x:4.2, z:-15};
+var craters = [MAIN, {x:19.5, z:15.5, R:8.6, depth:2.5, rim:0.5}, {x:-28, z:-24, R:9.5, depth:2.6, rim:0.5}, {x:-21, z:31, R:6, depth:1.9, rim:0.4}];
+for (var k = 0; k < 36; k++){
+  var Rk = 0.55*Math.pow(9, Math.pow(rand(), 1.7));
+  craters.push({x:(rand()*2 - 1)*46, z:(rand()*2 - 1)*46, R:Rk, depth:0.4*Rk, rim:0.09*Rk});
+}
+var peaks = [{x:4.2, z:-15, h:2.8, s:4.4}, {x:10.5, z:-10, h:1.4, s:2.8}, {x:-15.5, z:10.5, h:1.2, s:3.6}, {x:-33, z:4, h:2.2, s:6}, {x:30, z:-30, h:1.8, s:7}];
+function terrain(x, z){
+  var h = 0.24*fbm(x/12 + 3.1, z/12 - 7.3, 4) + 0.08*fbm(x/3.2 + 11, z/3.2 + 5, 4) + 0.02*fbm(x/0.8, z/0.8, 3);
+  for (var i = 0; i < peaks.length; i++){
+    var p = peaks[i], dx = x - p.x, dz = z - p.z, e = (dx*dx + dz*dz)/(2*p.s*p.s);
+    if (e < 9) h += p.h*Math.exp(-e)*(0.85 + 0.45*fbm(x/2.4 + p.x, z/2.4 + p.z, 3));
+  }
+  for (var j = 0; j < craters.length; j++){
+    var c = craters[j], cx = x - c.x, cz = z - c.z, r = Math.sqrt(cx*cx + cz*cz)/c.R;
+    if (r > 3) continue;
+    h += r < 1 ? -c.depth + (c.depth + c.rim)*r*r : c.rim*Math.exp(-(r - 1)*3);
+  }
+  return h;
+}
+var H = new Float32Array(BIG_N*BIG_N), HMAX = -1e9;
+for (var gj = 0; gj < BIG_N; gj++) for (var gi = 0; gi < BIG_N; gi++){
+  var hv = terrain(-HALF_BIG + gi*CELL, -HALF_BIG + gj*CELL);
+  H[gj*BIG_N + gi] = hv; if (hv > HMAX) HMAX = hv;
+}
+function hAt(x, z){
+  var fx = (x + HALF_BIG)/CELL, fz = (z + HALF_BIG)/CELL;
+  fx = clamp(fx, 0, BIG_N - 1.0001); fz = clamp(fz, 0, BIG_N - 1.0001);
+  var i = fx | 0, j = fz | 0, u = fx - i, w = fz - j, kk = j*BIG_N + i;
+  return (H[kk]*(1 - u) + H[kk + 1]*u)*(1 - w) + (H[kk + BIG_N]*(1 - u) + H[kk + BIG_N + 1]*u)*w;
+}
+function horizonDir(x0, z0, h0, dx, dz, step0, grow){
+  var best = -1e9, d = step0, lim = HMAX - h0;
+  while (d < MAX_D){
+    var x = x0 + dx*d, z = z0 + dz*d;
+    var fx = (x + HALF_BIG)/CELL, fz = (z + HALF_BIG)/CELL;
+    if (fx < 0 || fz < 0 || fx >= BIG_N - 1 || fz >= BIG_N - 1) break;
+    var i = fx | 0, j = fz | 0, u = fx - i, w = fz - j, kk = j*BIG_N + i;
+    var hh = (H[kk]*(1 - u) + H[kk + 1]*u)*(1 - w) + (H[kk + BIG_N]*(1 - u) + H[kk + BIG_N + 1]*u)*w;
+    var s = (hh - d*d*INV2R - h0)/d;
+    if (s > best) best = s;
+    if (lim/d < best) break;
+    var st = d*grow; d += st > step0 ? st : step0;
+  }
+  return best < -1e8 ? -90 : Math.atan(best)/DEG;
+}
+
+/* render-grid vertex data */
+var vx = new Float32Array(NV), vz = new Float32Array(NV), vh = new Float32Array(NV);
+var exV = new Float32Array(NV), ezV = new Float32Array(NV);
+var nor = new Float32Array(NV*3), hill = new Float32Array(NV), tone = new Float32Array(NV);
+var HMINr = 1e9, HMAXr = -1e9;
+(function(){
+  var L = [-0.45, 0.72, -0.53], ll = Math.hypot(L[0], L[1], L[2]); L = [L[0]/ll, L[1]/ll, L[2]/ll];
+  for (var j = 0; j < N; j++) for (var i = 0; i < N; i++){
+    var v = j*N + i, x = -HALF + i*CELL, z = -HALF + j*CELL, kk = (j + OFF)*BIG_N + (i + OFF);
+    var h = H[kk];
+    vx[v] = x; vz[v] = z; vh[v] = h;
+    if (h < HMINr) HMINr = h; if (h > HMAXr) HMAXr = h;
+    var c = Math.hypot(x, z)/R_MOON/DEG, az = Math.atan2(x, -z);
+    exV[v] = c*Math.sin(az); ezV[v] = c*Math.cos(az);
+    var dhdx = (H[kk + 1] - H[kk - 1])/(2*CELL), dhdz = (H[kk + BIG_N] - H[kk - BIG_N])/(2*CELL);
+    var nx = -dhdx, ny = 1, nz = -dhdz, nl = Math.hypot(nx, ny, nz);
+    nor[v*3] = nx/nl; nor[v*3 + 1] = ny/nl; nor[v*3 + 2] = nz/nl;
+    var ex = -dhdx*2.2, ez = -dhdz*2.2, el = Math.hypot(ex, 1, ez);
+    hill[v] = clamp((ex*L[0] + L[1] + ez*L[2])/el, 0, 1);
+    tone[v] = 0.5 + 0.5*fbm(x/1.4 + 40, z/1.4 - 12, 3);
+  }
+})();
+
+/* ---------- Sun & Earth (simplified) ---------- */
+function sunAt(t){ return {az: ((t/SYN)*360) % 360, el: 1.54*Math.sin(2*Math.PI*t/DRAC_Y)}; }
+function earthAt(t){ var a = 7.9*Math.sin(2*Math.PI*t/ANOM_M); return {az: (a + 360) % 360, el: 6.7*Math.sin(2*Math.PI*t/DRAC_M + 0.7)}; }
+function relAz(az){ var r = ((az + 180) % 360 + 360) % 360 - 180; return r; }
+
+/* ---------- horizon maps for every vertex (progressive) ---------- */
+var HZ = new Float32Array(NV*NAZ), BDX = new Float32Array(NAZ), BDZ = new Float32Array(NAZ);
+for (var b = 0; b < NAZ; b++){ BDX[b] = Math.sin(b*2*Math.PI/NAZ); BDZ[b] = -Math.cos(b*2*Math.PI/NAZ); }
+var hzDone = 0, meanDone = 0, stage = 0;
+var sunMean = new Float32Array(NV), earthMean = new Float32Array(NV);
+var light = new Float32Array(NV).fill(1), layer = new Float32Array(NV);
+
+function lightAt(t, out){
+  var s = sunAt(t), f = s.az/360*NAZ, i0 = Math.floor(f) % NAZ, fr = f - Math.floor(f), i1 = (i0 + 1) % NAZ;
+  var ca = Math.cos(s.az*DEG), sa = Math.sin(s.az*DEG), inv = 1/(2*SUN_R);
+  for (var v = 0; v < NV; v++){
+    var base = v*NAZ, hz = HZ[base + i0]*(1 - fr) + HZ[base + i1]*fr;
+    var el = s.el + ca*ezV[v] + sa*exV[v];
+    out[v] = clamp((el - hz + SUN_R)*inv, 0, 1);
+  }
+}
+function meanStep(t){
+  var s = sunAt(t), e = earthAt(t);
+  var fs = s.az/360*NAZ, s0 = Math.floor(fs) % NAZ, sr = fs - Math.floor(fs), s1 = (s0 + 1) % NAZ;
+  var fe = e.az/360*NAZ, e0 = Math.floor(fe) % NAZ, er = fe - Math.floor(fe), e1 = (e0 + 1) % NAZ;
+  var cs = Math.cos(s.az*DEG), ss = Math.sin(s.az*DEG), ce = Math.cos(e.az*DEG), se = Math.sin(e.az*DEG), inv = 1/(2*SUN_R);
+  for (var v = 0; v < NV; v++){
+    var base = v*NAZ;
+    var hs = HZ[base + s0]*(1 - sr) + HZ[base + s1]*sr;
+    var he = HZ[base + e0]*(1 - er) + HZ[base + e1]*er;
+    sunMean[v] += clamp((s.el + cs*ezV[v] + ss*exV[v] - hs + SUN_R)*inv, 0, 1);
+    if (e.el + ce*ezV[v] + se*exV[v] > he) earthMean[v] += 1;
+  }
+}
+
+/* ---------- candidate sites ---------- */
+var sites = [];
+function nearestVertexWhere(test){
+  var best = -1, bh = -1e9;
+  for (var v = 0; v < NV; v++){ if (test(vx[v], vz[v]) && vh[v] > bh){ bh = vh[v]; best = v; } }
+  return best;
+}
+function makeSite(id, name, x, z){
+  var c = Math.hypot(x, z)/R_MOON/DEG, az = Math.atan2(x, -z);
+  var s = {id:id, name:name, x:x, z:z, h:hAt(x, z), ex:c*Math.sin(az), ez:c*Math.cos(az), dist:Math.hypot(x, z)};
+  computeSite(s);
+  return s;
+}
+function computeSite(s){
+  var prof = new Float32Array(360), h0 = s.h + MAST, lo = 1e9, hi = -1e9;
+  for (var a = 0; a < 360; a++){
+    var val = horizonDir(s.x, s.z, h0, Math.sin(a*DEG), -Math.cos(a*DEG), 0.15, 0.025);
+    prof[a] = val; if (val < lo) lo = val; if (val > hi) hi = val;
+  }
+  s.prof = prof; s.pmin = lo; s.pmax = hi;
+  var n = YEAR*SPD, daySun = new Float32Array(YEAR), dayEarth = new Float32Array(YEAR);
+  var sumS = 0, sumE = 0, sumB = 0, run = 0, longest = 0;
+  for (var q = 0; q < n; q++){
+    var t = (q + 0.5)/SPD, st = siteState(s, t);
+    var lit = st.sunLit, ev = st.earthVis > 0.5 ? 1 : 0;
+    sumS += lit; sumE += ev; if (lit > 0.5 && ev) sumB += 1;
+    if (lit < 0.5){ run++; if (run > longest) longest = run; } else run = 0;
+    var d = Math.floor(t); daySun[d] += lit/SPD; dayEarth[d] += ev/SPD;
+  }
+  s.daySun = daySun; s.dayEarth = dayEarth;
+  s.pSun = sumS/n; s.pEarth = sumE/n; s.pBoth = sumB/n; s.night = longest/SPD;
+}
+function profAt(s, az){ var a = ((az % 360) + 360) % 360, i0 = Math.floor(a), fr = a - i0; return s.prof[i0 % 360]*(1 - fr) + s.prof[(i0 + 1) % 360]*fr; }
+function siteState(s, t){
+  var su = sunAt(t), ea = earthAt(t);
+  var sEl = su.el + Math.cos(su.az*DEG)*s.ez + Math.sin(su.az*DEG)*s.ex;
+  var eEl = ea.el + Math.cos(ea.az*DEG)*s.ez + Math.sin(ea.az*DEG)*s.ex;
+  var sHz = profAt(s, su.az), eHz = profAt(s, ea.az);
+  return {sunAz:su.az, sunEl:sEl, sunHz:sHz, sunLit:clamp((sEl - sHz + SUN_R)/(2*SUN_R), 0, 1),
+          earthAz:ea.az, earthEl:eEl, earthHz:eHz, earthVis:clamp((eEl - eHz + EARTH_R)/(2*EARTH_R), 0, 1)};
+}
+function quickScore(x, z){
+  var h0 = hAt(x, z) + MAST, prof = new Float32Array(72);
+  for (var a = 0; a < 72; a++){ var az = a*5*DEG; prof[a] = horizonDir(x, z, h0, Math.sin(az), -Math.cos(az), 0.2, 0.04); }
+  var c = Math.hypot(x, z)/R_MOON/DEG, saz = Math.atan2(x, -z), ex = c*Math.sin(saz), ez = c*Math.cos(saz);
+  var sumS = 0, sumE = 0, n = 0;
+  for (var t = 0.13; t < YEAR; t += 0.37){
+    var su = sunAt(t), ea = earthAt(t);
+    var f = su.az/5, i0 = Math.floor(f) % 72, fr = f - Math.floor(f), hz = prof[i0]*(1 - fr) + prof[(i0 + 1) % 72]*fr;
+    var el = su.el + Math.cos(su.az*DEG)*ez + Math.sin(su.az*DEG)*ex; sumS += clamp((el - hz + SUN_R)/(2*SUN_R), 0, 1);
+    var fe = ea.az/5, j0 = Math.floor(fe) % 72, fq = fe - Math.floor(fe), he = prof[j0]*(1 - fq) + prof[(j0 + 1) % 72]*fq;
+    var ee = ea.el + Math.cos(ea.az*DEG)*ez + Math.sin(ea.az*DEG)*ex; if (ee > he) sumE++;
+    n++;
+  }
+  return sumS/n + 0.15*sumE/n;
+}
+(function(){
+  var best = null, bs = -1;
+  for (var a = 0; a < 360; a += 5) for (var f = 0.96; f <= 1.05; f += 0.04){
+    var x = MAIN.x + Math.sin(a*DEG)*MAIN.R*f, z = MAIN.z - Math.cos(a*DEG)*MAIN.R*f;
+    if (Math.abs(x) > HALF - 1 || Math.abs(z) > HALF - 1) continue;
+    var sc = quickScore(x, z); if (sc > bs){ bs = sc; best = [x, z]; }
+  }
+  sites.push(makeSite('A', 'Creasta craterului', best[0], best[1]));
+  sites.push(makeSite('B', 'Versantul masivului', MASSIF.x + 0.3, MASSIF.z - 4.6));
+  sites.push(makeSite('C', 'Fundul craterului', MAIN.x, MAIN.z));
+  sites[0].note = 'Cel mai bun punct de pe margine, la ' + num(sites[0].dist, 1) + ' km de pol';
+  sites[1].note = 'Panta dinspre Pământ, la ' + num(sites[1].dist, 1) + ' km de pol';
+  sites[2].note = 'Zonă permanent umbrită, unde se poate afla gheață';
+})();
+var sel = 0;
+
+/* ---------- state ---------- */
+var state = {t: 80, playing: false, speed: 3, exag: 2.5, mode: 0};
+var cam = {yaw: 0.55, pitch: 0.58, dist: 66};
+var dirty = {geo: true, light: true, layer: true, view: true, charts: true, sites: true};
+
+/* ---------- WebGL ---------- */
+var canvas = $('#gl'), viewport = $('#viewport');
+var gl = null;
+try { gl = canvas.getContext('webgl', {antialias: true, alpha: false}); } catch (err) { gl = null; }
+var prog, wprog, bufs = {}, idxCount = 0, wallCount = 0, VP = new Float32Array(16), W = 1, Hh = 1;
+if (!gl){
+  var msg = document.createElement('div'); msg.className = 'nogl';
+  msg.textContent = 'Browserul nu poate afișa harta 3D (WebGL indisponibil). Locurile candidate și graficele funcționează în continuare.';
+  viewport.appendChild(msg);
+} else {
+  var deriv = gl.getExtension('OES_standard_derivatives');
+  var VS = 'attribute vec3 aPos;attribute vec3 aNor;attribute float aLight;attribute float aLayer;attribute float aHill;attribute float aTone;' +
+    'uniform mat4 uMVP;uniform vec3 uSun;' +
+    'varying float vLight;varying float vLayer;varying float vHill;varying float vTone;varying float vLam;varying vec2 vXZ;' +
+    'void main(){vLight=aLight;vLayer=aLayer;vHill=aHill;vTone=aTone;vLam=dot(aNor,uSun);vXZ=aPos.xz;gl_Position=uMVP*vec4(aPos,1.0);}';
+  var FS = (deriv ? '#extension GL_OES_standard_derivatives : enable\n#define DERIV 1\n' : '') +
+    'precision mediump float;uniform float uMode;' +
+    'varying float vLight;varying float vLayer;varying float vHill;varying float vTone;varying float vLam;varying vec2 vXZ;' +
+    'vec3 ramp3(float t,vec3 a,vec3 b,vec3 c){return t<0.5?mix(a,b,t*2.0):mix(b,c,t*2.0-1.0);}' +
+    'void main(){vec3 base=vec3(0.78,0.75,0.70)*(0.84+0.32*vTone);vec3 col;' +
+    'if(uMode<0.5){float lam=clamp(vLam*3.0,0.0,1.0);float direct=vLight*(0.52+0.48*lam);' +
+    'col=vec3(0.026,0.032,0.048)+vec3(0.055,0.065,0.085)*vHill+base*direct;}' +
+    'else if(uMode<1.5){float t=pow(clamp(vLayer,0.0,1.0),0.7);col=ramp3(t,vec3(0.035,0.04,0.06),vec3(0.62,0.36,0.10),vec3(1.0,0.88,0.58))*(0.72+0.28*vHill);}' +
+    'else{float t=clamp(vLayer,0.0,1.0);col=ramp3(t,vec3(0.035,0.04,0.06),vec3(0.13,0.33,0.66),vec3(0.70,0.88,1.0))*(0.72+0.28*vHill);}' +
+    '\n#ifdef DERIV\n' +
+    'vec2 gq=vXZ/4.0;vec2 gd=abs(fract(gq-0.5)-0.5)/fwidth(gq);float line=1.0-min(min(gd.x,gd.y),1.0);' +
+    'float r=length(vXZ);float fr=fwidth(r);float ring=max(1.0-min(abs(r-15.162)/fr,1.0),1.0-min(abs(r-7.581)/fr,1.0));' +
+    'col+=vec3(0.55,0.62,0.72)*(line*0.06+ring*0.24);' +
+    '\n#endif\n' +
+    'gl_FragColor=vec4(col,1.0);}';
+  var VSW = 'attribute vec3 aPos;attribute vec3 aNor;uniform mat4 uMVP;uniform float uBase;uniform float uTop;varying float vL;varying float vY;' +
+    'void main(){vL=0.55+0.45*max(dot(aNor,normalize(vec3(-0.4,0.5,0.75))),0.0);vY=(aPos.y-uBase)/(uTop-uBase);gl_Position=uMVP*vec4(aPos,1.0);}';
+  var FSW = 'precision mediump float;varying float vL;varying float vY;' +
+    'void main(){vec3 c=mix(vec3(0.06,0.07,0.09),vec3(0.18,0.19,0.21),clamp(vY,0.0,1.0));gl_FragColor=vec4(c*vL*1.15,1.0);}';
+  var compile = function(type, src){ var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+  var link = function(vs, fs){ var p = gl.createProgram(); gl.attachShader(p, compile(gl.VERTEX_SHADER, vs)); gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p)); return p; };
+  prog = link(VS, FS); wprog = link(VSW, FSW);
+  var mk = function(data, usage){ var bb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, bb); gl.bufferData(gl.ARRAY_BUFFER, data, usage || gl.STATIC_DRAW); return bb; };
+  bufs.pos = mk(new Float32Array(NV*3), gl.DYNAMIC_DRAW);
+  bufs.nor = mk(nor); bufs.hill = mk(hill); bufs.tone = mk(tone);
+  bufs.light = mk(light, gl.DYNAMIC_DRAW); bufs.layer = mk(layer, gl.DYNAMIC_DRAW);
+  var idx = new Uint16Array((N - 1)*(N - 1)*6), p = 0;
+  for (var j = 0; j < N - 1; j++) for (var i = 0; i < N - 1; i++){
+    var a = j*N + i, bq = a + 1, c = a + N, d = c + 1;
+    idx[p++] = a; idx[p++] = c; idx[p++] = bq; idx[p++] = bq; idx[p++] = c; idx[p++] = d;
+  }
+  bufs.idx = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufs.idx); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, idx, gl.STATIC_DRAW);
+  idxCount = idx.length;
+  bufs.wpos = mk(new Float32Array(4*(N - 1)*6*3), gl.DYNAMIC_DRAW);
+  bufs.wnor = mk(new Float32Array(4*(N - 1)*6*3), gl.DYNAMIC_DRAW);
+  gl.enable(gl.DEPTH_TEST);
+  gl.clearColor(0.0196, 0.0275, 0.039, 1);
+}
+function baseY(){ return HMINr*state.exag - 1.6; }
+function updateGeometry(){
+  if (!gl) return;
+  var pos = new Float32Array(NV*3), e = state.exag;
+  for (var v = 0; v < NV; v++){ pos[v*3] = vx[v]; pos[v*3 + 1] = vh[v]*e; pos[v*3 + 2] = vz[v]; }
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufs.pos); gl.bufferSubData(gl.ARRAY_BUFFER, 0, pos);
+  var wp = [], wn = [], yb = baseY();
+  var edges = [
+    {get: function(s){ return s; }, fixed: 0, axis: 'row', n: [0, 0, -1]},
+    {get: function(s){ return s; }, fixed: N - 1, axis: 'row', n: [0, 0, 1]},
+    {get: function(s){ return s; }, fixed: 0, axis: 'col', n: [-1, 0, 0]},
+    {get: function(s){ return s; }, fixed: N - 1, axis: 'col', n: [1, 0, 0]}
+  ];
+  edges.forEach(function(ed){
+    for (var s = 0; s < N - 1; s++){
+      var v0 = ed.axis === 'row' ? ed.fixed*N + s : s*N + ed.fixed;
+      var v1 = ed.axis === 'row' ? ed.fixed*N + s + 1 : (s + 1)*N + ed.fixed;
+      var A = [vx[v0], vh[v0]*e, vz[v0]], B = [vx[v1], vh[v1]*e, vz[v1]], A2 = [vx[v0], yb, vz[v0]], B2 = [vx[v1], yb, vz[v1]];
+      [A, A2, B, B, A2, B2].forEach(function(P){ wp.push(P[0], P[1], P[2]); wn.push(ed.n[0], ed.n[1], ed.n[2]); });
+    }
+  });
+  wallCount = wp.length/3;
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufs.wpos); gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(wp));
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufs.wnor); gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(wn));
+}
+
+/* ---------- matrices ---------- */
+function perspective(fovy, aspect, near, far){ var f = 1/Math.tan(fovy/2), nf = 1/(near - far); return [f/aspect,0,0,0, 0,f,0,0, 0,0,(far + near)*nf,-1, 0,0,2*far*near*nf,0]; }
+function lookAt(e, c){
+  var zx = e[0] - c[0], zy = e[1] - c[1], zz = e[2] - c[2], zl = Math.hypot(zx, zy, zz); zx /= zl; zy /= zl; zz /= zl;
+  var xx = zz, xy = 0, xz = -zx, xl = Math.hypot(xx, xy, xz); xx /= xl; xz /= xl;
+  var yx = zy*xz - zz*xy, yy = zz*xx - zx*xz, yz = zx*xy - zy*xx;
+  return [xx, yx, zx, 0, xy, yy, zy, 0, xz, yz, zz, 0, -(xx*e[0] + xy*e[1] + xz*e[2]), -(yx*e[0] + yy*e[1] + yz*e[2]), -(zx*e[0] + zy*e[1] + zz*e[2]), 1];
+}
+function mul(a, b){ var o = new Float32Array(16); for (var c = 0; c < 4; c++) for (var r = 0; r < 4; r++){ var s = 0; for (var k = 0; k < 4; k++) s += a[k*4 + r]*b[c*4 + k]; o[c*4 + r] = s; } return o; }
+function invert(a){
+  var a00=a[0],a01=a[1],a02=a[2],a03=a[3],a10=a[4],a11=a[5],a12=a[6],a13=a[7],a20=a[8],a21=a[9],a22=a[10],a23=a[11],a30=a[12],a31=a[13],a32=a[14],a33=a[15];
+  var b00=a00*a11-a01*a10,b01=a00*a12-a02*a10,b02=a00*a13-a03*a10,b03=a01*a12-a02*a11,b04=a01*a13-a03*a11,b05=a02*a13-a03*a12;
+  var b06=a20*a31-a21*a30,b07=a20*a32-a22*a30,b08=a20*a33-a23*a30,b09=a21*a32-a22*a31,b10=a21*a33-a23*a31,b11=a22*a33-a23*a32;
+  var det=b00*b11-b01*b10+b02*b09+b03*b08-b04*b07+b05*b06; if (!det) return null; det = 1/det;
+  return [(a11*b11-a12*b10+a13*b09)*det,(a02*b10-a01*b11-a03*b09)*det,(a31*b05-a32*b04+a33*b03)*det,(a22*b04-a21*b05-a23*b03)*det,
+    (a12*b08-a10*b11-a13*b07)*det,(a00*b11-a02*b08+a03*b07)*det,(a32*b02-a30*b05-a33*b01)*det,(a20*b05-a22*b02+a23*b01)*det,
+    (a10*b10-a11*b08+a13*b06)*det,(a01*b08-a00*b10-a03*b06)*det,(a30*b04-a31*b02+a33*b00)*det,(a21*b02-a20*b04-a23*b00)*det,
+    (a11*b07-a10*b09-a12*b06)*det,(a00*b09-a01*b07+a02*b06)*det,(a31*b01-a30*b03-a32*b00)*det,(a20*b03-a21*b01+a22*b00)*det];
+}
+function eyePos(){ return [cam.dist*Math.cos(cam.pitch)*Math.sin(cam.yaw), cam.dist*Math.sin(cam.pitch), cam.dist*Math.cos(cam.pitch)*Math.cos(cam.yaw)]; }
+function updateVP(){ VP = mul(perspective(40*DEG, W/Hh, 0.5, 600), lookAt(eyePos(), [0, -1, 0])); }
+function project(x, y, z){
+  var m = VP, cx = m[0]*x + m[4]*y + m[8]*z + m[12], cy = m[1]*x + m[5]*y + m[9]*z + m[13], cw = m[3]*x + m[7]*y + m[11]*z + m[15];
+  if (cw <= 0.05) return null;
+  return [(cx/cw*0.5 + 0.5)*W, (0.5 - cy/cw*0.5)*Hh];
+}
+
+function draw(){
+  if (!gl) return;
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  var s = sunAt(state.t), ce = Math.cos(s.el*DEG);
+  var sunDir = [ce*Math.sin(s.az*DEG), Math.sin(s.el*DEG), -ce*Math.cos(s.az*DEG)];
+  gl.useProgram(prog);
+  gl.uniformMatrix4fv(gl.getUniformLocation(prog, 'uMVP'), false, VP);
+  gl.uniform3fv(gl.getUniformLocation(prog, 'uSun'), sunDir);
+  gl.uniform1f(gl.getUniformLocation(prog, 'uMode'), state.mode);
+  [['aPos', bufs.pos, 3], ['aNor', bufs.nor, 3], ['aLight', bufs.light, 1], ['aLayer', bufs.layer, 1], ['aHill', bufs.hill, 1], ['aTone', bufs.tone, 1]].forEach(function(a){
+    var loc = gl.getAttribLocation(prog, a[0]); if (loc < 0) return;
+    gl.bindBuffer(gl.ARRAY_BUFFER, a[1]); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, a[2], gl.FLOAT, false, 0, 0);
+  });
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufs.idx);
+  gl.drawElements(gl.TRIANGLES, idxCount, gl.UNSIGNED_SHORT, 0);
+  for (var l = 0; l < 6; l++) gl.disableVertexAttribArray(l);
+  gl.useProgram(wprog);
+  gl.uniformMatrix4fv(gl.getUniformLocation(wprog, 'uMVP'), false, VP);
+  gl.uniform1f(gl.getUniformLocation(wprog, 'uBase'), baseY());
+  gl.uniform1f(gl.getUniformLocation(wprog, 'uTop'), HMAXr*state.exag);
+  [['aPos', bufs.wpos], ['aNor', bufs.wnor]].forEach(function(a){
+    var loc = gl.getAttribLocation(wprog, a[0]); if (loc < 0) return;
+    gl.bindBuffer(gl.ARRAY_BUFFER, a[1]); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 3, gl.FLOAT, false, 0, 0);
+  });
+  gl.drawArrays(gl.TRIANGLES, 0, wallCount);
+  for (var m = 0; m < 6; m++) gl.disableVertexAttribArray(m);
+}
+
+/* ---------- overlay labels ---------- */
+var labelsEl = $('#labels'), pinEls = [], geoEls = [], sunEl, earthEl;
+function buildPins(){
+  pinEls.forEach(function(p){ p.remove(); }); pinEls = [];
+  sites.forEach(function(s, i){
+    var el = document.createElement('div'); el.className = 'mk pin';
+    el.innerHTML = '<i class="dot"></i><i class="stem"></i>';
+    var tag = document.createElement('button'); tag.type = 'button'; tag.className = 'tag';
+    tag.setAttribute('aria-label', 'Selectează locul ' + s.id + ', ' + s.name);
+    tag.addEventListener('click', function(){ select(i); });
+    el.appendChild(tag); labelsEl.appendChild(el); pinEls.push(el);
+  });
+}
+function buildGeo(){
+  [[0, 0, 'Polul Sud'], [0, 15.162, '89,5° S']].forEach(function(g){
+    var el = document.createElement('div'); el.className = 'mk geo';
+    el.innerHTML = '<i></i><span></span>'; el.querySelector('span').textContent = g[2];
+    labelsEl.appendChild(el); geoEls.push({el: el, x: g[0], z: g[1]});
+  });
+  sunEl = document.createElement('div'); sunEl.className = 'mk sky sun'; sunEl.innerHTML = '<i></i><span></span>';
+  earthEl = document.createElement('div'); earthEl.className = 'mk sky earth'; earthEl.innerHTML = '<i></i><span></span>';
+  labelsEl.appendChild(sunEl); labelsEl.appendChild(earthEl);
+}
+function place(el, p){ if (!p || p[0] < -60 || p[0] > W + 60 || p[1] < -60 || p[1] > Hh + 60){ el.hidden = true; return; } el.hidden = false; el.style.transform = 'translate(' + p[0].toFixed(1) + 'px,' + p[1].toFixed(1) + 'px)'; }
+function updateLabels(){
+  var e = state.exag;
+  sites.forEach(function(s, i){
+    var el = pinEls[i]; if (!el) return;
+    place(el, project(s.x, s.h*e, s.z));
+    el.classList.toggle('sel', i === sel);
+    el.querySelector('.tag').textContent = i === sel ? s.id + ' · ' + s.name : s.id;
+  });
+  geoEls.forEach(function(g){ place(g.el, project(g.x, hAt(g.x, g.z)*e, g.z)); });
+  var st = siteState(sites[sel], state.t), top = HMAXr*e + 1.2, R = 27;
+  var ps = project(Math.sin(st.sunAz*DEG)*R, top + st.sunEl*1.4, -Math.cos(st.sunAz*DEG)*R);
+  var pe = project(Math.sin(st.earthAz*DEG)*R, top + 2 + st.earthEl*0.9, -Math.cos(st.earthAz*DEG)*R);
+  [ps, pe].forEach(function(p){ if (p){ p[0] = clamp(p[0], 14, W - 14); p[1] = clamp(p[1], 22, Hh - 64); } });
+  place(sunEl, ps); place(earthEl, pe);
+  sunEl.classList.toggle('flip', !!ps && ps[0] > W - 130);
+  earthEl.classList.toggle('flip', !!pe && pe[0] > W - 130);
+  sunEl.classList.toggle('blocked', st.sunLit < 0.5);
+  earthEl.classList.toggle('blocked', st.earthVis < 0.5);
+  sunEl.querySelector('span').textContent = 'Soare ' + sgn(st.sunEl, 1) + '°';
+  earthEl.querySelector('span').textContent = 'Pământ ' + sgn(st.earthEl, 1) + '°';
+}
+
+/* ---------- legend, readout, sites panel ---------- */
+var legendEl = $('#legend');
+function renderLegend(){
+  if (state.mode === 0) legendEl.innerHTML = '<span><i class="sw lit"></i>Luminat de Soare</span><span><i class="sw dark"></i>Umbră</span><span>Grilă de 4 km · cercuri la 89,75° și 89,5° S</span>';
+  else if (state.mode === 1) legendEl.innerHTML = '<span><i class="grad sun"></i>0% → 100% din an cu Soare</span><span>Media pe 365 de zile</span>';
+  else legendEl.innerHTML = '<span><i class="grad earth"></i>0% → 100% din an cu Pământul vizibil</span><span>Media pe 365 de zile</span>';
+}
+function pct(v){ return Math.round(v*100) + '%'; }
+function nightText(d){ return d > 364 ? 'tot anul' : num(d, d < 10 ? 1 : 0) + ' zile'; }
+var sitesEl = $('#sites');
+function renderSites(){
+  sitesEl.innerHTML = '';
+  sites.forEach(function(s, i){
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'site';
+    b.setAttribute('aria-pressed', i === sel ? 'true' : 'false');
+    b.innerHTML =
+      '<span class="site-id">' + s.id + '</span>' +
+      '<span><span class="site-name"></span><span class="site-note"></span></span>' +
+      '<span class="stats">' +
+        '<span class="st"><span class="st-k">Soare</span><span class="st-v sun">' + pct(s.pSun) + '</span><span class="bar sun"><b style="width:' + pct(s.pSun) + '"></b></span></span>' +
+        '<span class="st"><span class="st-k">Pământ</span><span class="st-v earth">' + pct(s.pEarth) + '</span><span class="bar earth"><b style="width:' + pct(s.pEarth) + '"></b></span></span>' +
+        '<span class="st"><span class="st-k">Ambele</span><span class="st-v">' + pct(s.pBoth) + '</span></span>' +
+        '<span class="st"><span class="st-k" title="Cea mai lungă perioadă fără Soare">Noapte max.</span><span class="st-v">' + nightText(s.night) + '</span></span>' +
+      '</span>';
+    b.querySelector('.site-name').textContent = s.name;
+    b.querySelector('.site-note').textContent = s.note;
+    b.addEventListener('click', function(){ select(i); });
+    sitesEl.appendChild(b);
+  });
+}
+function select(i){ sel = i; $('#hName').textContent = sites[i].id; dirty.sites = true; dirty.charts = true; dirty.view = true; }
+var readoutEl = $('#readout');
+function renderReadout(){
+  var s = sites[sel], st = siteState(s, state.t);
+  readoutEl.innerHTML = '<span class="m">Din ' + s.id + ':</span> ' +
+    '<span class="s">Soare ' + sgn(st.sunEl, 2) + '° (' + (st.sunLit > 0.5 ? 'luminat' : 'ascuns de relief') + ')</span> · ' +
+    '<span class="e">Pământ ' + sgn(st.earthEl, 2) + '° (' + (st.earthVis > 0.5 ? 'vizibil' : 'ascuns') + ')</span>';
+}
+
+/* ---------- charts ---------- */
+function tok(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function fitCanvas(cv, cssH){
+  var dpr = Math.min(window.devicePixelRatio || 1, 2), w = cv.clientWidth || 300;
+  if (cssH) cv.style.height = cssH + 'px';
+  var hgt = cssH || cv.clientHeight || 200;
+  var tw = Math.round(w*dpr), th = Math.round(hgt*dpr);
+  if (cv.width !== tw || cv.height !== th){ cv.width = tw; cv.height = th; }
+  var ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return {ctx: ctx, w: w, h: hgt};
+}
+var hzCanvas = $('#horizon');
+function drawHorizon(){
+  var f = fitCanvas(hzCanvas, 210), ctx = f.ctx, w = f.w, h = f.h, s = sites[sel], st = siteState(s, state.t);
+  var C = {ink: tok('--ink'), muted: tok('--muted'), line: tok('--line'), sky: tok('--sky'), ground: tok('--ground'), sun: tok('--sun-fill'), earth: tok('--earth-fill'), sunT: tok('--sun'), earthT: tok('--earth'), mono: tok('--f-mono')};
+  var pl = 36, pr = 8, pt = 10, pb = 24, pw = w - pl - pr, ph = h - pt - pb;
+  var yMax = Math.min(40, Math.max(8, Math.ceil(s.pmax + 2))), yMin = Math.min(-3, Math.floor(s.pmin - 1));
+  var X = function(rel){ return pl + (rel + 180)/360*pw; }, Y = function(el){ return pt + (yMax - el)/(yMax - yMin)*ph; };
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = C.sky; ctx.fillRect(pl, pt, pw, ph);
+  var stepY = (yMax - yMin) > 24 ? 10 : 5;
+  ctx.font = '500 10.5px ' + C.mono; ctx.textBaseline = 'middle'; ctx.textAlign = 'right';
+  for (var gy = Math.ceil(yMin/stepY)*stepY; gy <= yMax; gy += stepY){
+    ctx.strokeStyle = C.line; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(pl, Y(gy) + 0.5); ctx.lineTo(pl + pw, Y(gy) + 0.5); ctx.stroke();
+    ctx.fillStyle = C.muted; ctx.fillText((gy > 0 ? '+' : gy < 0 ? '−' : '') + Math.abs(gy) + '°', pl - 5, Y(gy));
+  }
+  var rel, az;
+  ctx.globalAlpha = 0.45; ctx.fillStyle = C.sun; ctx.beginPath();
+  for (rel = -180; rel <= 180; rel += 2){ az = (rel + 360) % 360; var off = Math.cos(az*DEG)*s.ez + Math.sin(az*DEG)*s.ex; if (rel === -180) ctx.moveTo(X(rel), Y(1.54 + off)); else ctx.lineTo(X(rel), Y(1.54 + off)); }
+  for (rel = 180; rel >= -180; rel -= 2){ az = (rel + 360) % 360; var off2 = Math.cos(az*DEG)*s.ez + Math.sin(az*DEG)*s.ex; ctx.lineTo(X(rel), Y(-1.54 + off2)); }
+  ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
+  var eOff = s.ez;
+  ctx.fillStyle = C.earth; ctx.globalAlpha = 0.28;
+  ctx.fillRect(X(-7.9), Y(6.7 + eOff), X(7.9) - X(-7.9), Y(-6.7 + eOff) - Y(6.7 + eOff));
+  ctx.globalAlpha = 1; ctx.strokeStyle = C.earth; ctx.lineWidth = 1;
+  ctx.strokeRect(X(-7.9) + 0.5, Y(6.7 + eOff) + 0.5, X(7.9) - X(-7.9), Y(-6.7 + eOff) - Y(6.7 + eOff));
+  ctx.fillStyle = C.ground; ctx.beginPath(); ctx.moveTo(X(-180), pt + ph);
+  for (rel = -180; rel <= 180; rel += 1){ az = (rel + 360) % 360; ctx.lineTo(X(rel), Y(clamp(s.prof[az % 360], yMin, yMax))); }
+  ctx.lineTo(X(180), pt + ph); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = C.ink; ctx.lineWidth = 1.2; ctx.beginPath();
+  for (rel = -180; rel <= 180; rel += 1){ az = (rel + 360) % 360; var yy = Y(clamp(s.prof[az % 360], yMin, yMax)); if (rel === -180) ctx.moveTo(X(rel), yy); else ctx.lineTo(X(rel), yy); }
+  ctx.stroke();
+  ctx.setLineDash([3, 3]); ctx.strokeStyle = C.muted; ctx.beginPath(); ctx.moveTo(pl, Y(0) + 0.5); ctx.lineTo(pl + pw, Y(0) + 0.5); ctx.stroke(); ctx.setLineDash([]);
+  var mark = function(r, el, color, filled, label, below){
+    var x = X(r), y = Y(clamp(el, yMin, yMax));
+    ctx.beginPath(); ctx.arc(x, y, 5.5, 0, Math.PI*2);
+    ctx.lineWidth = 2; ctx.strokeStyle = color; ctx.stroke();
+    if (filled){ ctx.fillStyle = color; ctx.fill(); }
+    ctx.font = '600 11px ' + C.mono; ctx.textBaseline = 'middle';
+    var tw = ctx.measureText(label).width, tx = x + 9; ctx.textAlign = 'left';
+    if (tx + tw > pl + pw) { tx = x - 9 - tw; }
+    ctx.fillStyle = below; ctx.fillText(label, tx, y);
+  };
+  mark(relAz(st.earthAz), st.earthEl, C.earth, st.earthVis > 0.5, 'Pământ', C.earthT);
+  mark(relAz(st.sunAz), st.sunEl, C.sun, st.sunLit > 0.5, 'Soare', C.sunT);
+  ctx.strokeStyle = C.line; ctx.strokeRect(pl + 0.5, pt + 0.5, pw - 1, ph - 1);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.font = '500 10.5px ' + C.mono;
+  [[-180, '−180°'], [-90, '−90°'], [0, '0° Pământ'], [90, '+90°'], [180, '+180°']].forEach(function(tk){
+    ctx.fillStyle = C.muted; var tx = X(tk[0]);
+    if (tk[0] === -180) ctx.textAlign = 'left'; else if (tk[0] === 180) ctx.textAlign = 'right'; else ctx.textAlign = 'center';
+    ctx.fillText(tk[1], tx, pt + ph + 6);
+  });
+}
+var tlCanvas = $('#timeline'), TL = {l: 26, r: 6, top: 6, row: 26, axis: 22};
+function drawTimeline(){
+  var hgt = TL.top + sites.length*TL.row + TL.axis;
+  var f = fitCanvas(tlCanvas, hgt), ctx = f.ctx, w = f.w, pw = w - TL.l - TL.r;
+  var C = {ink: tok('--ink'), muted: tok('--muted'), line: tok('--line'), sun: tok('--sun-fill'), earth: tok('--earth-fill'), mono: tok('--f-mono')};
+  ctx.clearRect(0, 0, w, hgt);
+  var cw = pw/YEAR;
+  sites.forEach(function(s, r){
+    var y0 = TL.top + r*TL.row;
+    ctx.font = '600 11.5px ' + C.mono; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    ctx.fillStyle = r === sel ? C.ink : C.muted; ctx.fillText(s.id, 4, y0 + 8);
+    ctx.fillStyle = C.line; ctx.fillRect(TL.l, y0, pw, 10); ctx.fillRect(TL.l, y0 + 12, pw, 6);
+    for (var d = 0; d < YEAR; d++){
+      var a = s.daySun[d]; if (a > 0.01){ ctx.globalAlpha = a; ctx.fillStyle = C.sun; ctx.fillRect(TL.l + d*cw, y0, cw + 0.6, 10); }
+      var e = s.dayEarth[d]; if (e > 0.01){ ctx.globalAlpha = e; ctx.fillStyle = C.earth; ctx.fillRect(TL.l + d*cw, y0 + 12, cw + 0.6, 6); }
+    }
+    ctx.globalAlpha = 1;
+    if (r === sel){ ctx.strokeStyle = C.ink; ctx.lineWidth = 1; ctx.strokeRect(TL.l - 0.5, y0 - 0.5, pw + 1, 19); }
+  });
+  var yA = TL.top + sites.length*TL.row;
+  ctx.font = '500 10.5px ' + C.mono; ctx.textBaseline = 'top'; ctx.fillStyle = C.muted;
+  [0, 60, 120, 180, 240, 300, 365].forEach(function(d){
+    var x = TL.l + d/YEAR*pw; ctx.textAlign = d === 0 ? 'left' : d === 365 ? 'right' : 'center';
+    ctx.fillText(d === 0 ? 'ziua 0' : String(d), x, yA);
+  });
+  var cx = TL.l + state.t/YEAR*pw;
+  ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx, 1); ctx.lineTo(cx, yA - 3); ctx.stroke();
+}
+tlCanvas.addEventListener('pointerdown', function(ev){
+  var rect = tlCanvas.getBoundingClientRect(), pw = rect.width - TL.l - TL.r;
+  setT(clamp((ev.clientX - rect.left - TL.l)/pw*YEAR, 0, YEAR));
+  var row = Math.floor((ev.clientY - rect.top - TL.top)/TL.row);
+  if (row >= 0 && row < sites.length && row !== sel) select(row);
+});
+
+/* ---------- interaction ---------- */
+var tInput = $('#t'), tOut = $('#tOut'), playBtn = $('#play'), playIcon = $('#playIcon');
+function setT(t){ state.t = ((t % YEAR) + YEAR) % YEAR; tInput.value = state.t.toFixed(2); dirty.light = true; dirty.charts = true; dirty.view = true; }
+tInput.addEventListener('input', function(){ setT(parseFloat(tInput.value)); });
+playBtn.addEventListener('click', function(){
+  state.playing = !state.playing;
+  playIcon.setAttribute('d', state.playing ? 'M3.5 2.5h3.2v11H3.5zM9.3 2.5h3.2v11H9.3z' : 'M4 2.5v11l9-5.5z');
+  playBtn.setAttribute('aria-label', state.playing ? 'Oprește simularea' : 'Pornește simularea');
+  last = performance.now();
+});
+$('#speed').addEventListener('change', function(e){ state.speed = parseFloat(e.target.value); });
+$('#exag').addEventListener('input', function(e){ state.exag = parseFloat(e.target.value); $('#exagOut').textContent = '×' + num(state.exag, 1); dirty.geo = true; dirty.view = true; });
+var segBtns = Array.prototype.slice.call(document.querySelectorAll('.seg button'));
+segBtns.forEach(function(btn){
+  btn.addEventListener('click', function(){
+    state.mode = parseInt(btn.getAttribute('data-mode'), 10);
+    segBtns.forEach(function(o){ o.setAttribute('aria-pressed', o === btn ? 'true' : 'false'); });
+    dirty.layer = true; dirty.view = true; renderLegend();
+  });
+});
+
+var pointers = new Map(), downInfo = null, pinch = null;
+function pdist(){ var p = Array.from(pointers.values()); return Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y) || 1; }
+canvas.addEventListener('pointerdown', function(e){
+  canvas.focus({preventScroll: true});
+  try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+  pointers.set(e.pointerId, {x: e.clientX, y: e.clientY});
+  if (pointers.size === 1) downInfo = {x: e.clientX, y: e.clientY, t: performance.now(), moved: 0};
+  else { downInfo = null; if (pointers.size === 2) pinch = {d: pdist(), dist: cam.dist}; }
+});
+canvas.addEventListener('pointermove', function(e){
+  var p = pointers.get(e.pointerId); if (!p) return;
+  var dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
+  if (pointers.size === 1){
+    cam.yaw -= dx*0.006; cam.pitch = clamp(cam.pitch + dy*0.005, 0.12, 1.45);
+    if (downInfo) downInfo.moved += Math.abs(dx) + Math.abs(dy);
+  } else if (pointers.size === 2 && pinch){ cam.dist = clamp(pinch.dist*pinch.d/pdist(), 24, 150); }
+  dirty.view = true;
+});
+function endPointer(e){
+  if (downInfo && pointers.size === 1 && downInfo.moved < 8 && performance.now() - downInfo.t < 450 && e.type === 'pointerup') pickAt(e.clientX, e.clientY);
+  pointers.delete(e.pointerId); downInfo = null; if (pointers.size < 2) pinch = null;
+}
+canvas.addEventListener('pointerup', endPointer);
+canvas.addEventListener('pointercancel', endPointer);
+canvas.addEventListener('wheel', function(e){ e.preventDefault(); cam.dist = clamp(cam.dist*Math.exp(e.deltaY*0.0012), 24, 150); dirty.view = true; }, {passive: false});
+canvas.addEventListener('keydown', function(e){
+  var used = true;
+  if (e.key === 'ArrowLeft') cam.yaw += 0.08; else if (e.key === 'ArrowRight') cam.yaw -= 0.08;
+  else if (e.key === 'ArrowUp') cam.pitch = clamp(cam.pitch + 0.06, 0.12, 1.45); else if (e.key === 'ArrowDown') cam.pitch = clamp(cam.pitch - 0.06, 0.12, 1.45);
+  else if (e.key === '+' || e.key === '=') cam.dist = clamp(cam.dist*0.9, 24, 150); else if (e.key === '-') cam.dist = clamp(cam.dist*1.1, 24, 150);
+  else used = false;
+  if (used){ e.preventDefault(); dirty.view = true; }
+});
+function pickAt(cx, cy){
+  var rect = canvas.getBoundingClientRect(), nx = (cx - rect.left)/rect.width*2 - 1, ny = 1 - (cy - rect.top)/rect.height*2;
+  var inv = invert(VP); if (!inv) return;
+  var un = function(z){ var x = inv[0]*nx + inv[4]*ny + inv[8]*z + inv[12], y = inv[1]*nx + inv[5]*ny + inv[9]*z + inv[13], zz = inv[2]*nx + inv[6]*ny + inv[10]*z + inv[14], w = inv[3]*nx + inv[7]*ny + inv[11]*z + inv[15]; return [x/w, y/w, zz/w]; };
+  var p0 = un(-1), p1 = un(1), d = [p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]], dl = Math.hypot(d[0], d[1], d[2]); d = [d[0]/dl, d[1]/dl, d[2]/dl];
+  var e = state.exag, prevT = 0;
+  for (var s = 1; s < 1400; s++){
+    var tt = s*0.15, x = p0[0] + d[0]*tt, y = p0[1] + d[1]*tt, z = p0[2] + d[2]*tt;
+    if (Math.abs(x) <= HALF && Math.abs(z) <= HALF && y <= hAt(x, z)*e){
+      var lo = prevT, hi = tt;
+      for (var it = 0; it < 10; it++){ var mid = (lo + hi)/2, mx = p0[0] + d[0]*mid, my = p0[1] + d[1]*mid, mz = p0[2] + d[2]*mid; if (my <= hAt(mx, mz)*e) hi = mid; else lo = mid; }
+      addCustom(p0[0] + d[0]*hi, p0[2] + d[2]*hi); return;
+    }
+    prevT = tt;
+  }
+}
+function addCustom(x, z){
+  x = clamp(x, -HALF + 0.5, HALF - 0.5); z = clamp(z, -HALF + 0.5, HALF - 0.5);
+  var s = makeSite('D', 'Locul tău', x, z);
+  s.note = 'Ales pe hartă, la ' + num(s.dist, 1) + ' km de pol, altitudine ' + sgn(s.h, 2) + ' km';
+  if (sites.length > 3) sites[3] = s; else sites.push(s);
+  buildPins(); select(3);
+}
+
+/* ---------- sizing & theme ---------- */
+var framed = false;
+function resize(){
+  W = viewport.clientWidth; Hh = viewport.clientHeight;
+  if (!framed && W > 0 && Hh > 0){ var asp = W/Hh; cam.dist = asp < 1.25 ? clamp(66*1.25/asp, 66, 140) : 66; framed = true; }
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(W*dpr); canvas.height = Math.round(Hh*dpr);
+  dirty.view = true; dirty.charts = true;
+}
+if (window.ResizeObserver){ new ResizeObserver(resize).observe(viewport); new ResizeObserver(function(){ dirty.charts = true; }).observe($('.rail')); }
+window.addEventListener('resize', resize);
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){ dirty.charts = true; }); } catch (err) {}
+new MutationObserver(function(){ dirty.charts = true; }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+
+/* ---------- loop ---------- */
+var statusEl = $('#status');
+function work(){
+  var t0 = performance.now();
+  if (stage === 0){
+    while (hzDone < NV && performance.now() - t0 < 24){
+      var end = Math.min(NV, hzDone + 48);
+      for (var v = hzDone; v < end; v++){
+        var base = v*NAZ, h0 = vh[v] + GROUND;
+        for (var b = 0; b < NAZ; b++) HZ[base + b] = horizonDir(vx[v], vz[v], h0, BDX[b], BDZ[b], CELL*0.75, 0.06);
+      }
+      hzDone = end;
+    }
+    statusEl.innerHTML = 'Calculez orizontul pentru ' + NV.toLocaleString('ro-RO') + ' de puncte… <b>' + Math.floor(hzDone/NV*100) + '%</b>';
+    if (hzDone >= NV){ stage = 1; dirty.light = true; dirty.view = true; }
+  } else if (stage === 1){
+    while (meanDone < MEAN_S && performance.now() - t0 < 24){ meanStep((meanDone + 0.5)*YEAR/MEAN_S); meanDone++; }
+    statusEl.innerHTML = 'Calculez mediile pe un an… <b>' + Math.floor(meanDone/MEAN_S*100) + '%</b>';
+    if (meanDone >= MEAN_S){
+      for (var q = 0; q < NV; q++){ sunMean[q] /= MEAN_S; earthMean[q] /= MEAN_S; }
+      stage = 2; statusEl.hidden = true;
+      segBtns.forEach(function(o){ o.disabled = false; });
+      dirty.layer = true; dirty.view = true;
+    }
+  }
+}
+var last = performance.now();
+function frame(now){
+  var dt = Math.min(0.1, (now - last)/1000); last = now;
+  if (stage < 2) work();
+  if (state.playing){ setT(state.t + dt*state.speed); }
+  if (dirty.geo){ updateGeometry(); dirty.geo = false; }
+  if (dirty.light && gl){
+    if (stage >= 1) lightAt(state.t, light); else light.fill(1);
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufs.light); gl.bufferSubData(gl.ARRAY_BUFFER, 0, light);
+    dirty.light = false;
+  }
+  if (dirty.layer && gl){
+    if (state.mode === 1) layer.set(sunMean); else if (state.mode === 2) layer.set(earthMean);
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufs.layer); gl.bufferSubData(gl.ARRAY_BUFFER, 0, layer);
+    dirty.layer = false;
+  }
+  if (dirty.sites){ renderSites(); dirty.sites = false; }
+  if (dirty.view){ updateVP(); draw(); updateLabels(); renderReadout(); tOut.textContent = 'Ziua ' + num(state.t, 1); dirty.view = false; }
+  if (dirty.charts){ drawHorizon(); drawTimeline(); dirty.charts = false; }
+  requestAnimationFrame(frame);
+}
+buildPins(); buildGeo(); renderLegend(); resize();
+window.__navigator = {sites: sites, state: state, get stage(){ return stage; }, sunMean: sunMean, earthMean: earthMean, light: light};
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
