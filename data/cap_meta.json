@@ -1,8 +1,8 @@
 {
- "generated_utc": "2026-11-14T12:23Z",
+ "generated_utc": "2026-11-14T12:24Z",
  "versions": {
   "dem": "LDEM_80S_80MPP_ADJ.TIF (PGDA 90, 2023-07-07), block mean of 80 m pixels",
-  "code": "b6af83d+uncommitted"
+  "code": "74c264f"
  },
  "purpose": "approximate horizon masks at clicked spots (label: approximate, 640 m terrain)",
  "nx": 950,
