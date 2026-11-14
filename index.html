@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="ro">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- Peaks of Light · NASA Space Apps 2026 Alba Iulia · prototip pre-eveniment: teren generat, poziții simplificate Soare/Pământ -->
-<title>Navigator Polul Sud</title>
+<!-- Peaks of Light · NASA Space Apps 2026 Alba Iulia · pre-event prototype: generated terrain, simplified Sun/Earth positions -->
+<title>South Pole Navigator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Saira+Condensed:wght@500;600;700&display=swap">
@@ -144,79 +144,79 @@ canvas.chart{width:100%;display:block}
   <header class="top">
     <div>
       <p class="eyebrow">NASA Space Apps 2026 · Lunar Landing Site Navigator</p>
-      <h1>Navigator Polul Sud</h1>
-      <p class="lede">La polul sud al Lunii, Soarele se rotește la 1–2° deasupra orizontului, iar Pământul urcă și coboară lângă orizont. Relieful decide unde ai energie și unde ai legătură cu Pământul.</p>
+      <h1>South Pole Navigator</h1>
+      <p class="lede">At the Moon's south pole, the Sun circles 1–2° above the horizon, and Earth rises and sinks near the horizon. The terrain decides where you have power and where you can talk to Earth.</p>
     </div>
-    <p class="badge">Demo: teren generat și poziții simplificate pentru Soare și Pământ</p>
+    <p class="badge">Demo: generated terrain and simplified Sun and Earth positions</p>
   </header>
 
   <main class="layout">
-    <section class="stage" aria-label="Harta 3D">
+    <section class="stage" aria-label="3D map">
       <div class="viewport" id="viewport">
-        <canvas id="gl" tabindex="0" aria-label="Relief 3D al zonei polului sud lunar. Trage ca să rotești, folosește săgețile de la tastatură sau atinge terenul ca să alegi un loc."></canvas>
+        <canvas id="gl" tabindex="0" aria-label="3D terrain of the lunar south pole region. Drag to rotate, use the arrow keys, or tap the terrain to pick a site."></canvas>
         <div class="labels" id="labels"></div>
-        <div class="status" id="status" role="status">Calculez umbrele… <b>0%</b></div>
+        <div class="status" id="status" role="status">Computing shadows… <b>0%</b></div>
         <div class="legend" id="legend"></div>
       </div>
       <div class="controls">
         <div class="timebar">
-          <button class="play" id="play" type="button" aria-label="Pornește simularea">
+          <button class="play" id="play" type="button" aria-label="Start the simulation">
             <svg viewBox="0 0 16 16" aria-hidden="true"><path id="playIcon" d="M4 2.5v11l9-5.5z"/></svg>
           </button>
-          <input id="t" type="range" min="0" max="365" step="0.05" value="80" aria-label="Ziua din an">
-          <output id="tOut" for="t">Ziua 80,0</output>
+          <input id="t" type="range" min="0" max="365" step="0.05" value="80" aria-label="Day of the year">
+          <output id="tOut" for="t">Day 80.0</output>
         </div>
         <div class="opts">
-          <div class="seg" role="group" aria-label="Ce arată harta">
-            <button type="button" data-mode="0" aria-pressed="true">Lumina acum</button>
-            <button type="button" data-mode="1" aria-pressed="false" disabled>Soare pe an</button>
-            <button type="button" data-mode="2" aria-pressed="false" disabled>Pământ pe an</button>
+          <div class="seg" role="group" aria-label="What the map shows">
+            <button type="button" data-mode="0" aria-pressed="true">Light now</button>
+            <button type="button" data-mode="1" aria-pressed="false" disabled>Sun per year</button>
+            <button type="button" data-mode="2" aria-pressed="false" disabled>Earth per year</button>
           </div>
-          <label class="opt" for="speed">Viteză
+          <label class="opt" for="speed">Speed
             <select id="speed">
-              <option value="1">1 zi/s</option>
-              <option value="3" selected>3 zile/s</option>
-              <option value="10">10 zile/s</option>
-              <option value="30">30 zile/s</option>
+              <option value="1">1 day/s</option>
+              <option value="3" selected>3 days/s</option>
+              <option value="10">10 days/s</option>
+              <option value="30">30 days/s</option>
             </select>
           </label>
-          <label class="opt" for="exag">Relief
+          <label class="opt" for="exag">Vertical scale
             <input id="exag" type="range" min="1" max="5" step="0.5" value="2.5">
-            <output id="exagOut" for="exag">×2,5</output>
+            <output id="exagOut" for="exag">×2.5</output>
           </label>
         </div>
         <p class="readout" id="readout"></p>
-        <p class="caption">Trage ca să rotești, ciupește sau folosește rotița pentru zoom, atinge terenul ca să adaugi un loc nou.</p>
+        <p class="caption">Drag to rotate, pinch or scroll to zoom, tap the terrain to add a new site.</p>
       </div>
     </section>
 
     <aside class="rail">
       <section class="block">
         <div class="block-head">
-          <h2>Locuri candidate</h2>
-          <p class="caption">Panouri și antenă pe catarg de 10 m</p>
+          <h2>Candidate sites</h2>
+          <p class="caption">Panels and antenna on a 10 m mast</p>
         </div>
         <div class="sites" id="sites"></div>
       </section>
       <section class="block">
-        <h2>Orizontul văzut din <span id="hName">A</span></h2>
+        <h2>Horizon seen from <span id="hName">A</span></h2>
         <canvas class="chart" id="horizon"></canvas>
-        <p class="caption">Gri: relieful din jur. Banda galbenă: pe unde trece Soarele într-un an. Dreptunghiul albastru: zona în care oscilează Pământul. 0° pe axa de jos înseamnă direcția Pământului.</p>
+        <p class="caption">Grey: surrounding terrain. Yellow band: the Sun's path over a year. Blue box: the area where Earth wobbles. 0° on the bottom axis is the direction of Earth.</p>
       </section>
       <section class="block">
-        <h2>Un an, zi cu zi</h2>
+        <h2>One year, day by day</h2>
         <canvas class="chart" id="timeline"></canvas>
-        <p class="caption">Galben: cât din zi are Soare. Albastru: cât din zi se vede Pământul. Atinge banda ca să sari la acea zi.</p>
+        <p class="caption">Yellow: how much of the day has Sun. Blue: how much of the day Earth is visible. Tap the strip to jump to that day.</p>
       </section>
     </aside>
   </main>
 
-  <section class="notes" aria-label="Ce e simulat">
-    <h2>Ce e simulat aici și ce ar folosi versiunea de concurs</h2>
+  <section class="notes" aria-label="What is simulated">
+    <h2>What is simulated here and what the competition version would use</h2>
     <dl>
-      <div><dt>Relief</dt><dd>Generat: un crater de 21 km lângă pol și un masiv spre Pământ, pe o hartă de 48 × 48 km. Versiunea reală ar folosi modelele de relief LOLA (Moon Trek, PDS).</dd></div>
-      <div><dt>Soare și Pământ</dt><dd>Mișcări simplificate: Soarele face un cerc complet la 29,5 zile și urcă sau coboară cu ±1,54° într-un an; Pământul oscilează cu ±6,7° pe verticală și ±7,9° pe orizontală. Versiunea reală ar folosi efemeridele NASA SPICE.</dd></div>
-      <div><dt>Calcul</dt><dd>Orizontul fiecărui punct e calculat în 64 de direcții (360 pentru locurile candidate), până la 46 km distanță, cu curbura Lunii inclusă. Același calcul merge pe date reale.</dd></div>
+      <div><dt>Terrain</dt><dd>Generated: a 21 km crater near the pole and a massif toward Earth, on a 48 × 48 km map. The real version would use LOLA elevation models (Moon Trek, PDS).</dd></div>
+      <div><dt>Sun and Earth</dt><dd>Simplified motion: the Sun makes a full circle every 29.5 days and rises or sinks by ±1.54° over a year; Earth wobbles ±6.7° vertically and ±7.9° horizontally. The real version would use NASA SPICE ephemerides.</dd></div>
+      <div><dt>Computation</dt><dd>Each point's horizon is computed in 64 directions (360 for candidate sites), out to 46 km, including the Moon's curvature. The same computation works on real data.</dd></div>
     </dl>
   </section>
 </div>
@@ -231,7 +231,7 @@ var SYN = 29.530589, DRAC_Y = 346.62, DRAC_M = 27.2122, ANOM_M = 27.5545;
 var MAST = 0.010, GROUND = 0.002, YEAR = 365, SPD = 8, MEAN_S = 730;
 
 function $(s){ return document.querySelector(s); }
-function num(v, d){ return v.toFixed(d).replace('.', ','); }
+function num(v, d){ return v.toFixed(d); }
 function sgn(v, d){ return (v < 0 ? '−' : '+') + num(Math.abs(v), d); }
 function clamp(v, a, b){ return v < a ? a : v > b ? b : v; }
 
@@ -422,12 +422,12 @@ function quickScore(x, z){
     if (Math.abs(x) > HALF - 1 || Math.abs(z) > HALF - 1) continue;
     var sc = quickScore(x, z); if (sc > bs){ bs = sc; best = [x, z]; }
   }
-  sites.push(makeSite('A', 'Creasta craterului', best[0], best[1]));
-  sites.push(makeSite('B', 'Versantul masivului', MASSIF.x + 0.3, MASSIF.z - 4.6));
-  sites.push(makeSite('C', 'Fundul craterului', MAIN.x, MAIN.z));
-  sites[0].note = 'Cel mai bun punct de pe margine, la ' + num(sites[0].dist, 1) + ' km de pol';
-  sites[1].note = 'Panta dinspre Pământ, la ' + num(sites[1].dist, 1) + ' km de pol';
-  sites[2].note = 'Zonă permanent umbrită, unde se poate afla gheață';
+  sites.push(makeSite('A', 'Crater rim', best[0], best[1]));
+  sites.push(makeSite('B', 'Massif slope', MASSIF.x + 0.3, MASSIF.z - 4.6));
+  sites.push(makeSite('C', 'Crater floor', MAIN.x, MAIN.z));
+  sites[0].note = 'Best point on the rim, ' + num(sites[0].dist, 1) + ' km from the pole';
+  sites[1].note = 'Earth-facing slope, ' + num(sites[1].dist, 1) + ' km from the pole';
+  sites[2].note = 'Permanently shadowed area, where ice may be found';
 })();
 var sel = 0;
 
@@ -443,7 +443,7 @@ try { gl = canvas.getContext('webgl', {antialias: true, alpha: false}); } catch 
 var prog, wprog, bufs = {}, idxCount = 0, wallCount = 0, VP = new Float32Array(16), W = 1, Hh = 1;
 if (!gl){
   var msg = document.createElement('div'); msg.className = 'nogl';
-  msg.textContent = 'Browserul nu poate afișa harta 3D (WebGL indisponibil). Locurile candidate și graficele funcționează în continuare.';
+  msg.textContent = 'This browser cannot show the 3D map (WebGL unavailable). The candidate sites and charts still work.';
   viewport.appendChild(msg);
 } else {
   var deriv = gl.getExtension('OES_standard_derivatives');
@@ -579,13 +579,13 @@ function buildPins(){
     var el = document.createElement('div'); el.className = 'mk pin';
     el.innerHTML = '<i class="dot"></i><i class="stem"></i>';
     var tag = document.createElement('button'); tag.type = 'button'; tag.className = 'tag';
-    tag.setAttribute('aria-label', 'Selectează locul ' + s.id + ', ' + s.name);
+    tag.setAttribute('aria-label', 'Select site ' + s.id + ', ' + s.name);
     tag.addEventListener('click', function(){ select(i); });
     el.appendChild(tag); labelsEl.appendChild(el); pinEls.push(el);
   });
 }
 function buildGeo(){
-  [[0, 0, 'Polul Sud'], [0, 15.162, '89,5° S']].forEach(function(g){
+  [[0, 0, 'South Pole'], [0, 15.162, '89.5° S']].forEach(function(g){
     var el = document.createElement('div'); el.className = 'mk geo';
     el.innerHTML = '<i></i><span></span>'; el.querySelector('span').textContent = g[2];
     labelsEl.appendChild(el); geoEls.push({el: el, x: g[0], z: g[1]});
@@ -613,19 +613,19 @@ function updateLabels(){
   earthEl.classList.toggle('flip', !!pe && pe[0] > W - 130);
   sunEl.classList.toggle('blocked', st.sunLit < 0.5);
   earthEl.classList.toggle('blocked', st.earthVis < 0.5);
-  sunEl.querySelector('span').textContent = 'Soare ' + sgn(st.sunEl, 1) + '°';
-  earthEl.querySelector('span').textContent = 'Pământ ' + sgn(st.earthEl, 1) + '°';
+  sunEl.querySelector('span').textContent = 'Sun ' + sgn(st.sunEl, 1) + '°';
+  earthEl.querySelector('span').textContent = 'Earth ' + sgn(st.earthEl, 1) + '°';
 }
 
 /* ---------- legend, readout, sites panel ---------- */
 var legendEl = $('#legend');
 function renderLegend(){
-  if (state.mode === 0) legendEl.innerHTML = '<span><i class="sw lit"></i>Luminat de Soare</span><span><i class="sw dark"></i>Umbră</span><span>Grilă de 4 km · cercuri la 89,75° și 89,5° S</span>';
-  else if (state.mode === 1) legendEl.innerHTML = '<span><i class="grad sun"></i>0% → 100% din an cu Soare</span><span>Media pe 365 de zile</span>';
-  else legendEl.innerHTML = '<span><i class="grad earth"></i>0% → 100% din an cu Pământul vizibil</span><span>Media pe 365 de zile</span>';
+  if (state.mode === 0) legendEl.innerHTML = '<span><i class="sw lit"></i>Sunlit</span><span><i class="sw dark"></i>Shadow</span><span>4 km grid · circles at 89.75° and 89.5° S</span>';
+  else if (state.mode === 1) legendEl.innerHTML = '<span><i class="grad sun"></i>0% → 100% of the year in sunlight</span><span>Average over 365 days</span>';
+  else legendEl.innerHTML = '<span><i class="grad earth"></i>0% → 100% of the year with Earth visible</span><span>Average over 365 days</span>';
 }
 function pct(v){ return Math.round(v*100) + '%'; }
-function nightText(d){ return d > 364 ? 'tot anul' : num(d, d < 10 ? 1 : 0) + ' zile'; }
+function nightText(d){ return d > 364 ? 'all year' : num(d, d < 10 ? 1 : 0) + ' days'; }
 var sitesEl = $('#sites');
 function renderSites(){
   sitesEl.innerHTML = '';
@@ -636,10 +636,10 @@ function renderSites(){
       '<span class="site-id">' + s.id + '</span>' +
       '<span><span class="site-name"></span><span class="site-note"></span></span>' +
       '<span class="stats">' +
-        '<span class="st"><span class="st-k">Soare</span><span class="st-v sun">' + pct(s.pSun) + '</span><span class="bar sun"><b style="width:' + pct(s.pSun) + '"></b></span></span>' +
-        '<span class="st"><span class="st-k">Pământ</span><span class="st-v earth">' + pct(s.pEarth) + '</span><span class="bar earth"><b style="width:' + pct(s.pEarth) + '"></b></span></span>' +
-        '<span class="st"><span class="st-k">Ambele</span><span class="st-v">' + pct(s.pBoth) + '</span></span>' +
-        '<span class="st"><span class="st-k" title="Cea mai lungă perioadă fără Soare">Noapte max.</span><span class="st-v">' + nightText(s.night) + '</span></span>' +
+        '<span class="st"><span class="st-k">Sun</span><span class="st-v sun">' + pct(s.pSun) + '</span><span class="bar sun"><b style="width:' + pct(s.pSun) + '"></b></span></span>' +
+        '<span class="st"><span class="st-k">Earth</span><span class="st-v earth">' + pct(s.pEarth) + '</span><span class="bar earth"><b style="width:' + pct(s.pEarth) + '"></b></span></span>' +
+        '<span class="st"><span class="st-k">Both</span><span class="st-v">' + pct(s.pBoth) + '</span></span>' +
+        '<span class="st"><span class="st-k" title="Longest period without Sun">Max. night</span><span class="st-v">' + nightText(s.night) + '</span></span>' +
       '</span>';
     b.querySelector('.site-name').textContent = s.name;
     b.querySelector('.site-note').textContent = s.note;
@@ -651,9 +651,9 @@ function select(i){ sel = i; $('#hName').textContent = sites[i].id; dirty.sites 
 var readoutEl = $('#readout');
 function renderReadout(){
   var s = sites[sel], st = siteState(s, state.t);
-  readoutEl.innerHTML = '<span class="m">Din ' + s.id + ':</span> ' +
-    '<span class="s">Soare ' + sgn(st.sunEl, 2) + '° (' + (st.sunLit > 0.5 ? 'luminat' : 'ascuns de relief') + ')</span> · ' +
-    '<span class="e">Pământ ' + sgn(st.earthEl, 2) + '° (' + (st.earthVis > 0.5 ? 'vizibil' : 'ascuns') + ')</span>';
+  readoutEl.innerHTML = '<span class="m">From ' + s.id + ':</span> ' +
+    '<span class="s">Sun ' + sgn(st.sunEl, 2) + '° (' + (st.sunLit > 0.5 ? 'lit' : 'hidden by terrain') + ')</span> · ' +
+    '<span class="e">Earth ' + sgn(st.earthEl, 2) + '° (' + (st.earthVis > 0.5 ? 'visible' : 'hidden') + ')</span>';
 }
 
 /* ---------- charts ---------- */
@@ -709,11 +709,11 @@ function drawHorizon(){
     if (tx + tw > pl + pw) { tx = x - 9 - tw; }
     ctx.fillStyle = below; ctx.fillText(label, tx, y);
   };
-  mark(relAz(st.earthAz), st.earthEl, C.earth, st.earthVis > 0.5, 'Pământ', C.earthT);
-  mark(relAz(st.sunAz), st.sunEl, C.sun, st.sunLit > 0.5, 'Soare', C.sunT);
+  mark(relAz(st.earthAz), st.earthEl, C.earth, st.earthVis > 0.5, 'Earth', C.earthT);
+  mark(relAz(st.sunAz), st.sunEl, C.sun, st.sunLit > 0.5, 'Sun', C.sunT);
   ctx.strokeStyle = C.line; ctx.strokeRect(pl + 0.5, pt + 0.5, pw - 1, ph - 1);
   ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.font = '500 10.5px ' + C.mono;
-  [[-180, '−180°'], [-90, '−90°'], [0, '0° Pământ'], [90, '+90°'], [180, '+180°']].forEach(function(tk){
+  [[-180, '−180°'], [-90, '−90°'], [0, '0° Earth'], [90, '+90°'], [180, '+180°']].forEach(function(tk){
     ctx.fillStyle = C.muted; var tx = X(tk[0]);
     if (tk[0] === -180) ctx.textAlign = 'left'; else if (tk[0] === 180) ctx.textAlign = 'right'; else ctx.textAlign = 'center';
     ctx.fillText(tk[1], tx, pt + ph + 6);
@@ -742,7 +742,7 @@ function drawTimeline(){
   ctx.font = '500 10.5px ' + C.mono; ctx.textBaseline = 'top'; ctx.fillStyle = C.muted;
   [0, 60, 120, 180, 240, 300, 365].forEach(function(d){
     var x = TL.l + d/YEAR*pw; ctx.textAlign = d === 0 ? 'left' : d === 365 ? 'right' : 'center';
-    ctx.fillText(d === 0 ? 'ziua 0' : String(d), x, yA);
+    ctx.fillText(d === 0 ? 'day 0' : String(d), x, yA);
   });
   var cx = TL.l + state.t/YEAR*pw;
   ctx.strokeStyle = C.ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx, 1); ctx.lineTo(cx, yA - 3); ctx.stroke();
@@ -761,7 +761,7 @@ tInput.addEventListener('input', function(){ setT(parseFloat(tInput.value)); });
 playBtn.addEventListener('click', function(){
   state.playing = !state.playing;
   playIcon.setAttribute('d', state.playing ? 'M3.5 2.5h3.2v11H3.5zM9.3 2.5h3.2v11H9.3z' : 'M4 2.5v11l9-5.5z');
-  playBtn.setAttribute('aria-label', state.playing ? 'Oprește simularea' : 'Pornește simularea');
+  playBtn.setAttribute('aria-label', state.playing ? 'Pause the simulation' : 'Start the simulation');
   last = performance.now();
 });
 $('#speed').addEventListener('change', function(e){ state.speed = parseFloat(e.target.value); });
@@ -826,8 +826,8 @@ function pickAt(cx, cy){
 }
 function addCustom(x, z){
   x = clamp(x, -HALF + 0.5, HALF - 0.5); z = clamp(z, -HALF + 0.5, HALF - 0.5);
-  var s = makeSite('D', 'Locul tău', x, z);
-  s.note = 'Ales pe hartă, la ' + num(s.dist, 1) + ' km de pol, altitudine ' + sgn(s.h, 2) + ' km';
+  var s = makeSite('D', 'Your site', x, z);
+  s.note = 'Picked on the map, ' + num(s.dist, 1) + ' km from the pole, elevation ' + sgn(s.h, 2) + ' km';
   if (sites.length > 3) sites[3] = s; else sites.push(s);
   buildPins(); select(3);
 }
@@ -859,11 +859,11 @@ function work(){
       }
       hzDone = end;
     }
-    statusEl.innerHTML = 'Calculez orizontul pentru ' + NV.toLocaleString('ro-RO') + ' de puncte… <b>' + Math.floor(hzDone/NV*100) + '%</b>';
+    statusEl.innerHTML = 'Computing the horizon for ' + NV.toLocaleString('en-US') + ' points… <b>' + Math.floor(hzDone/NV*100) + '%</b>';
     if (hzDone >= NV){ stage = 1; dirty.light = true; dirty.view = true; }
   } else if (stage === 1){
     while (meanDone < MEAN_S && performance.now() - t0 < 24){ meanStep((meanDone + 0.5)*YEAR/MEAN_S); meanDone++; }
-    statusEl.innerHTML = 'Calculez mediile pe un an… <b>' + Math.floor(meanDone/MEAN_S*100) + '%</b>';
+    statusEl.innerHTML = 'Computing yearly averages… <b>' + Math.floor(meanDone/MEAN_S*100) + '%</b>';
     if (meanDone >= MEAN_S){
       for (var q = 0; q < NV; q++){ sunMean[q] /= MEAN_S; earthMean[q] /= MEAN_S; }
       stage = 2; statusEl.hidden = true;
@@ -889,7 +889,7 @@ function frame(now){
     dirty.layer = false;
   }
   if (dirty.sites){ renderSites(); dirty.sites = false; }
-  if (dirty.view){ updateVP(); draw(); updateLabels(); renderReadout(); tOut.textContent = 'Ziua ' + num(state.t, 1); dirty.view = false; }
+  if (dirty.view){ updateVP(); draw(); updateLabels(); renderReadout(); tOut.textContent = 'Day ' + num(state.t, 1); dirty.view = false; }
   if (dirty.charts){ drawHorizon(); drawTimeline(); dirty.charts = false; }
   requestAnimationFrame(frame);
 }
