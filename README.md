@@ -1,283 +1,283 @@
-# Peaks of Light — Navigator Polul Sud
+# Peaks of Light — South Pole Navigator
 
-**NASA Space Apps Challenge 2026 · Alba Iulia · 14–15 noiembrie**
-Provocarea: **Lunar Landing Site Navigator**
-Echipa: **Peaks of Light** (Adrian, Eren)
+**NASA Space Apps Challenge 2026 · Alba Iulia, Romania · 14–15 November**
+Challenge: **Lunar Landing Site Navigator**
+Team: **Peaks of Light** (Adrian, Eren)
 
-O hartă 3D interactivă a polului sud lunar. Arată, pentru orice loc de aselenizare și orice zi, când are Soare (energie) și când vede Pământul (comunicații directe), calculat din relieful real.
+An interactive 3D map of the lunar south pole. For any landing site and any date, it shows when the site has sunlight (power) and when it can see Earth (direct-to-Earth communications), computed from the terrain.
 
-> **Stare la începutul hackathonului (sâmbătă dimineața):** avem un prototip funcțional pe **teren generat** și cu **poziții simplificate** pentru Soare și Pământ (`index.html`). Treaba din weekend: înlocuim terenul generat cu relieful LOLA, pozițiile simplificate cu efemeride NASA și validăm rezultatele pe hărțile oficiale de iluminare.
-
----
-
-## Cuprins
-
-1. [Termene și reguli care ne pot elimina](#1-termene-și-reguli-care-ne-pot-elimina)
-2. [Provocarea și de ce am ales-o](#2-provocarea-și-de-ce-am-ales-o)
-3. [Ideea: ce construim](#3-ideea-ce-construim)
-4. [Prototipul de până acum](#4-prototipul-de-până-acum)
-5. [Cum funcționează calculul](#5-cum-funcționează-calculul)
-6. [Datele NASA pe care le folosim](#6-datele-nasa-pe-care-le-folosim)
-7. [Planul pentru weekend](#7-planul-pentru-weekend)
-8. [Pitch (3–5 minute, în engleză)](#8-pitch-35-minute-în-engleză)
-9. [Checklist pentru predare](#9-checklist-pentru-predare)
-10. [Transparență: ce am făcut înainte și cu ce unelte](#10-transparență-ce-am-făcut-înainte-și-cu-ce-unelte)
-11. [Anexă: regulament, premii, logistică](#11-anexă-regulament-premii-logistică)
-12. [Surse](#12-surse)
+> **Status at the start of the hackathon (Saturday morning):** we have a working prototype on **generated terrain** with **simplified** Sun and Earth positions (`index.html`). The weekend's work: replace the generated terrain with LOLA elevation data, replace the simplified positions with NASA ephemerides, and validate the results against NASA's official illumination maps.
 
 ---
 
-## 1. Termene și reguli care ne pot elimina
+## Contents
 
-| Când | Ce | Dacă ratăm |
+1. [Deadlines and rules that can disqualify us](#1-deadlines-and-rules-that-can-disqualify-us)
+2. [The challenge and why we chose it](#2-the-challenge-and-why-we-chose-it)
+3. [The idea: what we are building](#3-the-idea-what-we-are-building)
+4. [The prototype so far](#4-the-prototype-so-far)
+5. [How the computation works](#5-how-the-computation-works)
+6. [NASA data we use](#6-nasa-data-we-use)
+7. [Weekend plan](#7-weekend-plan)
+8. [Pitch (3–5 minutes)](#8-pitch-35-minutes)
+9. [Submission checklist](#9-submission-checklist)
+10. [Transparency: prior work and tools](#10-transparency-prior-work-and-tools)
+11. [Appendix: rules, prizes, logistics](#11-appendix-rules-prizes-logistics)
+12. [Sources](#12-sources)
+
+---
+
+## 1. Deadlines and rules that can disqualify us
+
+| When | What | If we miss it |
 |---|---|---|
-| **Duminică 15:00** | Formularul local de pitch + orice fișiere sau linkuri pe care le folosim la prezentare (link-ul vine pe email și WhatsApp) | Nu mai putem lua premii în bani |
-| **Duminică 15:30** | Pitch în fața juriului | — |
-| **Duminică 18:50** | **Proiectul trimis pe platforma NASA Space Apps** | Fără premii locale și fără nominalizare globală |
+| **Sunday 15:00** | Local pitch form + any files or links we will use in the presentation (the form link comes by email and WhatsApp) | No cash prizes |
+| **Sunday 15:30** | Pitch to the jury | — |
+| **Sunday 18:50** | **Project submitted on the NASA Space Apps platform** | No local prizes and no global nomination |
 
-- **Suntem 2 în echipă, deci amândoi trebuie să fim fizic acolo pe toată durata jurizării.** Regula cere două treimi din echipă prezentă; pentru 2 membri, minimul e 2.
-- Fiecare membru trebuie să fie în echipa corectă de la Alba Iulia pe platforma NASA și **să nu fie pe waitlist**.
-- Proiectul trebuie să folosească **cel puțin o sursă de date NASA**, în mod real, și să răspundă provocării alese.
-- **Nu avem voie să inventăm date sau rezultate.** Cifrele din prototip vin din teren generat, deci nu le prezentăm ca rezultate reale (vezi secțiunea 10).
-- Putem folosi muncă făcută înainte, dar trebuie să arătăm **progres concret făcut în weekend** și să fim transparenți despre surse și unelte, inclusiv AI.
+- **We are a team of 2, so both of us must be on site for the whole judging session.** The rule requires two thirds of the team present; for 2 members the minimum is 2.
+- Each member must be in the correct Alba Iulia event team on the NASA platform and **must not be waitlisted**.
+- The project must **meaningfully use at least one NASA data resource** and answer the chosen challenge.
+- **We must not fabricate data or results.** The prototype's numbers come from generated terrain, so we never present them as real results (see section 10).
+- Prior work is allowed, but we must show **concrete progress made during the weekend** and be transparent about sources and tools, including AI.
 
-**Juriul** dă note de la 1 la 10 pe 5 criterii, fiecare cu 20%:
+**The jury** scores each of 5 criteria from 1 to 10, 20% each:
 
-| Criteriu | Ce urmărește | Cum îl atacăm |
+| Criterion | What it measures | How we address it |
 |---|---|---|
-| Impact | Beneficiu real, problemă importantă | Alegerea locurilor de aselenizare Artemis: energie + comunicații |
-| Creativitate | Originalitate | Hartă 3D „vie”, comparație pe zile, catarg reglabil |
-| Validitate | Fundament științific, fezabilitate | Comparație cu hărțile oficiale de iluminare LRO (secțiunea 6) |
-| Relevanță | Răspunde provocării, folosește date NASA | Exact ce cere provocarea: Soare și Pământ față de orizont |
-| Prezentare | Claritate, demo | Demo live + video de rezervă |
+| Impact | Real benefit, meaningful problem | Choosing Artemis landing sites: power + communications |
+| Creativity | Originality | A "live" 3D map, day-by-day comparison, adjustable mast |
+| Validity | Scientific grounding, feasibility | Comparison with NASA's official LRO illumination maps (section 6) |
+| Relevance | Answers the challenge, uses NASA data | Exactly what the challenge asks: Sun and Earth relative to the horizon |
+| Presentation | Clarity, demo | Live demo + backup video |
 
-La egalitate decide Impactul, apoi Validitatea, apoi Creativitatea.
+Ties are broken by Impact, then Validity, then Creativity.
 
 ---
 
-## 2. Provocarea și de ce am ales-o
+## 2. The challenge and why we chose it
 
-**Lunar Landing Site Navigator** (nivel mediu–avansat): o unealtă care compară locuri și date de aselenizare la **polul sud al Lunii**, arătând poziția **Soarelui** și a **Pământului** față de orizont. Din asta rezultă ferestrele de **energie** (Soare deasupra reliefului) și de **comunicații directe cu Pământul** (Pământ deasupra reliefului).
+**Lunar Landing Site Navigator** (intermediate–advanced): a tool that compares landing sites and dates at the **Moon's south pole** by showing where the **Sun** and **Earth** are relative to the horizon. From that come the **power** windows (Sun above the terrain) and the **direct-to-Earth communication** windows (Earth above the terrain).
 
-De ce această provocare:
+Why this challenge:
 
-- Pe 6 noiembrie, la Alba Iulia avea **o singură altă echipă** (Red rocket). Pe Health Monitoring erau ~5 echipe, pe Field Shift 4.
-- E cea mai „inginerească” provocare: geometrie, ferestre de timp, compromisuri. Se potrivește cu experiența noastră de validare de sisteme.
-- 3D-ul nu e decor aici: umbrele din cratere sunt chiar răspunsul la întrebare.
+- On 6 November, only **one other team** in Alba Iulia had chosen it (Red rocket). Health Monitoring had ~5 teams and Field Shift had 4.
+- It is the most engineering-heavy challenge: geometry, time windows, trade-offs. It fits our background in systems validation.
+- 3D is not decoration here: the shadows inside the craters are the answer to the question.
 
 <details>
-<summary>Toate cele 14 provocări și câte echipe aveau la Alba Iulia (6 noiembrie)</summary>
+<summary>All 14 challenges and how many Alba Iulia teams had picked them (6 November)</summary>
 
-| Provocare | Nivel | Echipe la Alba Iulia |
+| Challenge | Level | Teams in Alba Iulia |
 |---|---|---|
-| Dancing with the SARs | Mediu–Avansat | 0 |
-| The Earth Information Jukebox | Începător–Mediu | 0 |
-| Planet X and SPHEREx | Avansat | 0 |
-| Space Mission Design Game | Începător–Mediu | 0 |
-| Interplanetary Survival Guide: Martian Map | Mediu | 0 |
-| **Lunar Landing Site Navigator** | Mediu–Avansat | 1 (+ noi) |
-| Junior Astronaut Mission Trainer | Începător–Mediu | 1 |
-| Harmonization of MODIS and VIIRS Hot Spots | Mediu–Avansat | 1 |
-| Abandoned but not Forgotten | Începător–Mediu | 2 |
-| Be An Earth System Trend Detective! | Avansat | 2 |
-| Identify Earth Analogs (Lună/Marte) | Toate | 2 |
-| Flame in Freefall | Mediu–Avansat | 2 |
-| Field Shift: Adapting Farms with NASA Data | Mediu–Avansat | 4 |
-| Create Health Monitoring Software for Astronauts | Mediu | ~5 |
+| Dancing with the SARs | Intermediate–Advanced | 0 |
+| The Earth Information Jukebox | Beginner–Intermediate | 0 |
+| Planet X and SPHEREx | Advanced | 0 |
+| Space Mission Design Game | Beginner–Intermediate | 0 |
+| Interplanetary Survival Guide: Martian Map | Intermediate | 0 |
+| **Lunar Landing Site Navigator** | Intermediate–Advanced | 1 (+ us) |
+| Junior Astronaut Mission Trainer | Beginner–Intermediate | 1 |
+| Harmonization of MODIS and VIIRS Hot Spots | Intermediate–Advanced | 1 |
+| Abandoned but not Forgotten | Beginner–Intermediate | 2 |
+| Be An Earth System Trend Detective! | Advanced | 2 |
+| Identify Earth Analogs (Moon/Mars) | All | 2 |
+| Flame in Freefall | Intermediate–Advanced | 2 |
+| Field Shift: Adapting Farms with NASA Data | Intermediate–Advanced | 4 |
+| Create Health Monitoring Software for Astronauts | Intermediate | ~5 |
 
-Numărătoarea e din lista de echipe de pe platformă la data respectivă; între timp s-ar putea să se fi schimbat.
+Counts come from the platform's team list on that date and may have changed since.
 </details>
 
 ---
 
-## 3. Ideea: ce construim
+## 3. The idea: what we are building
 
-La polul sud, Soarele se rotește în jurul orizontului o dată la ~29,5 zile și nu urcă niciodată mai sus de ~1,5° (plus câteva zecimi de grad, în funcție de poziția locului). Pământul oscilează lângă orizont cu ±6,7° pe verticală. De aceea:
+At the south pole, the Sun circles the horizon once every ~29.5 days and never climbs higher than ~1.5° (plus a few tenths of a degree depending on the site's position). Earth wobbles near the horizon by ±6.7° vertically. As a result:
 
-- crestele și vârfurile pot avea Soare aproape tot timpul („peaks of light” — de aici numele echipei);
-- fundul craterelor poate fi în umbră permanentă (regiuni permanent umbrite, unde se poate afla gheață);
-- un loc bun pentru energie nu e neapărat bun pentru comunicații, și invers.
+- ridges and peaks can be sunlit almost all the time ("peaks of light", hence the team name);
+- crater floors can be in permanent shadow (permanently shadowed regions, where ice may be found);
+- a good site for power is not necessarily good for communications, and vice versa.
 
-**Navigatorul** răspunde la trei întrebări pentru orice loc ales pe hartă:
+For any site picked on the map, the **navigator** answers three questions:
 
-1. Ce procent din timp are Soare și Pământ deasupra orizontului?
-2. Care e cea mai lungă perioadă fără Soare (cât trebuie să țină bateriile)?
-3. În ce zile și ore sunt deschise ferestrele de energie și de comunicații?
+1. What fraction of the time are the Sun and Earth above the horizon?
+2. What is the longest period without sunlight (how long must the batteries last)?
+3. On which days and hours are the power and communication windows open?
 
-**Exemplul din prototip** (teren generat, deci doar ilustrativ, nu rezultate reale):
+**Example from the prototype** (generated terrain, so illustrative only, not real results):
 
-| Loc | Soare | Pământ | Ambele | Cea mai lungă noapte |
+| Site | Sun | Earth | Both | Longest night |
 |---|---|---|---|---|
-| A — creasta craterului | 78% | 56% | 45% | 6,5 zile |
-| B — versantul dinspre Pământ | 56% | 73% | 40% | 13 zile |
-| C — fundul craterului | 0% | 0% | 0% | tot anul |
+| A — crater rim | 78% | 56% | 45% | 6.5 days |
+| B — Earth-facing massif slope | 56% | 73% | 40% | 13 days |
+| C — crater floor | 0% | 0% | 0% | all year |
 
-Asta e povestea pentru pitch: A e cel mai bun loc pentru energie, B pentru comunicații, iar C are probabil gheață, dar nici energie, nici legătură cu Pământul. Pe date reale, punem în locul lor locuri reale: marginea craterului Shackleton, creasta de legătură, masivul Malapert.
-
----
-
-## 4. Prototipul de până acum
-
-Fișier: [`index.html`](index.html). Un singur fișier, fără dependențe și fără server. Se deschide direct în browser.
-
-**Rulare**
-- Local: dublu-click pe `index.html`.
-- Online: în repo, **Settings → Pages → Deploy from a branch → `main` / root**. După ~1 minut demo-ul e live la `https://<user>.github.io/<repo>/`. Linkul ăsta merge în formularul de pitch și în predarea NASA.
-
-**Ce face**
-- Hartă 3D a unei zone de 48 × 48 km în jurul polului, sub formă de bloc de relief care se rotește cu mouse-ul sau degetul.
-- Simulare în timp (butonul ▶, slider pe 365 de zile, viteză reglabilă): umbrele se mișcă odată cu Soarele.
-- Trei straturi: **Lumina acum**, **Soare pe an** (procent mediu de iluminare), **Pământ pe an** (procent mediu de vizibilitate).
-- Locuri candidate A, B, C, cu statistici; **atingi terenul și adaugi locul tău (D)**, cu statistici calculate pe loc.
-- **Graficul orizontului** pentru locul selectat: profilul reliefului pe 360°, banda pe unde trece Soarele într-un an, zona în care oscilează Pământul, pozițiile curente.
-- **Banda anuală**: pentru fiecare loc, zi cu zi, cât din zi are Soare și cât vede Pământul. Click pe ea te duce la acea zi.
-- Exagerare a reliefului reglabilă (doar vizual, nu schimbă calculul).
-- Merge pe telefon (touch, pinch-zoom) și în temă deschisă sau închisă.
-
-**Tehnic:** WebGL scris direct (fără Three.js), JavaScript simplu, Canvas 2D pentru grafice. Calculul inițial durează 1–2 secunde pe laptop.
+This is the story for the pitch: A is the best site for power, B for communications, and C probably has ice but neither power nor a link to Earth. On real data we replace them with real sites: the Shackleton crater rim, the connecting ridge, Malapert massif.
 
 ---
 
-## 5. Cum funcționează calculul
+## 4. The prototype so far
 
-### Relief
-- Grilă de calcul: 257 × 257 puncte, la 375 m, adică 96 × 96 km. Se afișează doar centrul de 48 × 48 km; restul există ca relieful din jur să poată umbri marginile.
-- În prototip relieful e generat: un crater de ~21 km lângă pol (seamănă cu Shackleton), un masiv spre Pământ (seamănă cu Malapert), cratere mici și zgomot fractal.
+File: [`index.html`](index.html). A single file, no dependencies, no server. It opens directly in a browser.
 
-### Orizontul fiecărui punct
-Pentru fiecare punct și fiecare direcție (64 de direcții pentru hartă, 360 pentru locurile candidate) mergem pe teren până la 46 km și reținem unghiul maxim de elevație:
+**Running it**
+- Locally: double-click `index.html`.
+- Online: in the repo, **Settings → Pages → Deploy from a branch → `main` / root**. After about a minute the demo is live at `https://<user>.github.io/<repo>/`. That link goes into the pitch form and the NASA submission.
+
+**What it does**
+- A 3D map of a 48 × 48 km area around the pole, shown as a terrain block you rotate with the mouse or a finger.
+- Time simulation (▶ button, 365-day slider, adjustable speed): the shadows move with the Sun.
+- Three layers: **Light now**, **Sun per year** (average sunlit fraction), **Earth per year** (average Earth visibility).
+- Candidate sites A, B, C with statistics; **tap the terrain to add your own site (D)**, with statistics computed on the spot.
+- **Horizon chart** for the selected site: the 360° terrain profile, the band the Sun travels through over a year, the area where Earth wobbles, and the current positions.
+- **Year strip**: for each site, day by day, how much of the day has sunlight and how much has Earth in view. Clicking it jumps to that day.
+- Adjustable vertical exaggeration (visual only, does not change the computation).
+- Works on phones (touch, pinch-zoom) and in light or dark theme.
+
+**Tech:** hand-written WebGL (no Three.js), plain JavaScript, Canvas 2D for the charts. The initial computation takes 1–2 seconds on a laptop.
+
+---
+
+## 5. How the computation works
+
+### Terrain
+- Computation grid: 257 × 257 points at 375 m spacing, i.e. 96 × 96 km. Only the central 48 × 48 km is displayed; the rest exists so that surrounding terrain can shadow the edges.
+- In the prototype the terrain is generated: a ~21 km crater near the pole (similar to Shackleton), a massif toward Earth (similar to Malapert), small craters and fractal noise.
+
+### Each point's horizon
+For each point and each direction (64 directions for the map, 360 for candidate sites) we march across the terrain out to 46 km and keep the maximum elevation angle:
 
 ```
-unghi = atan( (h(d) − d² / (2·R_Lună) − h₀) / d )
+angle = atan( (h(d) − d² / (2·R_Moon) − h₀) / d )
 ```
 
-Termenul `d² / (2·R)` e **curbura Lunii**: la 20 km, terenul „coboară” cu ~115 m. Pasul crește cu distanța (6% din distanță pentru hartă, 2,5% pentru locuri). Calculul se oprește devreme când nici cel mai înalt vârf nu mai poate depăși unghiul găsit.
+The `d² / (2·R)` term is the **Moon's curvature**: at 20 km, the terrain "drops" by ~115 m. The step grows with distance (6% of the distance for the map, 2.5% for sites). The march stops early once even the highest peak can no longer exceed the angle already found.
 
-Locurile candidate au panourile și antena pe un **catarg de 10 m**.
+Candidate sites have their panels and antenna on a **10 m mast**.
 
-### Soare și Pământ (simplificat în prototip)
+### Sun and Earth (simplified in the prototype)
 
-| Mărime | Model în prototip |
+| Quantity | Prototype model |
 |---|---|
-| Azimutul Soarelui | cerc complet la 29,53 zile (luna sinodică) |
-| Elevația Soarelui la pol | ±1,54° · sin(2π·t / 346,62 zile) |
-| Azimutul Pământului | ±7,9° · sin(2π·t / 27,55 zile) (librație în longitudine) |
-| Elevația Pământului la pol | ±6,7° · sin(2π·t / 27,21 zile + 0,7) (librație în latitudine) |
-| Corecție pentru un loc aflat la distanța c de pol | elevație + c·cos(azimut_corp − azimut_loc) |
-| Discul Soarelui | rază 0,267°; fracția luminată crește liniar pe diametrul discului |
-| Discul Pământului | rază 0,95° |
+| Sun azimuth | full circle every 29.53 days (synodic month) |
+| Sun elevation at the pole | ±1.54° · sin(2π·t / 346.62 days) |
+| Earth azimuth | ±7.9° · sin(2π·t / 27.55 days) (libration in longitude) |
+| Earth elevation at the pole | ±6.7° · sin(2π·t / 27.21 days + 0.7) (libration in latitude) |
+| Correction for a site at distance c from the pole | elevation + c·cos(body azimuth − site azimuth) |
+| Solar disk | radius 0.267°; the sunlit fraction grows linearly across the disk diameter |
+| Earth disk | radius 0.95° |
 
-**În versiunea finală** înlocuim tabelul cu efemeride reale (secțiunea 6) și cu formula exactă de elevație pentru un loc la latitudinea φ și longitudinea λ:
+**In the final version** we replace this table with real ephemerides (section 6) and with the exact elevation formula for a site at latitude φ and longitude λ:
 
 ```
-sin(elevație) = sin(φ)·sin(β) + cos(φ)·cos(β)·cos(λ_corp − λ)
+sin(elevation) = sin(φ)·sin(β) + cos(φ)·cos(β)·cos(λ_body − λ)
 ```
 
-unde (β, λ_corp) e punctul subsolar, respectiv subterestru, pe Lună.
+where (β, λ_body) is the sub-solar or sub-Earth point on the Moon.
 
-### Statistici pe loc
-Eșantionăm anul la fiecare 3 ore (2.920 de momente):
-- **Soare**: media fracției luminate a discului.
-- **Pământ**: procentul momentelor cu mai mult de jumătate din disc deasupra reliefului.
-- **Ambele**: momente cu Soare și Pământ în același timp.
-- **Cea mai lungă noapte**: cel mai lung șir de momente fără Soare.
+### Per-site statistics
+We sample the year every 3 hours (2,920 instants):
+- **Sun**: mean sunlit fraction of the solar disk.
+- **Earth**: share of instants with more than half of Earth's disk above the terrain.
+- **Both**: instants with Sun and Earth at the same time.
+- **Longest night**: the longest run of instants without sunlight.
 
-### Limite cunoscute
-- Relieful de dincolo de 46 km nu e luat în calcul.
-- Rezoluția de 375 m netezește crestele mici; pe date reale de 20 m sau 5 m, rezultatele se schimbă.
-- În prototip, efemeridele sunt simplificate (vezi mai sus).
+### Known limitations
+- Terrain beyond 46 km is not considered.
+- The 375 m resolution smooths small ridges; on real 20 m or 5 m data the results will change.
+- The prototype's ephemerides are simplified (see above).
 
 ---
 
-## 6. Datele NASA pe care le folosim
+## 6. NASA data we use
 
-### Relief: LOLA (Lunar Orbiter Laser Altimeter, LRO)
+### Terrain: LOLA (Lunar Orbiter Laser Altimeter, LRO)
 
-| Fișier | Acoperire | Rezoluție | Mărime | Pentru ce |
+| File | Coverage | Resolution | Size | Use |
 |---|---|---|---|---|
-| `LDEM_875S_20M` | 87,5°S → pol (~76 km rază) | 20 m | JP2 20 MB / IMG 110 MB | **Varianta principală** pentru hartă |
-| `LDEM_85S_40M` | 85°S → pol (~150 km rază) | 40 m | JP2 21 MB / IMG 110 MB | Relieful din jur, pentru orizont |
-| `ldem_87s_5mpp.tif` (PGDA) | 87°S → pol | 5 m | 3,3 GB | Prea mare pentru weekend |
-| DEM-uri pe locuri (PGDA, ex. `Site04` = marginea Shackleton, `Site23` = masivul Malapert) | ~20 × 20 km | 5 m | — | Zoom pe un loc, dacă avem timp |
+| `LDEM_875S_20M` | 87.5°S → pole (~76 km radius) | 20 m | JP2 20 MB / IMG 110 MB | **Main option** for the map |
+| `LDEM_85S_40M` | 85°S → pole (~150 km radius) | 40 m | JP2 21 MB / IMG 110 MB | Surrounding terrain, for the horizon |
+| `ldem_87s_5mpp.tif` (PGDA) | 87°S → pole | 5 m | 3.3 GB | Too large for this weekend |
+| Per-site DEMs (PGDA, e.g. `Site04` = Shackleton rim, `Site23` = Malapert massif) | ~20 × 20 km | 5 m | — | Zoom on a single site, if time allows |
 
-Descărcare: `https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/LDEM_875S_20M.IMG` (și `.LBL` alături). Formatul `.IMG` e binar cu valori întregi pe 16 biți. **Citiți `SCALING_FACTOR`, `OFFSET` și proiecția din fișierul `.LBL`** înainte de conversie (proiecție polar-stereografică, coordonate în metri).
+Download: `https://imbrium.mit.edu/DATA/LOLA_GDR/POLAR/IMG/LDEM_875S_20M.IMG` (with the `.LBL` next to it). The `.IMG` format is binary with 16-bit integer values. **Read `SCALING_FACTOR`, `OFFSET` and the projection from the `.LBL` file** before converting (polar stereographic projection, coordinates in meters).
 
-### Validare: hărțile oficiale de iluminare (PGDA / LRO)
+### Validation: NASA's official illumination maps (PGDA / LRO)
 
-| Fișier | Ce conține | Rezoluție |
+| File | Contents | Resolution |
 |---|---|---|
-| `AVGVISIB_85S_060M_201608` | Iluminare solară medie | 60 m |
-| `AVGVISIB_85S_060M_201608_EARTH` | Vizibilitate medie a Pământului | 60 m |
-| `LPSR_85S_060M_201608` | Regiuni permanent umbrite | 60 m |
+| `AVGVISIB_85S_060M_201608` | Average solar illumination | 60 m |
+| `AVGVISIB_85S_060M_201608_EARTH` | Average Earth visibility | 60 m |
+| `LPSR_85S_060M_201608` | Permanently shadowed regions | 60 m |
 
-Descărcare GeoTIFF: `https://pgda.gsfc.nasa.gov/data/MoonIllumination/<NUME>.TIF`
+GeoTIFF download: `https://pgda.gsfc.nasa.gov/data/MoonIllumination/<NAME>.TIF`
 
-**Pentru Validitate:** calculăm cu algoritmul nostru media pe un an și o comparăm cu `AVGVISIB_85S...` pe aceeași zonă. Un grafic „noi vs. NASA” în pitch e cel mai puternic argument științific pe care îl putem aduce. Diferențele mari ne arată limitele noastre (rezoluție, efemeride, perioada de timp).
+**For Validity:** we compute the yearly average with our algorithm and compare it with `AVGVISIB_85S...` over the same area. A "ours vs. NASA" chart in the pitch is the strongest scientific argument we can bring. Large differences show our limits (resolution, ephemerides, time span).
 
-### Poziții reale pentru Soare și Pământ
+### Real Sun and Earth positions
 
-**Varianta rapidă: JPL Horizons.** Cerere pe ținta **Lună (301)**, observator **centrul Pământului (500@399)**, pas de 1 oră, pe un an, cu cantitățile:
-- **14** — punctul subterestru (sub-lon, sub-lat), de unde se vede Pământul;
-- **15** — punctul subsolar (sub-lon, sub-lat), de unde se vede Soarele.
+**Quick option: JPL Horizons.** Query the target **Moon (301)** from observer **Earth's center (500@399)**, 1-hour step, over one year, with quantities:
+- **14** — sub-observer point (sub-lon, sub-lat): where Earth is seen from;
+- **15** — sub-solar point (sub-lon, sub-lat): where the Sun is seen from.
 
-Exportăm tabelul CSV și îl încărcăm în pagină. Verificați convenția de longitudine (est/vest) față de proiecția LOLA.
+Export the table as CSV and load it into the page. Check the longitude convention (east/west) against the LOLA projection.
 
-**Varianta precisă: NASA NAIF SPICE** (Python: `spiceypy`), cu nucleele generice NAIF pentru timp, efemeride planetare și orientarea Lunii (cadrul `MOON_ME`, același ca LOLA, DE421).
+**Precise option: NASA NAIF SPICE** (Python: `spiceypy`), with the NAIF generic kernels for time, planetary ephemerides and lunar orientation (the `MOON_ME` frame, same as LOLA, DE421).
 
-### Pipeline-ul de date (de scris sâmbătă)
+### Data pipeline (to write on Saturday)
 
 ```
-LDEM_875S_20M.IMG ──► Python (numpy): citire după .LBL, decupare în jurul polului,
-                      reeșantionare la grila de calcul ──► heights.bin (Float32)
-Horizons CSV ──► Python: interpolare la pași de 1–3 ore ──► ephem.json
-index.html ──► încarcă heights.bin și ephem.json în loc de terenul generat
-AVGVISIB_85S_060M ──► Python: comparație cu media noastră ──► grafic pentru pitch
+LDEM_875S_20M.IMG ──► Python (numpy): read using the .LBL, crop around the pole,
+                      resample to the computation grid ──► heights.bin (Float32)
+Horizons CSV ──► Python: interpolate to 1–3 hour steps ──► ephem.json
+index.html ──► load heights.bin and ephem.json instead of the generated terrain
+AVGVISIB_85S_060M ──► Python: compare with our average ──► chart for the pitch
 ```
 
-Atenție: GitHub Pages servește fișiere până la 100 MB. Un `heights.bin` de 257 × 257 Float32 are ~260 KB; o grilă mai fină, de 1025 × 1025, are ~4 MB.
+Note: GitHub Pages serves files up to 100 MB. A 257 × 257 Float32 `heights.bin` is ~260 KB; a finer 1025 × 1025 grid is ~4 MB.
 
 ---
 
-## 7. Planul pentru weekend
+## 7. Weekend plan
 
-Rolurile sunt **propuse**; le stabilim pe loc.
+The roles are **proposed**; we settle them on site.
 
-| Cine | Rol |
+| Who | Role |
 |---|---|
-| Adrian | Datele reale (LOLA, efemeride), algoritmul, validarea față de NASA |
-| Eren | Interfața și 3D-ul, pitch deck-ul, video-ul demo |
+| Adrian | Real data (LOLA, ephemerides), the algorithm, validation against NASA |
+| Eren | UI and 3D, pitch deck, demo video |
 
-### Sâmbătă, 14 noiembrie
+### Saturday, 14 November
 
-| Ora | Ce | Gata când |
+| Time | What | Done when |
 |---|---|---|
-| 11:00–13:00 | Descărcăm `LDEM_875S_20M`, `LDEM_85S_40M`, `AVGVISIB_85S_060M` (+ `_EARTH`, `LPSR`). Script Python care citește `.IMG` după `.LBL` | Avem relieful real ca matrice numpy |
-| 11:00–13:00 | În paralel: cerere Horizons (cantitățile 14 și 15, un an, pas de 1 h) | Avem `ephem.csv` |
-| 14:00–17:00 | `heights.bin` + `ephem.json`; pagina le încarcă în loc de terenul generat | Harta arată Shackleton și relieful real |
-| 17:00 | Check-in cu mentorii: arătăm progresul | Feedback notat |
-| 20:00–22:00 | Validare: media noastră vs. `AVGVISIB_85S_060M`, pe aceeași grilă | Un grafic și un procent de potrivire |
-| seara | Locuri reale: marginea Shackleton, creasta de legătură, Malapert, plus o regiune permanent umbrită | Tabel cu cele 4 locuri, pe date reale |
+| 11:00–13:00 | Download `LDEM_875S_20M`, `LDEM_85S_40M`, `AVGVISIB_85S_060M` (+ `_EARTH`, `LPSR`). Python script that reads `.IMG` using the `.LBL` | We have the real terrain as a numpy array |
+| 11:00–13:00 | In parallel: Horizons query (quantities 14 and 15, one year, 1 h step) | We have `ephem.csv` |
+| 14:00–17:00 | `heights.bin` + `ephem.json`; the page loads them instead of the generated terrain | The map shows Shackleton and the real terrain |
+| 17:00 | Mentor check-in: show progress | Feedback noted |
+| 20:00–22:00 | Validation: our average vs. `AVGVISIB_85S_060M`, on the same grid | A chart and a match percentage |
+| evening | Real sites: Shackleton rim, connecting ridge, Malapert, plus one permanently shadowed region | Table of the 4 sites on real data |
 
-### Duminică, 15 noiembrie
+### Sunday, 15 November
 
-| Ora | Ce |
+| Time | What |
 |---|---|
-| 09:10–12:00 | Pitch deck, video demo de rezervă (60–90 s), README final, GitHub Pages live |
-| 13:00 | Testăm tot: linkul GitHub Pages pe alt laptop și pe telefon, video-ul, slide-urile |
-| **înainte de 15:00** | **Formularul de pitch** cu linkurile (demo, repo, slide-uri, video) |
+| 09:10–12:00 | Pitch deck, backup demo video (60–90 s), final README, GitHub Pages live |
+| 13:00 | Test everything: the GitHub Pages link on another laptop and on a phone, the video, the slides |
+| **before 15:00** | **Pitch form** with the links (demo, repo, slides, video) |
 | 15:30 | Pitch |
-| **cât mai repede după pitch, înainte de 18:50** | **Predarea pe platforma NASA** (ideal o pregătim înainte de 15:00 și doar apăsăm Submit) |
+| **as soon as possible after the pitch, before 18:50** | **NASA platform submission** (ideally prepared before 15:00 so we only press Submit) |
 
-Dacă rămâne timp:
-- Comutator pentru înălțimea catargului (0 / 10 / 50 m) și efectul lui asupra statisticilor.
-- Export CSV cu ferestrele de energie și comunicații pentru locul selectat.
-- Narare vocală a ferestrelor (ElevenLabs are premiu separat pentru proiecte care îl folosesc).
+If time allows:
+- A mast-height switch (0 / 10 / 50 m) and its effect on the statistics.
+- CSV export of the power and communication windows for the selected site.
+- Voice narration of the windows (ElevenLabs has a separate award for projects that use it).
 
 ---
 
-## 8. Pitch (3–5 minute, în engleză)
+## 8. Pitch (3–5 minutes)
 
-Timpul exact se anunță înainte de jurizare: 3–5 minute de pitch, plus 1–3 minute de întrebări, în funcție de numărul de echipe. Pregătim o variantă de 3 minute și una de 5.
+The exact time is announced before judging: 3–5 minutes of pitch plus 1–3 minutes of questions, depending on the number of teams. We prepare a 3-minute and a 5-minute version.
 
 1. **Hook (20 s).** *"At the Moon's south pole, the Sun never climbs more than about one and a half degrees above the horizon. A crater rim can be in sunlight almost all the time, while the floor of the same crater hasn't seen the Sun in billions of years."*
 2. **Problem (30 s).** Artemis landers need power from the Sun and a direct line to Earth. Both depend on terrain, location and date, and the best spot for one is often bad for the other.
@@ -287,87 +287,88 @@ Timpul exact se anunță înainte de jurizare: 3–5 minute de pitch, plus 1–3
 6. **What we built this weekend (20 s).** Be explicit: the prototype existed on synthetic terrain; this weekend we connected real NASA data and validated it.
 7. **Impact & next steps (20 s).** Mission planning, rover traverse planning, power and battery sizing, public outreach.
 
-**Întrebări probabile de la juriu**
-- *Cât de precis e?* → Graficul de validare: diferența față de hărțile NASA și de unde vine.
-- *De ce nu folosiți direct hărțile NASA de iluminare?* → Ele dau medii; noi dăm ferestre pe zi și oră, pentru orice loc și orice înălțime de catarg, plus comparația între locuri.
-- *Curbura Lunii?* → Inclusă: la 20 km, ~115 m.
-- *Ce lipsește?* → Rezoluția (folosim 20 m, există 5 m), relieful de dincolo de 46 km, umbrirea parțială a discului Pământului.
+**Likely jury questions**
+- *How accurate is it?* → The validation chart: the difference from NASA's maps and where it comes from.
+- *Why not use NASA's illumination maps directly?* → They give averages; we give day-and-hour windows for any site and any mast height, plus side-by-side site comparison.
+- *Lunar curvature?* → Included: ~115 m at 20 km.
+- *What's missing?* → Resolution (we use 20 m, 5 m exists), terrain beyond 46 km, partial blocking of Earth's disk.
 
 ---
 
-## 9. Checklist pentru predare
+## 9. Submission checklist
 
-**Formularul local (până duminică la 15:00)**
-- [ ] Formatul prezentării (slide-uri + demo live)
-- [ ] Link GitHub Pages (demo)
-- [ ] Link repo
-- [ ] Slide-uri (PDF) și video de rezervă
+**Local form (by Sunday 15:00)**
+- [ ] Presentation format (slides + live demo)
+- [ ] GitHub Pages link (demo)
+- [ ] Repo link
+- [ ] Slides (PDF) and backup video
 
-**Platforma NASA Space Apps (până duminică la 18:50)**
-- [ ] Amândoi în echipa Peaks of Light, la evenimentul Alba Iulia, fără waitlist
-- [ ] Provocarea: Lunar Landing Site Navigator
-- [ ] Titlu și descriere (textul de mai jos)
-- [ ] Datele NASA folosite, cu linkuri (secțiunea 6)
-- [ ] Alte surse și unelte, inclusiv asistența AI (secțiunea 10)
-- [ ] Link demo + repo (+ video sau slide-uri, dacă platforma le cere)
+**NASA Space Apps platform (by Sunday 18:50)**
+- [ ] Both of us in the Peaks of Light team, at the Alba Iulia event, not waitlisted
+- [ ] Challenge: Lunar Landing Site Navigator
+- [ ] Title and description (text below)
+- [ ] NASA data used, with links (section 6)
+- [ ] Other sources and tools, including AI assistance (section 10)
+- [ ] Demo link + repo (+ video or slides, if the platform asks for them)
 
-**Descriere de proiect (draft în engleză, de actualizat cu rezultatele reale):**
+**Project description (draft, to update with the real results):**
 
 > *Peaks of Light is an interactive 3D navigator for the lunar south pole. Using LRO LOLA elevation models and JPL ephemerides, it computes the terrain horizon of every point and shows, for any candidate landing site and date, when the Sun is above the horizon (power) and when the Earth is visible (direct-to-Earth communications). Users can compare sites side by side, add their own site, and see yearly statistics such as the longest period without sunlight. We validated our yearly illumination results against NASA's official LRO average illumination maps.*
 
 ---
 
-## 10. Transparență: ce am făcut înainte și cu ce unelte
+## 10. Transparency: prior work and tools
 
-Regulamentul permite muncă făcută înainte, cu condiția să o declarăm și să arătăm progres făcut în weekend. O spunem deschis, în pitch și în predare:
+The rules allow prior work as long as we declare it and show progress made during the weekend. We state it openly, in the pitch and in the submission:
 
-- **Înainte de eveniment (6–13 noiembrie):** am ales provocarea, am făcut prototipul `index.html` pe **teren generat procedural** și cu **poziții simplificate** pentru Soare și Pământ. Prototipul a fost construit cu ajutorul unui asistent AI (Claude, de la Anthropic).
-- **Cifrele din prototip nu sunt rezultate reale** și nu le prezentăm ca atare. Le folosim doar ca exemplu în acest document.
-- **În weekend:** legătura cu datele NASA reale (LOLA, efemeride), validarea față de hărțile oficiale de iluminare, locurile reale, pitch-ul și predarea. Ce facem cu AI în weekend notăm în lista de mai jos.
+- **Before the event (6–13 November):** we chose the challenge and built the `index.html` prototype on **procedurally generated terrain** with **simplified** Sun and Earth positions. The prototype was built with the help of an AI assistant (Claude, by Anthropic).
+- **The prototype's numbers are not real results** and we do not present them as such. We use them only as an example in this document.
+- **During the weekend:** connecting real NASA data (LOLA, ephemerides), validation against the official illumination maps, real sites, the English UI, the pitch and the submission. We log what we do with AI during the weekend in the table below.
 
-| Ce | Unealtă / sursă |
+| What | Tool / source |
 |---|---|
-| Prototip, documentație | Claude (asistent AI) |
-| _de completat în weekend_ | |
+| Prototype, documentation | Claude (AI assistant) |
+| English translation of the UI | Eren |
+| _to fill in during the weekend_ | |
 
 ---
 
-## 11. Anexă: regulament, premii, logistică
+## 11. Appendix: rules, prizes, logistics
 
-**Program**
-- Sâmbătă: check-in 08:30 (cu buletin sau pașaport), deschidere 09:30, hacking de la 11:00, pauză 13:00, check-in-uri cu mentorii 17:00, încheierea zilei ~21:30.
-- Se poate lucra peste noapte în locație, dar fără paturi. **La 23:00 se închid ușile**: cine iese nu mai intră până dimineață.
-- Duminică: uși deschise 08:30, briefing 09:00, sprint final 09:10, **termen formular 15:00**, pitch-uri de la 15:30, **predare NASA 18:50**, premiere ~19:00.
+**Schedule**
+- Saturday: check-in 08:30 (with ID card or passport), opening 09:30, hacking from 11:00, lunch 13:00, mentor check-ins 17:00, day wrap-up ~21:30.
+- Working overnight at the venue is allowed, but there are no beds. **The doors close at 23:00**: anyone who leaves cannot come back in until morning.
+- Sunday: doors open 08:30, briefing 09:00, final sprint 09:10, **form deadline 15:00**, pitches from 15:30, **NASA submission 18:50**, awards ~19:00.
 
-**Locația:** Centrul de Conferințe „Gheorghe Șincai”, strada Gheorghe Șincai, Alba Iulia.
+**Venue:** Gheorghe Șincai Conference Centre, Strada Gheorghe Șincai, Alba Iulia.
 
-**Premii (brut, plătite în lei la cursul fix 1 € = 5,2405 lei, prin transfer, în cel mult 30 de zile):**
+**Prizes (gross, paid in RON at the fixed rate 1 EUR = 5.2405 RON, by bank transfer within 30 days):**
 
-| Loc | Euro | Lei |
+| Place | EUR | RON |
 |---|---|---|
-| 1 | 3.000 | 15.721,50 |
-| 2 | 2.000 | 10.481,00 |
-| 3 | 1.000 | 5.240,50 |
+| 1 | 3,000 | 15,721.50 |
+| 2 | 2,000 | 10,481.00 |
+| 3 | 1,000 | 5,240.50 |
 
-Echipa desemnează un reprezentant care primește premiul și semnează cum îl împarte. Impozitul depinde de cum și cui se plătește; organizatorii stabilesc la plată.
+The team designates a representative who receives the prize and signs how it will be shared. Tax depends on how and to whom it is paid; the organizers settle this at payment.
 
-**ElevenLabs:** o lună gratuită de Creator pentru fiecare participant (cod pe Discord, `#coupon-codes`), plus premii software separate, inclusiv unul pentru cel mai bun proiect construit cu ElevenLabs.
+**ElevenLabs:** one free month of the Creator tier for every participant (code on Discord, `#coupon-codes`), plus separate software awards, including one for the best project built with ElevenLabs.
 
-**Global:** primele echipe locale pot fi nominalizate la jurizarea internațională (18–30 noiembrie); câștigătorii globali sunt anunțați în ianuarie 2027.
+**Global:** top local teams can be nominated for international judging (18–30 November); global winners are announced in January 2027.
 
-**Contact organizatori:** contact@daregen.ro, comunitatea WhatsApp a evenimentului.
+**Organizer contact:** contact@daregen.ro, the event's WhatsApp community.
 
 ---
 
-## 12. Surse
+## 12. Sources
 
-- Regulamentul participanților, NASA Space Apps Alba Iulia 2026 (Dare.Gen, versiunea finală, 6 nov. 2026)
-- Provocările oficiale: <https://www.spaceappschallenge.org/2026/challenges/>
-- LOLA, produse polare (LDEM): <https://imbrium.mit.edu/BROWSE/LOLA_GDR/POLAR/SOUTH_POLE>
-- LOLA 5 m/pixel, mozaicul 87°S: <https://pgda.gsfc.nasa.gov/products/81>
-- LOLA 5 m/pixel, locuri de aselenizare: <https://pgda.gsfc.nasa.gov/products/78>
-- Hărți de iluminare polară LRO: <https://pgda.gsfc.nasa.gov/products/69>
+- Participant Rulebook, NASA Space Apps Alba Iulia 2026 (Dare.Gen, final version, 6 Nov 2026)
+- Official challenges: <https://www.spaceappschallenge.org/2026/challenges/>
+- LOLA polar products (LDEM): <https://imbrium.mit.edu/BROWSE/LOLA_GDR/POLAR/SOUTH_POLE>
+- LOLA 5 m/pixel, 87°S mosaic: <https://pgda.gsfc.nasa.gov/products/81>
+- LOLA 5 m/pixel, landing-site DEMs: <https://pgda.gsfc.nasa.gov/products/78>
+- LRO polar illumination maps: <https://pgda.gsfc.nasa.gov/products/69>
 - Moon Trek (NASA): <https://trek.nasa.gov/moon/>
 - JPL Horizons: <https://ssd.jpl.nasa.gov/horizons/>
 - NASA NAIF SPICE: <https://naif.jpl.nasa.gov/naif/>
-- Barker et al., 2021, *Planetary and Space Science* 203, 105119 — de citat dacă folosim produsele LOLA de 5 m: <https://doi.org/10.1016/j.pss.2020.105119>
+- Barker et al., 2021, *Planetary and Space Science* 203, 105119 — cite if we use the 5 m LOLA products: <https://doi.org/10.1016/j.pss.2020.105119>
