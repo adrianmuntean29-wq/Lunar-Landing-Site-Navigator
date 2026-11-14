@@ -78,6 +78,8 @@ h2{font-family:var(--f-display);font-weight:600;font-size:21px;line-height:1.1;l
 .pin .dot{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:var(--space-ink)}
 .pin .tag{position:absolute;left:0;top:-24px;transform:translate(-50%,-100%);pointer-events:auto;font:600 12px/1.2 var(--f-mono);color:var(--space);background:var(--space-ink);border:0;border-radius:3px;padding:3px 7px;cursor:pointer;white-space:nowrap}
 .pin.sel .tag{box-shadow:0 0 0 2px var(--space),0 0 0 3.5px var(--space-ink)}
+.pin.out .stem{opacity:.35}
+.pin.out .tag{background:var(--space-veil);color:var(--space-ink);box-shadow:inset 0 0 0 1px var(--space-muted)}
 .pin .tag:focus-visible{outline:2px solid var(--earth-fill);outline-offset:2px}
 .geo{font:500 11px/1 var(--f-mono);color:var(--space-muted);white-space:nowrap}
 .geo span{position:absolute;left:6px;top:-5px}
@@ -220,7 +222,7 @@ input[type=date]{font:500 13px var(--f-body);color:var(--ink);background:var(--p
     </div>
     <div class="topright">
       <nav class="pages" aria-label="Pages"><a href="index.html" aria-current="page">Landing calendar</a><a href="mission.html">Mission</a></nav>
-      <p class="badge">Sun and Earth: real positions (JPL Horizons). 3D terrain: still a generated demo.</p>
+      <p class="badge" id="terrainBadge">Sun and Earth: real positions (JPL Horizons). 3D terrain: loading…</p>
     </div>
   </header>
 
@@ -315,7 +317,7 @@ input[type=date]{font:500 13px var(--f-body);color:var(--ink);background:var(--p
           </label>
         </div>
         <p class="readout" id="readout"></p>
-        <p class="caption">Drag to rotate, pinch or scroll to zoom. The 3D view is lit by the real Sun as seen from the pole, on demo terrain.</p>
+        <p class="caption" id="terrainCaption">Drag to rotate, pinch or scroll to zoom. The 3D view is lit by the real Sun as seen from the pole.</p>
       </div>
     </section>
 
@@ -350,7 +352,7 @@ input[type=date]{font:500 13px var(--f-body);color:var(--ink);background:var(--p
   <section class="notes" aria-label="What is simulated">
     <h2>What is simulated here and what the competition version would use</h2>
     <dl>
-      <div><dt>Terrain</dt><dd>Generated: a 21 km crater near the pole and a massif toward Earth, on a 48 × 48 km map. Next: real LOLA heights from NASA PGDA (LDEM_80S_*_ADJ), baked by our Python engine.</dd></div>
+      <div><dt>Terrain</dt><dd>Real: NASA LOLA heights (PGDA product 90, LDEM_80S_80MPP_ADJ) averaged to 240 m by our Python engine (data/heights.bin), on a 48 × 48 km map around the pole, with 96 × 96 km used for shadows. Site pins sit at the published coordinates; sites farther out are pinned at the map edge with their distance. If the heights file cannot load, the page falls back to a generated demo terrain and says so.</dd></div>
       <div><dt>Sun and Earth</dt><dd>Real: one JPL Horizons table (2026-2030, every 6 h) of the sub-solar and sub-Earth points in the Moon's mean-Earth frame. The page interpolates it and computes the Sun and Earth direction from any site, including Earth parallax. Checked against Horizons topocentric values.</dd></div>
       <div><dt>Computation</dt><dd>3D demo: each point's horizon in 64 directions out to 46 km, with the Moon's curvature. Real sites: 360-direction horizon masks from LOLA terrain, computed by our Python engine (flat horizon until they load).</dd></div>
     </dl>
@@ -441,9 +443,17 @@ function terrain(x, z){
   }
   return h;
 }
+/* scene km: +x toward 90 E, -z toward 0 E (Earth side); heights.bin: +x toward 90 E, +y toward 0 E, metres */
+function lolaAt(x, z){
+  var m = LOLA.m, fc = (x*1000 - m.xmin)/m.px - 0.5, fr = (m.ymax + z*1000)/m.px - 0.5;
+  fc = clamp(fc, 0, m.nx - 1.001); fr = clamp(fr, 0, m.ny - 1.001);
+  var i = fc | 0, j = fr | 0, u = fc - i, w = fr - j, k = j*m.nx + i, A = LOLA.h;
+  function g(q){ var v = A[q]; return v === v ? v : 0; }
+  return ((g(k)*(1 - u) + g(k + 1)*u)*(1 - w) + (g(k + m.nx)*(1 - u) + g(k + m.nx + 1)*u)*w)/1000;
+}
 var H = new Float32Array(BIG_N*BIG_N), HMAX = -1e9;
 for (var gj = 0; gj < BIG_N; gj++) for (var gi = 0; gi < BIG_N; gi++){
-  var hv = terrain(-HALF_BIG + gi*CELL, -HALF_BIG + gj*CELL);
+  var hv = LOLA ? lolaAt(-HALF_BIG + gi*CELL, -HALF_BIG + gj*CELL) : terrain(-HALF_BIG + gi*CELL, -HALF_BIG + gj*CELL);
   H[gj*BIG_N + gi] = hv; if (hv > HMAX) HMAX = hv;
 }
 function hAt(x, z){
@@ -778,9 +788,22 @@ function draw(){
 
 /* ---------- overlay labels ---------- */
 var labelsEl = $('#labels'), pinEls = [], geoEls = [], sunEl, earthEl;
-/* Real sites are not on the demo terrain, so the 3D view carries no site pins until real
-   LOLA heights replace it. */
-function buildPins(){ pinEls.forEach(function(p){ p.remove(); }); pinEls = []; }
+/* Site pins at the published coordinates, only on real LOLA terrain (none on the demo terrain).
+   Sites outside the 48 km block are pinned at the block edge in their direction, with the distance. */
+function siteXZ(s){ var rho = 2*R_MOON*Math.tan(Math.PI/4 + s.lat*DEG/2), L = s.lon*DEG; return [rho*Math.sin(L), -rho*Math.cos(L)]; }
+function buildPins(){
+  pinEls.forEach(function(p){ p.el.remove(); }); pinEls = [];
+  if (!LOLA) return;
+  sites.forEach(function(s, i){
+    var el = document.createElement('div'); el.className = 'mk pin';
+    el.innerHTML = '<span class="stem"></span><span class="dot"></span><button type="button" class="tag"></button>';
+    var b = el.querySelector('.tag'), code = (s.name.match(/\(([^)]+)\)/) || [])[1] || s.name;
+    b.addEventListener('click', function(){ select(i); });
+    labelsEl.appendChild(el);
+    var xz = siteXZ(s);
+    pinEls.push({el: el, b: b, x: xz[0], z: xz[1], i: i, label: String.fromCharCode(65 + i) + ' · ' + code});
+  });
+}
 function buildGeo(){
   [[0, 0, 'South Pole'], [0, 15.162, '89.5° S']].forEach(function(g){
     var el = document.createElement('div'); el.className = 'mk geo';
@@ -794,6 +817,15 @@ function buildGeo(){
 function place(el, p){ if (!p || p[0] < -60 || p[0] > W + 60 || p[1] < -60 || p[1] > Hh + 60){ el.hidden = true; return; } el.hidden = false; el.style.transform = 'translate(' + p[0].toFixed(1) + 'px,' + p[1].toFixed(1) + 'px)'; }
 function updateLabels(){
   var e = state.exag;
+  if (LOLA && pinEls.length !== sites.length) buildPins();
+  pinEls.forEach(function(p){
+    var inside = Math.abs(p.x) <= HALF && Math.abs(p.z) <= HALF, x = p.x, z = p.z;
+    if (!inside){ var k = (HALF - 0.4)/Math.max(Math.abs(p.x), Math.abs(p.z)); x *= k; z *= k; }
+    place(p.el, project(x, hAt(x, z)*e, z));
+    p.el.classList.toggle('sel', p.i === sel); p.el.classList.toggle('out', !inside);
+    p.b.textContent = p.label + (inside ? '' : ', ' + Math.round(Math.hypot(p.x, p.z)) + ' km out');
+    p.b.setAttribute('aria-label', 'Pick site ' + p.label + (inside ? '' : ', ' + Math.round(Math.hypot(p.x, p.z)) + ' km from the pole, outside this map'));
+  });
   geoEls.forEach(function(g){ place(g.el, project(g.x, hAt(g.x, g.z)*e, g.z)); });
   var su = sunAt(state.t), ea = earthAt(state.t), top = HMAXr*e + 1.2, R = 27;
   var st = {sunAz: su.az, sunEl: su.el, sunLit: su.el > 0 ? 1 : 0, earthAz: ea.az, earthEl: ea.el, earthVis: ea.el > 0 ? 1 : 0};
@@ -1308,6 +1340,22 @@ window.__navigator = {get sites(){ return sites; }, state: state, get stage(){ r
 requestAnimationFrame(frame);
 }
 
+/* ---------- real terrain for the 3D view: data/heights.bin from the engine (LOLA, 240 m, +/-60 km, Float32, row 0 = +y) ---------- */
+var LOLA = null;
+function loadHeights(){
+  var meta = {nx: 500, ny: 500, px: 240, xmin: -60000, ymax: 60000};
+  var el = document.getElementById('data-heights');
+  if (el){
+    try { var b = atob(el.textContent.trim()), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); LOLA = {h: new Float32Array(u.buffer), m: meta}; } catch (err) {}
+    return Promise.resolve();
+  }
+  return fetch('data/heights.bin').then(function(r){ if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+    .then(function(ab){ if (ab.byteLength === meta.nx*meta.ny*4) LOLA = {h: new Float32Array(ab), m: meta}; }).catch(function(){});
+}
+function terrainWording(){
+  document.getElementById('terrainBadge').textContent = 'Sun and Earth: real positions (JPL Horizons). 3D terrain: ' + (LOLA ? 'real LOLA heights (NASA PGDA 90, 240 m).' : 'generated demo (heights file not loaded).');
+  document.getElementById('terrainCaption').textContent = 'Drag to rotate, pinch or scroll to zoom. The 3D view is lit by the real Sun as seen from the pole, on ' + (LOLA ? 'real LOLA terrain. Click a pin to pick that site.' : 'demo terrain.');
+}
 /* ---------- boot: load the ephemeris (required) and terrain masks (optional) ---------- */
 fetch('data/subpoints.json').then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); }).then(function(d){
   EPH = d;
@@ -1323,7 +1371,7 @@ fetch('data/subpoints.json').then(function(r){ if (!r.ok) throw new Error(r.stat
       if (ok) window.__siteData[o.id] = o;
     });
   }
-  startApp();
+  return loadHeights().then(function(){ terrainWording(); startApp(); });
 }).catch(function(err){
   document.getElementById('status').textContent = 'Could not load data/subpoints.json (' + err.message + '). Open the page through a web server, not as a local file.';
 });

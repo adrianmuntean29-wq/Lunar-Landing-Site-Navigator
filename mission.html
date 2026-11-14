@@ -315,6 +315,7 @@ canvas.chart{width:100%;display:block}
         <button type="button" data-look="earth" aria-pressed="false">Look at Earth</button>
         <button type="button" id="enlarge" aria-pressed="true">Sun &amp; Earth ×3</button>
         <button type="button" id="watchLand">Watch the landing</button>
+        <button type="button" id="watchLift">Watch the liftoff</button>
       </div>
     </div>
     <div class="rank-head"><h3 id="minisTitle">The same moment at your 5 sites</h3></div>
@@ -1625,7 +1626,8 @@ function drawPanorama(c, w, h, site, fi, o){
     if (name){ c.fillStyle = name.length === 1 ? 'rgba(240,244,248,.85)' : 'rgba(200,210,220,.6)'; c.fillText(name, x, yk + 9); }
   }
   // lander + shadow (full view only): absent before touchdown, flying during the replay, on the ground after
-  if (!mini && !o.noLander) drawLander(c, w, h, yT, sk, {light: light, shine: shine, sunUp: sunUp, sunDx: sunDx, centerAz: centerAz}, o.land || null);
+  if (!mini && !o.noLander) drawLander(c, w, h, yT, sk, {light: light, shine: shine, sunUp: sunUp, sunDx: sunDx, centerAz: centerAz}, o.land || null,
+    {lift: o.lift || null, baseOnly: !!o.baseOnly, crew: active === 'crewed'});
   // labels and off-screen / below-horizon hints
   function tag(x, y, txt, col, below){
     c.font = (mini ? '600 10px ' : '600 11.5px ') + tok('--f-mono'); var tw = c.measureText(txt).width;
@@ -1646,14 +1648,23 @@ function drawPanorama(c, w, h, site, fi, o){
 var LAND = {pre: 120, post: 8, dur: 15000, c2: 0.0958};
 var landAnim = null;
 function descentAt(tau){ tau = Math.max(0, tau); return {alt: tau + LAND.c2*tau*tau, vs: 1 + 2*LAND.c2*tau}; }
+/* Liftoff (crewed): the ascent stage leaves, the descent stage stays as its launch pad. Illustrative profile:
+   altitude 1.2 t^2 m for the first 10 s (straight up), then pitch-over and 24 m/s + 1 m/s^2 climbing while picking up speed sideways. */
+var LIFT = {pre: 2, post: 25, dur: 12000};
+function liftState(now){
+  if (!landAnim || landAnim.kind !== 'lift') return null;
+  var p = clamp((now - landAnim.start)/LIFT.dur, 0, 1), ts = -LIFT.pre + p*(LIFT.pre + LIFT.post), t = Math.max(0, ts), alt, v, x = 0;
+  if (t <= 10){ alt = 1.2*t*t; v = 2.4*t; } else { var u = t - 10; alt = 120 + 24*u + 0.5*u*u; v = 24 + u; x = 3*u*u; }
+  return {p: p, ts: ts, t: t, alt: alt, v: v, x: x, af: Math.sqrt(clamp(alt/1500, 0, 1)), engine: ts >= 0 ? 1 : 0, debris: ts >= 0 ? clamp(1 - t/4, 0, 1) : 0};
+}
 function landState(now){
-  if (!landAnim) return null;
+  if (!landAnim || landAnim.kind === 'lift') return null;
   var p = clamp((now - landAnim.start)/LAND.dur, 0, 1), ts = -LAND.pre + p*(LAND.pre + LAND.post), tau = Math.max(0, -ts), d = descentAt(tau);
   var af = Math.sqrt(clamp(d.alt/1500, 0, 1));
   return {p: p, ts: ts, tau: tau, alt: tau > 0 ? d.alt : 0, vs: tau > 0 ? d.vs : 0, af: af, flying: ts < 0,
           dust: ts < 0 ? clamp(1 - d.alt/35, 0, 1) : clamp(1 - ts/5, 0, 1)*0.9, engine: ts < 0 ? 1 : clamp(1 - ts/0.6, 0, 1)};
 }
-function drawLander(c, w, h, yT, sk, E, L){
+function drawLander(c, w, h, yT, sk, E, L, X){
   var bx = w*0.5, by = h*0.93, lh = Math.min(h*0.17, 110), lw = lh*0.9, light = E.light, sunDx = E.sunDx;
   var ax = bx, ay = by, sc = 1;
   if (L && L.flying){ ax = bx - Math.pow(L.tau/LAND.pre, 1.6)*w*0.3; ay = by - L.af*(by - h*0.16); sc = 0.5 + 0.5*(1 - L.af); }
@@ -1709,18 +1720,50 @@ function drawLander(c, w, h, yT, sk, E, L){
     ng.addColorStop(0, 'rgba(255,240,210,' + (0.7*L.engine).toFixed(3) + ')'); ng.addColorStop(1, 'rgba(255,220,170,0)');
     c.fillStyle = ng; c.beginPath(); c.arc(0, -lh*0.28, lh*0.35, 0, Math.PI*2); c.fill();
   }
+  // descent stage: legs, descent engine and the gold body (it stays on the Moon after a crewed liftoff)
   c.strokeStyle = 'rgba(200,205,212,' + lit + ')'; c.lineWidth = 2.2;
   c.beginPath(); c.moveTo(-lw*0.42, 0); c.lineTo(-lw*0.22, -lh*0.42); c.moveTo(lw*0.42, 0); c.lineTo(lw*0.22, -lh*0.42); c.moveTo(-lw*0.18, 0); c.lineTo(-lw*0.1, -lh*0.4); c.moveTo(lw*0.18, 0); c.lineTo(lw*0.1, -lh*0.4); c.stroke();
   c.fillStyle = 'rgba(90,92,98,' + lit + ')'; c.beginPath(); c.moveTo(-lw*0.06, -lh*0.38); c.lineTo(lw*0.06, -lh*0.38); c.lineTo(lw*0.08, -lh*0.3); c.lineTo(-lw*0.08, -lh*0.3); c.closePath(); c.fill();
   var bg = c.createLinearGradient(-lw*0.3, 0, lw*0.3, 0);
   bg.addColorStop(sunDx > 0 ? 0 : 1, 'rgba(70,64,40,' + lit + ')'); bg.addColorStop(sunDx > 0 ? 1 : 0, 'rgba(232,196,96,' + lit + ')');
   c.fillStyle = bg; c.fillRect(-lw*0.3, -lh*0.72, lw*0.6, lh*0.34);
+  c.restore();
+  if (X && X.baseOnly) return;
+  // ascent stage (crew cabin, mast, panel, dish): rises on its own engine at liftoff
+  var F = X && X.lift, ux = ax, uy = ay, us = sc;
+  if (F){ ux = ax + Math.min(F.x/700, 1)*w*0.32; uy = ay - F.af*(by - h*0.14); us = sc*(1 - 0.45*F.af); }
+  c.save(); c.translate(ux, uy); c.scale(us, us);
+  if (F && F.engine > 0){
+    var fl2 = 0.85 + 0.15*Math.sin(performance.now()/29), reach = (ay - uy)/us;
+    var pl2 = Math.max(lh*0.35, Math.min(reach - lh*0.05, lh*2.4))*fl2;
+    var pg2 = c.createLinearGradient(0, -lh*0.72, 0, -lh*0.72 + pl2);
+    pg2.addColorStop(0, 'rgba(255,250,235,1)'); pg2.addColorStop(0.25, 'rgba(255,200,130,.6)'); pg2.addColorStop(1, 'rgba(255,170,100,0)');
+    c.fillStyle = pg2; c.beginPath(); c.moveTo(-lw*0.05, -lh*0.72); c.lineTo(lw*0.05, -lh*0.72); c.lineTo(lw*0.24, -lh*0.72 + pl2); c.lineTo(-lw*0.24, -lh*0.72 + pl2); c.closePath(); c.fill();
+    var ng2 = c.createRadialGradient(0, -lh*0.7, 0, 0, -lh*0.7, lh*0.3);
+    ng2.addColorStop(0, 'rgba(255,240,210,.75)'); ng2.addColorStop(1, 'rgba(255,220,170,0)');
+    c.fillStyle = ng2; c.beginPath(); c.arc(0, -lh*0.7, lh*0.3, 0, Math.PI*2); c.fill();
+  }
+  if (X && X.crew){
+    c.fillStyle = 'rgba(150,156,168,' + lit + ')'; c.fillRect(-lw*0.22, -lh*0.98, lw*0.44, lh*0.26);
+    c.fillStyle = 'rgba(20,24,32,' + Math.min(1, lit + 0.2) + ')'; c.fillRect(-lw*0.12, -lh*0.93, lw*0.09, lh*0.08); c.fillRect(lw*0.03, -lh*0.93, lw*0.09, lh*0.08);
+  }
   c.fillStyle = 'rgba(120,130,150,' + lit + ')'; c.fillRect(-lw*0.04, -lh*1.05, lw*0.08, lh*0.34);
   c.fillStyle = 'rgba(40,70,140,' + Math.min(1, lit + 0.1) + ')'; c.fillRect(-lw*0.42, -lh*1.12, lw*0.84, lh*0.14);
   c.strokeStyle = 'rgba(160,190,240,' + lit + ')'; c.lineWidth = 1; for (var p = -3; p <= 3; p++){ c.beginPath(); c.moveTo(p*lw*0.12, -lh*1.12); c.lineTo(p*lw*0.12, -lh*0.98); c.stroke(); }
   var dish = wrap180(sk.earthAz - E.centerAz) > 0 ? 1 : -1;
   c.strokeStyle = 'rgba(220,225,232,' + lit + ')'; c.lineWidth = 2; c.beginPath(); c.arc(lw*0.22*dish, -lh*0.82, lh*0.1, dish > 0 ? -2.4 : -0.7, dish > 0 ? 0.7 : 2.4, dish < 0); c.stroke();
   c.restore();
+  // insulation flakes blown off the descent stage at ignition, falling back on ballistic arcs (no air on the Moon)
+  if (F && F.debris > 0){
+    var g2 = 1.62*sc*lh/3.5, t2 = F.t*1.6;
+    for (var q2 = 0; q2 < 36; q2++){
+      var a2 = -Math.PI*(0.08 + 0.84*((q2*0.618) % 1)), v2 = (0.5 + ((q2*0.377) % 1))*lh*1.4;
+      var px2 = ax + Math.cos(a2)*v2*t2, py2 = ay - lh*0.72*sc + Math.sin(a2)*v2*t2 + 0.5*g2*t2*t2;
+      if (py2 > by) continue;
+      c.fillStyle = q2 % 3 ? 'rgba(232,196,96,' + (0.9*F.debris).toFixed(3) + ')' : 'rgba(220,224,230,' + (0.9*F.debris).toFixed(3) + ')';
+      c.save(); c.translate(px2, py2); c.rotate(q2 + t2*4); c.fillRect(-2, -1, 4, 2); c.restore();
+    }
+  }
 }
 function autoAz(site, fi){
   var sk = skyInterp(site, fi);
@@ -1871,6 +1914,28 @@ function escH(t){ return String(t).replace(/[&<>"]/g, function(ch){ return {'&':
   $('#orbCenter').addEventListener('click', function(){ orbView.dx = 0; orbView.dy = 0; orbDirty = true; });
 })();
 /* descent camera: looking straight down during the landing replay, on the real LRO image */
+function drawAscentCam(c, w, h, site, F){
+  drawDownCam(c, w, h, site, F.alt, F.x, 'Ascent camera · real LRO image', F.engine ? (F.t > 0 ? Math.round(F.alt) + ' m up · ' : 'ignition · ') : 'ignition · ');
+}
+function drawDownCam(c, w, h, site, alt, off, title, sub){
+  var p = lroXY(site.lat, site.lon); if (Math.abs(p[0]) > LRO.TL - 3000 || Math.abs(p[1]) > LRO.TL - 3000) return;
+  var iw = Math.round(clamp(w*0.22, 160, 250)), ih = Math.round(iw*0.68), ix = w - iw - 12, iy = 52;
+  var foot = Math.max(2*alt*Math.tan(35*DEG), 140), mpp = foot/iw, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var e = lroDir(site, 90), cx = p[0] + e[0]*off, cy = p[1] - e[1]*off;
+  c.save(); c.beginPath(); c.rect(ix, iy, iw, ih); c.clip(); c.translate(ix, iy);
+  c.fillStyle = '#000'; c.fillRect(0, 0, iw, ih);
+  var n = drawLRO(c, iw, ih, cx, cy, mpp, dpr);
+  var tx = (p[0] - cx)/mpp + iw/2, ty = (cy - p[1])/mpp + ih/2;
+  c.strokeStyle = 'rgba(255,255,255,.55)'; c.lineWidth = 1; c.beginPath(); c.moveTo(iw/2 - 12, ih/2); c.lineTo(iw/2 + 12, ih/2); c.moveTo(iw/2, ih/2 - 12); c.lineTo(iw/2, ih/2 + 12); c.stroke();
+  c.strokeStyle = '#7CF0A0'; c.lineWidth = 2; c.beginPath(); c.arc(tx, ty, 8, 0, Math.PI*2); c.stroke();
+  c.fillStyle = 'rgba(0,0,0,.6)'; c.fillRect(0, 0, iw, 20); c.fillRect(0, ih - 20, iw, 20);
+  c.font = '600 11px ' + tok('--f-mono'); c.fillStyle = '#E4E8EC'; c.textAlign = 'left'; c.textBaseline = 'middle';
+  c.fillText(title, 6, 10);
+  c.font = '500 10.5px ' + tok('--f-mono'); c.fillText(sub + 'view ' + (foot >= 1000 ? (foot/1000).toFixed(1) + ' km' : Math.round(foot) + ' m') + ' wide', 6, ih - 10);
+  if (!n){ c.fillStyle = '#9AA4AF'; c.textAlign = 'center'; c.fillText(LRO.failed && !LRO.loaded ? 'No image: needs internet' : 'Loading image…', iw/2, ih/2 + 24); }
+  c.restore();
+  c.strokeStyle = 'rgba(228,232,236,.5)'; c.lineWidth = 1; c.strokeRect(ix + 0.5, iy + 0.5, iw - 1, ih - 1);
+}
 function drawDescentCam(c, w, h, site, LS){
   var p = lroXY(site.lat, site.lon); if (Math.abs(p[0]) > LRO.TL - 3000 || Math.abs(p[1]) > LRO.TL - 3000) return;
   var iw = Math.round(clamp(w*0.22, 160, 250)), ih = Math.round(iw*0.68), ix = w - iw - 12, iy = 52;
@@ -1896,11 +1961,22 @@ function drawSurface(){
   if (surfC.width !== Math.round(w*dpr) || surfC.height !== Math.round(h*dpr)){ surfC.width = Math.round(w*dpr); surfC.height = Math.round(h*dpr); }
   var c = surfC.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
   if (!R){ c.fillStyle = '#000'; c.fillRect(0, 0, w, h); surfHud.innerHTML = '<span>Pick a site to stand on it</span>'; drawMinis(); return; }
-  var site = R.site, fiNow = nowIndex(), LS = landState(performance.now()), before = !LS && fiNow < R.iL - 0.5, fi = LS ? R.iL : Math.max(fiNow, R.iL);
+  var site = R.site, fiNow = nowIndex(), LS = landState(performance.now()), LF = liftState(performance.now()), before = !LS && !LF && fiNow < R.iL - 0.5, fi = LS ? R.iL : Math.max(fiNow, R.iL);
+  var lifted = !LF && active === 'crewed' && mission && met >= mission.tLift;
+  $('#watchLift').hidden = active !== 'crewed';
   if (look.follow === 'sun') look.az = skyInterp(site, fi).sunAz;
   else if (look.follow === 'earth') look.az = skyInterp(site, fi).earthAz;
   else if (look.follow === 'auto' || look.az === null) look.az = autoAz(site, fi);
-  var out = drawPanorama(c, w, h, site, fi, {az: look.az, fov: look.fov, land: LS, noLander: before});
+  var out = drawPanorama(c, w, h, site, fi, {az: look.az, fov: look.fov, land: LS, lift: LF, baseOnly: lifted, noLander: before});
+  if (LF){
+    surfHud.innerHTML = LF.ts < 0
+      ? '<span><b>Liftoff</b> · ' + site.name + ' · ' + fmtDate(tabTime(0) + fi*3600000) + '</span><span>Ascent engine: ignition in <b>' + Math.ceil(-LF.ts) + ' s</b></span><span>The descent stage stays as the launch pad</span>'
+      : '<span><b>Liftoff</b> · ' + site.name + '</span><span>Altitude <b>' + Math.round(LF.alt).toLocaleString('en-US') + ' m</b></span><span>Climbing <b>' + LF.v.toFixed(1) + ' m/s</b></span><span>T+ <b>' + Math.round(LF.t) + ' s</b></span><span>' + (LF.t < 10 ? 'Straight up' : 'Pitching over toward orbit') + '</span><span>Replay about 2× real time</span>';
+    $('#surfWho').textContent = site.name;
+    $('#surfNote').textContent = 'Horizon: ' + hzLabel(site) + ' · ascent stage, flakes and plume illustrative · ascent camera: real LRO image';
+    drawAscentCam(c, w, h, site, LF);
+    return;
+  }
   if (LS){
     var tmm = Math.floor(LS.tau/60), tss = Math.round(LS.tau % 60);
     surfHud.innerHTML = LS.flying
@@ -1919,7 +1995,8 @@ function drawSurface(){
     '<span class="' + (out.sunUp ? 'good' : 'bad') + '">Sun <b>' + sgn(sk.sunEl, 2) + '°</b> az ' + Math.round(sk.sunAz) + '° · ' + (sunT.up ? 'sets in ' : 'rises in ') + (sunT.capped ? '> 60 d' : dh(sunT.h)) + '</span>' +
     '<span class="' + (out.earthUp ? 'good' : 'bad') + '">Earth <b>' + sgn(sk.earthEl, 2) + '°</b> az ' + Math.round(sk.earthAz) + '° · ' + (out.earthUp ? 'direct link possible' : 'no direct link') + ' · ' + (earT.up ? 'sets in ' : 'rises in ') + (earT.capped ? '> 60 d' : dh(earT.h)) + '</span>' +
     '<span>Earth phase <b>' + Math.round(out.k*100) + '%</b> · ' + Math.round(sk.D).toLocaleString('en-US') + ' km</span>' +
-    (shadow ? '<span>A 3 m lander casts a <b>' + (shadow > 999 ? Math.round(shadow/1000*10)/10 + ' km' : Math.round(shadow) + ' m') + '</b> shadow</span>' : '');
+    (shadow ? '<span>A 3 m lander casts a <b>' + (shadow > 999 ? Math.round(shadow/1000*10)/10 + ' km' : Math.round(shadow) + ' m') + '</b> shadow</span>' : '') +
+    (lifted ? '<span>Crew left on ' + fmtDate(mission.landMs + (mission.tLift - mission.tLand)*1000) + '; the descent stage stays</span>' : '');
   $('#surfNote').textContent = 'Horizon: ' + hzLabel(site) + ' (dashed: flat Moon)' + ' · foreground craters illustrative' + (enlarge > 1 ? ' · Sun and Earth drawn ×' + enlarge : '');
   drawMinis(fi);
 }
@@ -2288,7 +2365,7 @@ function startLanding(fromPlay){
   if (!mission) return;
   met = mission.tLand; syncMet(); setPlaying(false);
   look.follow = 'auto'; look.az = null;
-  landAnim = {start: performance.now(), resume: !!fromPlay};
+  landAnim = {kind: 'land', start: performance.now(), resume: !!fromPlay};
   if (fromPlay && !landAnim.scrolled){
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     surfWrap.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'center'});
@@ -2296,6 +2373,18 @@ function startLanding(fromPlay){
   dirty = true;
 }
 $('#watchLand').addEventListener('click', function(){ startLanding(false); });
+function startLiftoff(fromPlay){
+  if (!mission || mission.key !== 'crewed') return;
+  met = mission.tLift; syncMet(); setPlaying(false);
+  look.follow = 'auto'; look.az = null;
+  landAnim = {kind: 'lift', start: performance.now(), resume: !!fromPlay};
+  if (fromPlay){
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    surfWrap.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'center'});
+  }
+  dirty = true;
+}
+$('#watchLift').addEventListener('click', function(){ startLiftoff(false); });
 function setMast(v){ mast = v; seriesCache = {}; lwKey = ''; autoBest = false; recompute(); renderAll(); }
 $('#mastSel').addEventListener('change', function(e){ setMast(e.target.value); });
 $('#relayChk').addEventListener('change', function(e){ relay = e.target.checked; seriesCache = {}; lwKey = ''; autoBest = false; recompute(); renderAll(); });
@@ -2355,6 +2444,7 @@ function frame(now){
     var metBefore = met;
     met += dt*warp*3600;
     if (metBefore < mission.tLand && met >= mission.tLand){ startLanding(true); }
+    else if (mission.key === 'crewed' && metBefore < mission.tLift && met >= mission.tLift){ startLiftoff(true); }
     if (met >= mission.tEnd){ met = mission.tEnd; playing = false; playIcon.setAttribute('d', 'M4 2.5v11l9-5.5z'); playBtn.setAttribute('aria-label', 'Play the mission'); }
     syncMet(); dirty = true;
   }
@@ -2363,7 +2453,7 @@ function frame(now){
     if (landAnim) drawSurface();
     if (orbDirty) drawOrbit();
   }
-  if (landAnim && performance.now() - landAnim.start > LAND.dur){
+  if (landAnim && performance.now() - landAnim.start > (landAnim.kind === 'lift' ? LIFT.dur : LAND.dur)){
     var resume = landAnim.resume; landAnim = null; dirty = true;
     if (resume) setPlaying(true);
   }
@@ -2409,7 +2499,7 @@ if (FROMCAL){
   met = mission.tLand + 6*3600; syncMet();
   applyBest();
 }
-window.__mission = {LRO: LRO, lroXY: lroXY, orbView: orbView, evalAt: evalAt, siteSeries: siteSeries, LIMITS: LIMITS, startLanding: startLanding, get landAnim(){ return landAnim; }, get mast(){ return mast; }, get target(){ return target; }, get active(){ return active; }, budgets: budgets, results: results, get mission(){ return mission; }, PROFILES: PROFILES, SITES: SITES, picks: picks,
+window.__mission = {LRO: LRO, lroXY: lroXY, orbView: orbView, evalAt: evalAt, siteSeries: siteSeries, LIMITS: LIMITS, startLanding: startLanding, startLiftoff: startLiftoff, get landAnim(){ return landAnim; }, get mast(){ return mast; }, get target(){ return target; }, get active(){ return active; }, budgets: budgets, results: results, get mission(){ return mission; }, PROFILES: PROFILES, SITES: SITES, picks: picks,
   get windows(){ return lwRes; }, get wx(){ return wx; }, get launchMs(){ return launchMs; }, budget: budget, launchOpps: launchOpps, moonRADec: moonRADec, gmstDeg: gmstDeg};
 requestAnimationFrame(frame);
 })();
