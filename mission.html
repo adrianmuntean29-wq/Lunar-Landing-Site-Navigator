@@ -97,6 +97,7 @@ input[type=datetime-local]{font:500 13px var(--f-mono);color:var(--ink);backgrou
 #surf{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
 #surf:active{cursor:grabbing}
 .surface .hud span.good{color:#9BE7A0} .surface .hud span.bad{color:#FF9A8F}
+.surface .hud span.crewtag{background:#2CC3B1;color:#05201C;border-color:transparent}
 .minis{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
 .mini{display:grid;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px;cursor:pointer;text-align:left;font:inherit;color:inherit}
 .mini[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
@@ -114,6 +115,11 @@ input[type=datetime-local]{font:500 13px var(--f-mono);color:var(--ink);backgrou
 .hud span{background:var(--space-veil);border:1px solid rgba(228,232,236,.14);padding:4px 7px;border-radius:3px;white-space:nowrap}
 .hud b{font-weight:600}
 .views{position:absolute;right:12px;bottom:12px}
+.surfbar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-top:10px}
+.surfbar .seg{flex-wrap:wrap}
+.surfbar .replay button{font-weight:600}
+.surfbar .replay svg{width:12px;height:12px;fill:currentColor}
+.surfbar .replay button[hidden]{display:none}
 .views.seg{background:var(--space-veil);border-color:rgba(228,232,236,.2)}
 .views.seg button{color:var(--space-ink);border-right-color:rgba(228,232,236,.2);padding:8px 11px}
 .views.seg button[aria-pressed="true"]{background:var(--space-ink);color:var(--space)}
@@ -196,6 +202,42 @@ canvas.chart{width:100%;display:block}
 .lwrule li{font-size:13px;color:var(--muted);border-left:3px solid var(--line);padding-left:10px}
 .lwrule b{color:var(--ink);font-weight:600}
 #lwChart{height:98px}
+/* mission at a glance */
+.glance{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2fr) auto;gap:14px 26px;align-items:center;padding:16px 18px;background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--crew-fill);border-radius:6px}
+.glance.robot{border-left-color:var(--robot-fill)}
+.g-type{display:inline-block;font:600 12px/1 var(--f-mono);padding:5px 8px;border-radius:3px;background:var(--crew-fill);color:#05201C;margin-bottom:8px}
+.glance.robot .g-type{background:var(--robot-fill);color:#1A0B33}
+.glance h2{font-size:26px}
+.g-verdict{margin:8px 0 0;font-size:14px}
+.g-verdict.ok{color:var(--ok)} .g-verdict.bad{color:var(--warn)}
+.g-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:0}
+.g-steps li{position:relative;padding:4px 14px 4px 0;display:grid;gap:2px;min-width:0}
+.g-steps li + li{padding-left:18px}
+.g-steps li + li::before{content:'';position:absolute;left:0;top:13px;width:10px;height:10px;border-top:2px solid var(--muted);border-right:2px solid var(--muted);transform:translateX(-4px) rotate(45deg);opacity:.6}
+.g-steps b{font:600 12px/1.2 var(--f-mono);color:var(--muted)}
+.g-steps span{font:600 16px/1.2 var(--f-body)}
+.g-steps small{font-size:12.5px;color:var(--muted)}
+.g-act{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.g-act button{font:500 13px/1 var(--f-body);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:4px;padding:9px 12px;cursor:pointer;white-space:nowrap}
+.g-act button.primary{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600;padding:12px 14px}
+.g-act button:hover{border-color:var(--ink)}
+.g-act button:focus-visible,.jump a:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media (max-width:980px){.glance{grid-template-columns:minmax(0,1fr)}.g-act{flex-direction:row;flex-wrap:wrap}}
+@media (max-width:620px){.g-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 0}.g-steps li:nth-child(3){padding-left:0}.g-steps li:nth-child(3)::before{display:none}}
+/* sticky page sections */
+.jump{position:sticky;top:0;z-index:30;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin:0 -4px;padding:6px 4px;background:color-mix(in srgb, var(--bg) 92%, transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.jump::-webkit-scrollbar{display:none}
+.jump a{font:500 13px/1 var(--f-body);color:var(--muted);text-decoration:none;padding:8px 10px;border-radius:4px;white-space:nowrap}
+.jump a:hover{color:var(--ink);background:var(--panel)}
+.jump a.on{color:var(--ink);background:var(--panel);box-shadow:inset 0 -2px 0 var(--ink)}
+[id="flight"],[id="lw"],[id="surface"],[id="orbit"],[id="compare"],[id="skysec"],[id="numbers"],[id="allsites"],[id="yearsec"],[id="how"]{scroll-margin-top:56px}
+/* folded technical sections */
+details.fold > summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;padding:10px 0;border-top:1px solid var(--line)}
+details.fold > summary::-webkit-details-marker{display:none}
+details.fold > summary h2::after{content:' +';color:var(--muted);font-weight:500}
+details.fold[open] > summary h2::after{content:' −'}
+details.fold > summary:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+details.fold{display:grid;gap:12px}
 #lwTable td{vertical-align:top}
 #lwTable td small{display:block}
 #lwTable tr.on td{background:color-mix(in srgb, var(--ink) 6%, transparent)}
@@ -214,7 +256,16 @@ canvas.chart{width:100%;display:block}
     </nav>
   </header>
   <p class="fromcal" id="fromCal" hidden></p>
-  <p class="prov" id="prov"></p>
+
+  <section class="glance" id="glance" aria-label="Mission at a glance">
+    <div><span class="g-type" id="gType">Crewed mission</span><h2 id="gSite">the site</h2><p class="g-verdict" id="gVerdict"></p></div>
+    <ol class="g-steps" id="gSteps"></ol>
+    <div class="g-act">
+      <button type="button" class="primary" id="gPlay">Play the whole mission</button>
+      <button type="button" id="gLaunch">Watch the launch</button>
+      <button type="button" id="gLand">Watch the landing</button>
+    </div>
+  </section>
 
   <section class="setup" aria-label="Mission setup">
     <div class="seg" role="group" aria-label="Mission shown">
@@ -235,7 +286,12 @@ canvas.chart{width:100%;display:block}
     <p class="landing" id="landingOut"></p>
   </section>
 
-  <main class="grid">
+
+  <nav class="jump" id="jump" aria-label="Sections of this page">
+    <a href="#flight">Flight</a><a href="#lw">Launch dates</a><a href="#surface">At the site</a><a href="#orbit">From orbit</a><a href="#compare">Compare sites</a><a href="#skysec">Sky</a><a href="#numbers">Numbers</a><a href="#allsites">All sites</a><a href="#yearsec">Year</a><a href="#how">How it works</a>
+  </nav>
+
+  <main class="grid" id="flight">
     <section class="scene" aria-label="Trajectory">
       <div class="viewport" id="vp">
         <canvas id="sc" tabindex="0" aria-label="Trajectory from Earth to the Moon. Drag to rotate, scroll or pinch to zoom."></canvas>
@@ -304,37 +360,42 @@ canvas.chart{width:100%;display:block}
     </ul>
   </section>
 
-  <section class="section" aria-label="Standing at the site">
+  <section class="section" aria-label="Standing at the site" id="surface">
     <div class="rank-head"><h2>Standing at <span id="surfWho">the site</span></h2><p class="caption" id="surfCaption">Drag to look around · scroll to zoom · the time follows the mission timeline above</p></div>
     <div class="surface" id="surfWrap">
       <canvas id="surf" tabindex="0" aria-label="View from the landing site: horizon, Sun and Earth at their computed positions. Drag to look around."></canvas>
       <div class="hud" id="surfHud"></div>
       <p class="scale-note" id="surfNote"></p>
-      <div class="views seg" role="group" aria-label="Look">
+    </div>
+    <div class="surfbar">
+      <div class="seg replay" role="group" aria-label="Replay a moment">
+        <button type="button" id="watchLaunch"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg>Launch from Earth</button>
+        <button type="button" id="watchLand"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg>Landing on the Moon</button>
+        <button type="button" id="watchLift"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z"/></svg>Liftoff from the Moon</button>
+      </div>
+      <div class="seg" role="group" aria-label="Look">
         <button type="button" data-look="sun" aria-pressed="false">Look at the Sun</button>
         <button type="button" data-look="earth" aria-pressed="false">Look at Earth</button>
         <button type="button" id="enlarge" aria-pressed="true">Sun &amp; Earth ×3</button>
-        <button type="button" id="watchLand">Watch the landing</button>
-        <button type="button" id="watchLift">Watch the liftoff</button>
       </div>
     </div>
     <div class="rank-head"><h3 id="minisTitle">The same moment at your 5 sites</h3></div>
     <div class="minis" id="minis"></div>
   </section>
 
-  <section class="section" aria-label="Seen from orbit">
-    <div class="rank-head"><h2>Seen from orbit: <span id="orbWho">the site</span></h2><p class="caption" id="orbCaption">Real photo mosaic from NASA's Lunar Reconnaissance Orbiter. Drag to move, scroll to zoom.</p></div>
+  <section class="section" aria-label="Seen from orbit" id="orbit">
+    <div class="rank-head"><h2>Seen from orbit: <span id="orbWho">the site</span></h2><p class="caption" id="orbCaption">Real photo mosaics from NASA's Lunar Reconnaissance Orbiter: sharp 2 m per pixel where the ground was lit, softer 100 m per pixel inside shadows. Drag to move, scroll to zoom.</p></div>
     <div class="orbit" id="orbWrap">
       <canvas id="orb" tabindex="0" aria-label="Real LRO image of the landing site seen from orbit, with the directions to the Sun and Earth at the time shown"></canvas>
       <div class="hud" id="orbHud"></div>
       <p class="scale-note" id="orbNote"></p>
       <div class="views seg" role="group" aria-label="Map width">
-        <button type="button" data-orbw="40000" aria-pressed="false">40 km</button><button type="button" data-orbw="15000" aria-pressed="true">15 km</button><button type="button" data-orbw="4000" aria-pressed="false">4 km</button><button type="button" id="orbCenter">Center on site</button>
+        <button type="button" data-orbw="40000" aria-pressed="false">40 km</button><button type="button" data-orbw="15000" aria-pressed="true">15 km</button><button type="button" data-orbw="4000" aria-pressed="false">4 km</button><button type="button" id="orbCenter">Center on site</button><button type="button" id="orbFill" aria-pressed="true" title="Inside shadows, show the wide-angle mosaic (100 m per pixel). Turn off to see only the sharp 2 m mosaic, with its shadows black.">Fill shadows</button>
       </div>
     </div>
   </section>
 
-  <section class="ranks" aria-label="Site comparison">
+  <section class="ranks" aria-label="Site comparison" id="compare">
     <div class="rank crew">
       <div class="rank-head"><h2>Crewed: compare 5 sites</h2><p class="caption">Viable if the Sun stays up for the whole stay and Earth is in view at landing</p></div>
       <ol class="rlist" id="rankCrew"></ol>
@@ -345,32 +406,33 @@ canvas.chart{width:100%;display:block}
     </div>
   </section>
 
-  <section class="section" aria-label="Sky from the site">
+  <section class="section" aria-label="Sky from the site" id="skysec">
     <div class="rank-head"><h2>Sky from <span id="skyWho">the site</span></h2><p class="caption" id="skyCaption"></p></div>
     <canvas class="chart" id="sky"></canvas>
   </section>
 
-  <section class="section" aria-label="Mission budget">
-    <div class="rank-head"><h2>Δv, mass and time</h2><p class="caption">Patched-conic model, values in km/s unless marked</p></div>
+  <details class="section fold" aria-label="Mission budget" id="numbers">
+    <summary><h2>Δv, mass and time</h2><p class="caption">Fuel and mass for the whole trip, patched-conic model, values in km/s unless marked. Click to open.</p></summary>
     <div class="tablewrap"><table class="budget" id="budget"></table></div>
     <details>
       <summary>Vehicle assumptions (edit to see the effect)</summary>
       <div class="vgrid" id="vehicle"></div>
     </details>
-  </section>
+  </details>
 
-  <section class="section" aria-label="All sites">
-    <div class="rank-head"><h2>All sites</h2><p class="caption">The local horizon is an assumption per site; replace it with values from the Navigator or LOLA data</p></div>
+  <details class="section fold" aria-label="All sites" id="allsites">
+    <summary><h2>All sites</h2><p class="caption">Pick sites for each mission and edit the assumed horizons. Click to open.</p></summary>
     <div class="tablewrap"><table id="sitesTable"></table></div>
-  </section>
+  </details>
 
-  <section class="section" aria-label="Year view">
-    <div class="rank-head"><h2>The year after landing, <span id="yearWho">crewed</span> picks</h2><p class="caption">Yellow: sunlight · Blue: Earth in view · Mission colour: days you could land · Line: best window</p></div>
+  <section class="section" aria-label="Year view" id="yearsec">
+    <div class="rank-head"><h2>The year after landing, <span id="yearWho">crewed</span> picks</h2><p class="caption">Yellow: sunlight · Blue: Earth in view · Mission colour: days you could land · Line: best window</p></div></div>
     <canvas class="chart" id="year"></canvas>
   </section>
 
-  <section class="notes" aria-label="Model and sources">
+  <section class="notes" aria-label="Model and sources" id="how">
     <h2>How this works, and what is simplified</h2>
+    <p class="prov" id="prov"></p>
     <dl>
       <div><dt>Trajectory</dt><dd>Patched conics. Launch due east into a 185 km parking orbit (inclination = launch latitude), translunar injection on a conic that reaches the Moon's distance in the chosen time, insertion into a 100 km polar lunar orbit, powered descent. The crewed mission also climbs back, leaves lunar orbit and returns on a mirrored conic. The 3D view is schematic: Earth's equator and the Moon's orbit are drawn in one plane.</dd></div>
       <div><dt>Sun and Earth over the site</dt><dd>Real dates. Positions of the Moon and Sun from Meeus' algorithms (main lunar terms, optical and physical libration), then the Sun and Earth seen from the site, including the parallax of Earth. Checked against JPL Horizons on 1–2 Dec 2026 at the IM-2 site: Sun within 0.01°, Earth within 0.03° in azimuth and elevation. There is no atmosphere, so there is no refraction.</dd></div>
@@ -378,7 +440,7 @@ canvas.chart{width:100%;display:block}
       <div><dt>Mass</dt><dd>Rocket equation per stage with dry mass as a fraction of propellant. Crewed: capsule + service module (lunar orbit insertion and return), two-stage lander. Robotic: one lander stage. Translunar stage on top. All inputs are editable above.</dd></div>
       <div><dt>Launch site</dt><dd>Spaceport Nova Scotia (45.35° N, 61.02° W) is under development. No heavy-lift rocket is planned there today, so a lunar mission from Canada is hypothetical. Kennedy and Kourou are there for comparison.</dd></div>
       <div><dt>Launch dates and weather</dt><dd>Launch times: the site's latitude must reach the parking-orbit plane that contains the Moon's position on arrival (Moon right ascension and declination from the same ephemeris, sidereal time from the IAU formula). Δv uses the real Earth–Moon distance on arrival. Weather comes live from Open-Meteo: its 16-day forecast and ERA5 reanalysis for 2015–2024 at the launch site. Offline, dates are ranked without weather. Real launch rules also cover upper-level winds, lightning and recovery-zone sea state; those are not modelled.</dd></div>
-      <div><dt>Shared with the landing calendar</dt><dd>Sun and Earth seen from the sites come from the team's JPL Horizons table (DE441, every 6 h, interpolated to each hour). The four published sites (C1, S, MP1, GR1) use the LOLA horizon masks from our engine, at the chosen mast height. A good landing uses the calendar's example limits: sunlight share, Earth contact share, longest night and Sun height at touchdown. Earth counts as visible when any part of its disc clears the terrain; night means the Sun's centre is below the terrain. The trajectory, launch times and the 3D scene use a simplified model (Meeus ephemeris, patched conics) and do not change the site numbers. The landing replay is illustrative: the descent profile is a smooth curve from 1.5 km, shown about 8× faster.</dd></div>
+      <div><dt>Shared with the landing calendar</dt><dd>Sun and Earth seen from the sites come from the team's JPL Horizons table (DE441, every 6 h, interpolated to each hour). The four published sites (C1, S, MP1, GR1) use the LOLA horizon masks from our engine, at the chosen mast height. A good landing uses the calendar's example limits: sunlight share, Earth contact share, longest night and Sun height at touchdown. Earth counts as visible when any part of its disc clears the terrain; night means the Sun's centre is below the terrain. The trajectory, launch times and the 3D scene use a simplified model (Meeus ephemeris, patched conics) and do not change the site numbers. The landing replay is illustrative: the descent profile is a smooth curve from 1.5 km, shown about 8× faster. The launch replay uses the real Sun height at the launch site and time for the sky; the rocket, its ascent profile (altitude, speed, Max-Q, staging) and the camera are illustrative, not a flight simulation. The two astronauts during a crewed stay are drawn for scale, not placed by any plan.</dd></div>
       <div><dt>Sites</dt><dd>South pole: the four published sites with LOLA terrain horizons (C1 and S from Gläser et al. 2018, MP1 and GR1 from De Rosa et al. 2012), plus the IM-1 and IM-2 landing points. Elsewhere: past landings for reference. Every site except the four published ones uses a flat horizon you can edit in the table (assumed, not measured). Sites you add on the map also use a flat horizon.</dd></div>
     </dl>
     <p class="caption">Sources: <a href="https://ntrs.nasa.gov/citations/20250011660" target="_blank" rel="noopener">NASA NTRS 20250011660 (Artemis candidate regions and criteria)</a> · <a href="https://ssd.jpl.nasa.gov/horizons/" target="_blank" rel="noopener">JPL Horizons (validation)</a> · <a href="https://en.wikipedia.org/wiki/List_of_artificial_objects_on_the_Moon" target="_blank" rel="noopener">Landing coordinates</a> · <a href="https://www.nasa.gov/missions/lro/nasas-lro-images-intuitive-machines-odysseus-lander/" target="_blank" rel="noopener">IM-1 landing site (LRO)</a> · <a href="https://en.wikipedia.org/wiki/Mons_Mouton" target="_blank" rel="noopener">Mons Mouton / IM-2</a> · <a href="https://spaceodysseyhub.com/compare/spaceports/spaceport-nova-scotia" target="_blank" rel="noopener">Spaceport Nova Scotia</a> · <a href="https://open-meteo.com/en/docs" target="_blank" rel="noopener">Open-Meteo forecast</a> · <a href="https://open-meteo.com/en/docs/historical-weather-api" target="_blank" rel="noopener">Open-Meteo historical (ERA5)</a></p>
@@ -1627,7 +1689,7 @@ function drawPanorama(c, w, h, site, fi, o){
   }
   // lander + shadow (full view only): absent before touchdown, flying during the replay, on the ground after
   if (!mini && !o.noLander) drawLander(c, w, h, yT, sk, {light: light, shine: shine, sunUp: sunUp, sunDx: sunDx, centerAz: centerAz}, o.land || null,
-    {lift: o.lift || null, baseOnly: !!o.baseOnly, crew: active === 'crewed'});
+    {lift: o.lift || null, baseOnly: !!o.baseOnly, crew: active === 'crewed', walk: !!o.walk});
   // labels and off-screen / below-horizon hints
   function tag(x, y, txt, col, below){
     c.font = (mini ? '600 10px ' : '600 11.5px ') + tok('--f-mono'); var tw = c.measureText(txt).width;
@@ -1658,12 +1720,202 @@ function liftState(now){
   return {p: p, ts: ts, t: t, alt: alt, v: v, x: x, af: Math.sqrt(clamp(alt/1500, 0, 1)), engine: ts >= 0 ? 1 : 0, debris: ts >= 0 ? clamp(1 - t/4, 0, 1) : 0};
 }
 function landState(now){
-  if (!landAnim || landAnim.kind === 'lift') return null;
+  if (!landAnim || landAnim.kind !== 'land') return null;
   var p = clamp((now - landAnim.start)/LAND.dur, 0, 1), ts = -LAND.pre + p*(LAND.pre + LAND.post), tau = Math.max(0, -ts), d = descentAt(tau);
   var af = Math.sqrt(clamp(d.alt/1500, 0, 1));
   return {p: p, ts: ts, tau: tau, alt: tau > 0 ? d.alt : 0, vs: tau > 0 ? d.vs : 0, af: af, flying: ts < 0,
           dust: ts < 0 ? clamp(1 - d.alt/35, 0, 1) : clamp(1 - ts/5, 0, 1)*0.9, engine: ts < 0 ? 1 : clamp(1 - ts/0.6, 0, 1)};
 }
+/* ---------- launch from Earth (replay in the site view) ----------
+   A ground tracking camera 3 km from the pad, 30 m up, side-on to the flight. The Sun's height in the sky is real for the
+   launch time and site; the ascent profile is illustrative, typical of a heavy-lift launcher (no specific vehicle).
+   Replay time runs slower near liftoff and faster later (see LAUNCH.map). */
+var LAUNCH = {dur: 19000, pre: 6, post: 150, map: [[0, -6], [0.24, 0], [0.5, 16], [0.78, 80], [1, 150]],
+  /* t s, altitude m, downrange m */
+  prof: [[0, 0, 0, 0], [5, 18, 0, 8], [10, 105, 2, 25], [15, 290, 12, 48], [20, 640, 40, 80], [30, 1850, 180, 160], [45, 5000, 900, 300], [60, 9800, 2600, 450],
+         [75, 15500, 5600, 610], [90, 22000, 10500, 790], [110, 32000, 20000, 1060], [126, 41000, 30500, 1350], [140, 48500, 42000, 1500], [150, 53500, 51000, 1650], [175, 66000, 82000, 2050]],
+  events: {crewed: [[-6, 'Core engines start'], [0, 'Liftoff'], [7, 'Clear of the tower'], [12, 'Roll and pitch over'], [30, 'Climbing and speeding up'], [52, 'Faster than sound'], [70, 'Max-Q: highest air pressure on the rocket'], [95, 'Above most of the air'], [126, 'Side boosters separate'], [140, 'Abort tower jettisoned']],
+           robotic: [[-3, 'Engines start'], [0, 'Liftoff'], [7, 'Clear of the tower'], [12, 'Pitch over'], [30, 'Climbing and speeding up'], [52, 'Faster than sound'], [70, 'Max-Q: highest air pressure on the rocket'], [95, 'Above most of the air'], [140, 'First stage done, second stage burns']]},
+  cam: {d: 3000, up: 30}};
+function launchState(now){
+  if (!landAnim || landAnim.kind !== 'launch') return null;
+  var p = clamp((now - landAnim.start)/LAUNCH.dur, 0, 1), m = LAUNCH.map, i = 1;
+  while (i < m.length - 1 && p > m[i][0]) i++;
+  var u = (p - m[i - 1][0])/(m[i][0] - m[i - 1][0]), ts = m[i - 1][1] + u*(m[i][1] - m[i - 1][1]);
+  var rate = (m[i][1] - m[i - 1][1])/((m[i][0] - m[i - 1][0])*LAUNCH.dur/1000);
+  var P = ascentAt(Math.max(0, ts)), ev = '', E = LAUNCH.events[landAnim.key || 'crewed'];
+  for (var k = 0; k < E.length; k++) if (ts >= E[k][0]) ev = E[k][1];
+  return {p: p, ts: ts, t: Math.max(0, ts), alt: P.alt, x: P.x, v: P.v, pitch: P.pitch, rate: rate, event: ev, engine: ts >= (landAnim.key === 'robotic' ? -3 : -6) ? 1 : 0};
+}
+function ascentAt(t){
+  var A = LAUNCH.prof, i = 1;
+  while (i < A.length - 1 && t > A[i][0]) i++;
+  var a = A[i - 1], b = A[i], u = clamp((t - a[0])/(b[0] - a[0]), 0, 1), s = u*u*(3 - 2*u)*0.35 + u*0.65;
+  var alt = a[1] + (b[1] - a[1])*s, x = a[2] + (b[2] - a[2])*s;
+  var dt = b[0] - a[0], va = (b[1] - a[1])/dt, vx = (b[2] - a[2])/dt;
+  return {alt: alt, x: x, v: a[3] + (b[3] - a[3])*u, pitch: Math.atan2(vx, Math.max(va, 1e-3))};
+}
+/* low-precision Sun position (about 0.01 deg, enough for the sky colour); returns altitude and azimuth in degrees */
+function sunAltAz(lat, lon, ms){
+  var n = ms/86400000 + 2440587.5 - 2451545.0, L = n360(280.460 + 0.9856474*n), g = n360(357.528 + 0.9856003*n)*DEG;
+  var lam = (L + 1.915*Math.sin(g) + 0.020*Math.sin(2*g))*DEG, eps = (23.439 - 0.0000004*n)*DEG;
+  var ra = Math.atan2(Math.cos(eps)*Math.sin(lam), Math.cos(lam)), dec = Math.asin(Math.sin(eps)*Math.sin(lam));
+  var H = (gmstDeg(ms) + lon)*DEG - ra, f = lat*DEG;
+  var alt = Math.asin(Math.sin(f)*Math.sin(dec) + Math.cos(f)*Math.cos(dec)*Math.cos(H));
+  var az = Math.atan2(-Math.sin(H)*Math.cos(dec), Math.cos(f)*Math.sin(dec) - Math.sin(f)*Math.cos(dec)*Math.cos(H));
+  return {alt: alt/DEG, az: n360(az/DEG)};
+}
+function mixC(a, b, t){ return [a[0] + (b[0] - a[0])*t, a[1] + (b[1] - a[1])*t, a[2] + (b[2] - a[2])*t]; }
+function rgb(a, al){ return 'rgba(' + Math.round(a[0]) + ',' + Math.round(a[1]) + ',' + Math.round(a[2]) + ',' + (al === undefined ? 1 : al) + ')'; }
+/* sky colours at the horizon and overhead for a Sun altitude (degrees) */
+function skyCols(sa){
+  var K = [[-18, [6, 9, 18], [3, 5, 12]], [-10, [24, 34, 66], [6, 10, 26]], [-4, [214, 120, 74], [28, 44, 92]], [2, [246, 178, 110], [62, 98, 160]],
+           [10, [186, 206, 226], [74, 122, 190]], [40, [176, 204, 232], [52, 104, 182]]];
+  if (sa <= K[0][0]) return {hz: K[0][1], zen: K[0][2], night: 1};
+  for (var i = 1; i < K.length; i++) if (sa <= K[i][0]){ var u = (sa - K[i - 1][0])/(K[i][0] - K[i - 1][0]); return {hz: mixC(K[i - 1][1], K[i][1], u), zen: mixC(K[i - 1][2], K[i][2], u), night: clamp(-sa/12, 0, 1)}; }
+  return {hz: K[K.length - 1][1], zen: K[K.length - 1][2], night: 0};
+}
+var LSTARS = (function(){ var a = 4242, out = []; function r(){ a = (a*16807) % 2147483647; return a/2147483647; } for (var i = 0; i < 300; i++) out.push([r()*2.4 - 1.2, r()*1.5, r()]); return out; })();
+function drawEarthLaunch(c, w, h, F){
+  var LS = LAUNCH_SITES[launchIdx], sun = sunAltAz(LS.lat, LS.lon, launchMs + F.ts*1000), S = skyCols(sun.alt), crew = landAnim.key !== 'robotic';
+  var RL = crew ? 98 : 70, long = F.ts >= 16;   // rocket length (m); camera cut at T+16 s
+  /* world: X downrange, Y away from the camera, Z up (m). Pad camera 3 km away, long-range tracker 25 km away, both 30 m up. */
+  var D = long ? 25000 : 3000, UP = 30;
+  function dir(x, z){ return [x, D, z - UP]; }
+  var mid = [F.x + Math.sin(F.pitch)*RL/2, F.alt + Math.cos(F.pitch)*RL/2], dR = norm(dir(mid[0], mid[1]));
+  var k = long ? ease(clamp((F.ts - 16)/45, 0, 1)) : 0, Fz;
+  if (!long) Fz = h*0.5/(RL/3000);
+  else Fz = Math.exp(Math.log(h*0.16/(RL/Math.hypot(25000, ascentAt(16).alt))) *(1 - k) + Math.log(h*1.15)*k);
+  var dP = norm(dir(0, 60)), aD = norm(add(mul(dR, 1 - 0.3*k), mul(dP, 0.3*k)));
+  var fw = aD, rt = norm([fw[1], -fw[0], 0]), upv = cross(rt, fw), cx0 = w*0.5, cy0 = h*(long ? 0.5 + 0.12*k : 0.45);
+  function Pv(v){ var z = dot(v, fw); if (z <= 1e-6) return null; return [cx0 + Fz*dot(v, rt)/z, cy0 - Fz*dot(v, upv)/z, z]; }
+  function P(x, z){ return Pv(dir(x, z)); }
+  var pitchC = Math.asin(clamp(fw[2], -1, 1)), yHz = cy0 + Fz*Math.tan(pitchC);
+  // sky by elevation angle, coloured from the real Sun altitude
+  function skyAt(el){ var u = Math.pow(clamp(el/(Math.PI/2.4), 0, 1), 0.55); return mixC(S.hz, S.zen, u); }
+  var elTop = pitchC + Math.atan(cy0/Fz), sg = c.createLinearGradient(0, 0, 0, Math.max(2, Math.min(h, yHz)));
+  sg.addColorStop(0, rgb(skyAt(elTop))); sg.addColorStop(1, rgb(skyAt(Math.max(0, pitchC - Math.atan((h - cy0)/Fz)))));
+  c.fillStyle = sg; c.fillRect(0, 0, w, h);
+  if (yHz < h){ var hg = c.createLinearGradient(0, yHz - h*0.25, 0, yHz); hg.addColorStop(0, rgb(S.hz, 0)); hg.addColorStop(1, rgb(S.hz, 0.9)); c.fillStyle = hg; c.fillRect(0, yHz - h*0.25, w, h*0.25); }
+  // stars (night), fixed on the sky
+  if (S.night > 0.2){
+    for (var i = 0; i < LSTARS.length; i++){
+      var s = LSTARS[i], az = s[0]*1.6, el = s[1]*0.95, q = Pv([Math.cos(el)*Math.sin(az), Math.cos(el)*Math.cos(az), Math.sin(el)]);
+      if (!q || q[0] < 0 || q[0] > w || q[1] < 0 || q[1] > yHz) continue;
+      c.globalAlpha = (S.night - 0.2)*(0.3 + 0.7*s[2]); c.fillStyle = '#E6ECF5'; c.fillRect(q[0], q[1], s[2] > 0.9 ? 1.6 : 1, s[2] > 0.9 ? 1.6 : 1);
+    }
+    c.globalAlpha = 1;
+  }
+  // the Sun: the camera looks across the flight path (flight to the right), i.e. toward launch azimuth − 90°
+  var view = n360((budgets[active] ? budgets[active].az : 90) - 90), ra = (sun.az - view)*DEG, sa = sun.alt*DEG;
+  var sp = sun.alt > -1 ? Pv([Math.cos(sa)*Math.sin(ra), Math.cos(sa)*Math.cos(ra), Math.sin(sa)]) : null;
+  if (sp && sp[0] > -200 && sp[0] < w + 200){
+    var sr = Math.max(Fz*0.0047, 3), gl = c.createRadialGradient(sp[0], sp[1], 0, sp[0], sp[1], sr*14);
+    gl.addColorStop(0, 'rgba(255,248,228,.9)'); gl.addColorStop(0.2, 'rgba(255,226,170,.35)'); gl.addColorStop(1, 'rgba(255,214,150,0)');
+    c.fillStyle = gl; c.beginPath(); c.arc(sp[0], sp[1], sr*14, 0, Math.PI*2); c.fill();
+    c.fillStyle = '#FFF8E6'; c.beginPath(); c.arc(sp[0], sp[1], sr, 0, Math.PI*2); c.fill();
+  }
+  var day = clamp((sun.alt + 6)/12, 0, 1), lightK = 0.25 + 0.75*day;
+  // sea beyond the pad, land in front of it
+  if (yHz < h){
+    var sea = mixC([14, 22, 36], [52, 86, 118], day), land = mixC([10, 12, 12], [62, 70, 52], day);
+    c.fillStyle = rgb(sea); c.fillRect(0, yHz, w, h - yHz);
+    var sh = P(0, 0), yl0 = sh ? Math.max(yHz + 1, sh[1] - (sh[1] - yHz)*0.5) : h;
+    var lg = c.createLinearGradient(0, yl0, 0, h); lg.addColorStop(0, rgb(land)); lg.addColorStop(1, rgb(mixC(land, [0, 0, 0], 0.45)));
+    c.fillStyle = lg; c.beginPath(); c.moveTo(0, h); c.lineTo(0, yl0 + 6);
+    for (var xx = 0; xx <= w; xx += 24) c.lineTo(xx, yl0 + 4*Math.sin(xx*0.031) + 3*Math.sin(xx*0.11));
+    c.lineTo(w, h); c.closePath(); c.fill();
+  }
+  var tNow = F.t;
+  // exhaust trail: past positions, widening and fading with age (white smoke by day, dim by night)
+  if (F.ts > 0.5){
+    var smoke = mixC([70, 66, 64], [236, 234, 230], day), n = 110;
+    c.lineCap = 'round';
+    for (var kk = n; kk >= 1; kk--){
+      var ta = tNow*(kk - 1)/n, tb = tNow*kk/n, A = ascentAt(ta), B = ascentAt(tb), age = tNow - tb;
+      var pa = P(A.x, A.alt), pb = P(B.x, B.alt); if (!pa || !pb) continue;
+      var wpx = Math.max(1.2, Fz*(6 + age*2.2)/pb[2]), al = clamp(0.8 - age/160, 0.08, 0.8);
+      if (B.alt > 45000) al *= clamp(1 - (B.alt - 45000)/15000, 0.2, 1);
+      c.strokeStyle = rgb(smoke, al); c.lineWidth = wpx; c.beginPath(); c.moveTo(pa[0], pa[1]); c.lineTo(pb[0], pb[1]); c.stroke();
+    }
+  }
+  // steam and smoke billowing out of the flame trench
+  if (F.engine > 0){
+    var age2 = F.ts - (crew ? -6 : -3), cloud = mixC([60, 58, 56], [242, 240, 236], day);
+    for (var qq = 0; qq < 46; qq++){
+      var side = qq % 2 ? 1 : -1, sp2 = 0.4 + ((qq*0.618) % 1)*0.9, grow = Math.min(age2, 60);
+      var cx2 = side*(12 + grow*sp2*6), ca = 4 + grow*(0.25 + ((qq*0.377) % 1)*0.5)*2.2, r2 = 14 + grow*2.4*(0.5 + ((qq*0.29) % 1));
+      var pp = P(cx2, ca); if (!pp) continue;
+      var pr = Fz*r2/pp[2];
+      if (pp[1] - pr > h || pp[0] + pr < 0 || pp[0] - pr > w || pr < 0.6) continue;
+      var a2 = clamp(0.55 - age2/220, 0.12, 0.55);
+      var cg = c.createRadialGradient(pp[0], pp[1], 0, pp[0], pp[1], pr);
+      cg.addColorStop(0, rgb(cloud, a2)); cg.addColorStop(1, rgb(cloud, 0));
+      c.fillStyle = cg; c.beginPath(); c.arc(pp[0], pp[1], pr, 0, Math.PI*2); c.fill();
+    }
+  }
+  // launch tower (left of the rocket) and pad
+  var tw0 = P(-26, 0), tw1 = P(-26, 120);
+  if (tw0 && tw1 && tw0[1] > -20){
+    var twW = Math.max(1.5, Fz*12/tw0[2]);
+    c.fillStyle = rgb(mixC([20, 22, 26], [92, 96, 104], lightK)); c.fillRect(tw0[0] - twW/2, tw1[1], twW, tw0[1] - tw1[1]);
+    if (twW > 6){
+      c.strokeStyle = rgb(mixC([40, 42, 48], [150, 154, 162], lightK), 0.8); c.lineWidth = Math.max(0.6, twW*0.06);
+      for (var yy = tw1[1]; yy < tw0[1]; yy += Math.max(4, twW*0.9)){ c.beginPath(); c.moveTo(tw0[0] - twW/2, yy); c.lineTo(tw0[0] + twW/2, yy + twW*0.9); c.stroke(); }
+    }
+    var arm = P(-26, 92), armE = P(-6, 92);
+    if (F.ts < 0 && arm && armE){ c.fillStyle = rgb(mixC([20, 22, 26], [110, 112, 118], lightK)); c.fillRect(arm[0], arm[1] - twW*0.15, armE[0] - arm[0], twW*0.3); }
+    var pd0 = P(-40, 0), pd1 = P(40, 0);
+    if (pd0 && pd1){ c.fillStyle = rgb(mixC([16, 16, 18], [120, 118, 112], lightK)); c.fillRect(pd0[0], pd0[1] - 2, pd1[0] - pd0[0], Math.max(2, Fz*10/pd0[2])); }
+  }
+  // the rocket, drawn along its projected axis
+  var base = P(F.x, F.alt), nose = P(F.x + Math.sin(F.pitch)*RL, F.alt + Math.cos(F.pitch)*RL);
+  if (!base || !nose) return {sun: sun, crew: crew, LS: LS};
+  var sz = Math.hypot(nose[0] - base[0], nose[1] - base[1]), rot = Math.atan2(nose[0] - base[0], base[1] - nose[1]);
+  var plumeL = Math.max(sz*(F.ts < 0 ? 0.15 : 0.55 + Math.min(F.alt/30000, 1.6)), F.ts < 0 ? 0 : 7), fl = 0.9 + 0.1*Math.sin(performance.now()/31);
+  c.save(); c.translate(base[0], base[1]); c.rotate(rot);
+  if (F.engine > 0){
+    // plume: white-hot at the nozzles, orange further out, wider as the air thins
+    var pw = Math.max(sz*(crew ? 0.2 : 0.11)*(1 + Math.min(F.alt/20000, 2)), 1.5);
+    var pg = c.createLinearGradient(0, 0, 0, plumeL*fl);
+    pg.addColorStop(0, 'rgba(255,252,240,1)'); pg.addColorStop(0.25, 'rgba(255,214,140,.9)'); pg.addColorStop(1, 'rgba(255,150,70,0)');
+    c.fillStyle = pg; c.beginPath(); c.moveTo(-pw*0.5, 0); c.lineTo(pw*0.5, 0); c.lineTo(pw*1.3, plumeL*fl); c.lineTo(-pw*1.3, plumeL*fl); c.closePath(); c.fill();
+  }
+  var body = mixC([38, 40, 44], [236, 236, 232], lightK), shade = mixC([20, 22, 26], [168, 170, 174], lightK), dark = mixC([10, 10, 12], [44, 46, 52], lightK);
+  var cw = Math.max(sz*(crew ? 0.085 : 0.075), 0.8);
+  function cyl(x0, wd, y0, y1, col){ var g = c.createLinearGradient(x0 - wd/2, 0, x0 + wd/2, 0); g.addColorStop(0, rgb(col)); g.addColorStop(0.55, rgb(mixC(col, [255, 255, 255], 0.12))); g.addColorStop(1, rgb(mixC(col, [0, 0, 0], 0.45))); c.fillStyle = g; c.fillRect(x0 - wd/2, y0, wd, y1 - y0); }
+  if (crew){
+    cyl(0, cw, -sz*0.74, 0, body);                                          // core stage
+    c.fillStyle = rgb(dark); c.fillRect(-cw/2, -sz*0.76, cw, sz*0.025);       // interstage band
+    cyl(0, cw*0.8, -sz*0.86, -sz*0.76, shade);                                 // upper stage
+    c.fillStyle = rgb(shade); c.beginPath(); c.moveTo(-cw*0.42, -sz*0.86); c.lineTo(cw*0.42, -sz*0.86); c.lineTo(cw*0.22, -sz*0.93); c.lineTo(-cw*0.22, -sz*0.93); c.closePath(); c.fill();   // crew capsule
+    if (F.ts < 140){ c.strokeStyle = rgb(body); c.lineWidth = Math.max(1, cw*0.12); c.beginPath(); c.moveTo(0, -sz*0.93); c.lineTo(0, -sz); c.stroke(); }   // abort tower
+    if (F.ts < 126){ [-1, 1].forEach(function(sd){ cyl(sd*cw*0.78, cw*0.48, -sz*0.62, 0, body); c.fillStyle = rgb(body); c.beginPath(); c.moveTo(sd*cw*0.78 - cw*0.24, -sz*0.62); c.lineTo(sd*cw*0.78 + cw*0.24, -sz*0.62); c.lineTo(sd*cw*0.78, -sz*0.68); c.closePath(); c.fill(); }); }
+  } else {
+    cyl(0, cw, -sz*0.72, 0, body);
+    c.fillStyle = rgb(dark); c.fillRect(-cw/2, -sz*0.74, cw, sz*0.03);
+    cyl(0, cw, -sz*0.9, -sz*0.74, body);
+    c.fillStyle = rgb(body); c.beginPath(); c.moveTo(-cw/2, -sz*0.9); c.quadraticCurveTo(-cw/2, -sz, 0, -sz); c.quadraticCurveTo(cw/2, -sz, cw/2, -sz*0.9); c.fill();   // payload fairing
+  }
+  c.restore();
+  // side boosters falling away after separation (crewed)
+  if (crew && F.ts >= 126){
+    var dtb = F.ts - 126, Bp = ascentAt(126);
+    [-1, 1].forEach(function(sd){
+      var bx = Bp.x + (F.x - Bp.x)*0.6 + sd*dtb*20, ba = Bp.alt + (F.alt - Bp.alt)*0.5 - 2*dtb*dtb, bp = P(bx, ba); if (!bp) return;
+      c.save(); c.translate(bp[0], bp[1]); c.rotate(rot + sd*dtb*0.15); c.fillStyle = rgb(body, 0.9); c.fillRect(-Math.max(cw*0.24, 0.6), -sz*0.6, Math.max(cw*0.48, 1.2), Math.max(sz*0.6, 2.5)); c.restore();
+    });
+  }
+  // engine glow: lights the pad and smoke, strongest at night
+  if (F.engine > 0){
+    var gr = Math.max(sz*1.6, 26)*(F.alt < 2000 ? 1 : 0.7), gp = c.createRadialGradient(base[0], base[1], 0, base[0], base[1], gr);
+    var ga = (0.25 + 0.5*(1 - day))*fl;
+    gp.addColorStop(0, 'rgba(255,214,150,' + ga.toFixed(3) + ')'); gp.addColorStop(1, 'rgba(255,170,90,0)');
+    c.save(); c.globalCompositeOperation = 'lighter'; c.fillStyle = gp; c.beginPath(); c.arc(base[0], base[1], gr, 0, Math.PI*2); c.fill(); c.restore();
+  }
+  return {sun: sun, crew: crew, LS: LS};
+}
+function night2(S){ return S.night > 0.5; }
 function drawLander(c, w, h, yT, sk, E, L, X){
   var bx = w*0.5, by = h*0.93, lh = Math.min(h*0.17, 110), lw = lh*0.9, light = E.light, sunDx = E.sunDx;
   var ax = bx, ay = by, sc = 1;
@@ -1753,6 +2005,24 @@ function drawLander(c, w, h, yT, sk, E, L, X){
   var dish = wrap180(sk.earthAz - E.centerAz) > 0 ? 1 : -1;
   c.strokeStyle = 'rgba(220,225,232,' + lit + ')'; c.lineWidth = 2; c.beginPath(); c.arc(lw*0.22*dish, -lh*0.82, lh*0.1, dish > 0 ? -2.4 : -0.7, dish > 0 ? 0.7 : 2.4, dish < 0); c.stroke();
   c.restore();
+  // crew outside during the stay: two astronauts beside the lander (illustrative, about to scale with the lander)
+  if (X && X.walk && !F){
+    var tw = performance.now()/1000, ah = lh*0.36;
+    [[-0.95, 0], [1.25, 1.7]].forEach(function(A, n){
+      var px = ax + A[0]*lw + Math.sin(tw*0.35 + A[1])*lw*0.12, bob = Math.abs(Math.sin(tw*2.2 + A[1]))*ah*0.05, py = by - bob, face = Math.cos(tw*0.35 + A[1]) > 0 ? 1 : -1;
+      if (E.sunUp && sk.sunEl > 0.05){ var rel2 = wrap180(sk.sunAz + 180 - E.centerAz)*DEG, Ls2 = Math.min(ah/Math.tan(Math.max(sk.sunEl, 0.3)*DEG)*0.35, h); c.strokeStyle = 'rgba(0,0,0,.5)'; c.lineWidth = ah*0.16; c.beginPath(); c.moveTo(px, by); c.lineTo(px + Math.sin(rel2)*Ls2, Math.max(by - Math.cos(rel2)*Ls2*0.22, yT + 2)); c.stroke(); }
+      var suit = 'rgba(' + Math.round(228*lit) + ',' + Math.round(230*lit) + ',' + Math.round(232*lit) + ',1)', sh2 = 'rgba(' + Math.round(150*lit) + ',' + Math.round(154*lit) + ',' + Math.round(160*lit) + ',1)';
+      var step = Math.sin(tw*2.2 + A[1])*ah*0.08;
+      c.strokeStyle = suit; c.lineCap = 'round'; c.lineWidth = ah*0.14;
+      c.beginPath(); c.moveTo(px - ah*0.05, py - ah*0.42); c.lineTo(px - ah*0.06 - step, py); c.moveTo(px + ah*0.05, py - ah*0.42); c.lineTo(px + ah*0.06 + step, py); c.stroke();   // legs
+      c.fillStyle = sh2; c.fillRect(px - face*ah*0.2, py - ah*0.82, ah*0.13, ah*0.32);                                                             // backpack
+      c.fillStyle = suit; c.beginPath(); c.moveTo(px - ah*0.13, py - ah*0.42); c.lineTo(px + ah*0.13, py - ah*0.42); c.lineTo(px + ah*0.12, py - ah*0.8); c.lineTo(px - ah*0.12, py - ah*0.8); c.closePath(); c.fill();   // body
+      c.lineWidth = ah*0.1; c.beginPath(); c.moveTo(px + face*ah*0.1, py - ah*0.76); c.lineTo(px + face*ah*0.2, py - ah*0.5); c.stroke();      // arm
+      c.beginPath(); c.arc(px, py - ah*0.9, ah*0.12, 0, Math.PI*2); c.fill();                                                                // helmet
+      var vg = c.createLinearGradient(px, py - ah*0.98, px + face*ah*0.12, py - ah*0.84); vg.addColorStop(0, 'rgba(255,214,120,' + (0.6 + 0.4*lit).toFixed(2) + ')'); vg.addColorStop(1, 'rgba(120,80,20,' + (0.6 + 0.4*lit).toFixed(2) + ')');
+      c.fillStyle = vg; c.beginPath(); c.ellipse(px + face*ah*0.04, py - ah*0.9, ah*0.075, ah*0.065, 0, 0, Math.PI*2); c.fill();             // gold visor
+    });
+  }
   // insulation flakes blown off the descent stage at ignition, falling back on ballistic arcs (no air on the Moon)
   if (F && F.debris > 0){
     var g2 = 1.62*sc*lh/3.5, t2 = F.t*1.6;
@@ -1776,27 +2046,39 @@ function autoAz(site, fi){
    Checked against the mosaic itself: Shackleton's permanently dark floor falls where this formula puts it.
    Tiles load from trek.nasa.gov while online; offline the views say so and everything else keeps working. */
 var LRO = {base: 'https://trek.nasa.gov/tiles/Moon/SP/LRO_NAC_Mosaic_1mpp_SP/1.0.0/default/default028mm/', TL: 1095930, PX0: 8561.953125, maxZ: 12,
-           half: 136700, tiles: {}, loaded: 0, failed: 0};
-/* LRO WAC south-pole mosaic (100 m/px) underneath: fills the NAC mosaic's gaps and deepest shadows with a wider, lower-resolution view */
+           half: 136700, tiles: {}, loaded: 0, failed: 0, fill: true};
+/* LRO WAC south-pole mosaic (100 m/px) underneath: fills the NAC mosaic's gaps and, with "Fill shadows" on, its shadows */
 var WAC = {base: 'https://trek.nasa.gov/tiles/Moon/SP/LRO_WAC_Mosaic_SPole60_100m_v02/1.0.0/default/default028mm/', maxZ: 5, tiles: {}};
 var orbDirty = true;
 function lroXY(lat, lon){ var rho = 2*1737400*Math.tan(Math.PI/4 + lat*DEG/2); return [rho*Math.sin(lon*DEG), rho*Math.cos(lon*DEG)]; }
 function lroCovers(x, y, margin){ return Math.abs(x) < LRO.half - (margin || 0) && Math.abs(y) < LRO.half - (margin || 0); }
+/* NAC tiles get a second copy whose near-black (shadow) pixels are transparent, so the WAC shows through only there */
+function keyShadows(img){
+  try {
+    var k = document.createElement('canvas'); k.width = img.naturalWidth; k.height = img.naturalHeight;
+    var x = k.getContext('2d'); x.drawImage(img, 0, 0);
+    var d = x.getImageData(0, 0, k.width, k.height), p = d.data;
+    for (var i = 0; i < p.length; i += 4){ var a = (p[i] - 3)/9; p[i + 3] = Math.round(p[i + 3]*(a < 0 ? 0 : a > 1 ? 1 : a)); }
+    x.putImageData(d, 0, 0); return k;
+  } catch (err) { return img; }
+}
 function lroTile(z, r, c, layer){
   var Lr = layer || LRO, k = z + '/' + r + '/' + c, t = Lr.tiles[k];
-  if (t) return t.ok ? t.img : null;
+  if (t) return t.ok ? (Lr === LRO && LRO.fill ? t.key : t.img) : null;
   t = Lr.tiles[k] = {img: new Image(), ok: false};
   t.img.crossOrigin = 'anonymous';
-  t.img.onload = function(){ t.ok = true; LRO.loaded++; orbDirty = true; };
+  t.img.onload = function(){ if (Lr === LRO) t.key = keyShadows(t.img); t.ok = true; LRO.loaded++; orbDirty = true; };
   t.img.onerror = function(){ LRO.failed++; orbDirty = true; };
   t.img.src = Lr.base + z + '/' + r + '/' + c + '.png';
   return null;
 }
 /* draws the mosaic with world point (cx, cy) at the centre of a w x h box, mpp metres per CSS pixel */
 function drawLRO(c, w, h, cx, cy, mpp, dpr){
-  var zWant = clamp(Math.ceil(Math.log(LRO.PX0/(mpp/(dpr || 1)))/Math.LN2), 0, LRO.maxZ), drawn = 0;
+  /* finest level whose pixels are no larger than a screen pixel (a 15% tolerance avoids fetching 4x the tiles for a 1% gain) */
+  var zWant = clamp(Math.ceil(Math.log(LRO.PX0/(mpp/(dpr || 1)))/Math.LN2 - 0.2), 0, LRO.maxZ), drawn = 0;
   var wx0 = cx - w/2*mpp, wx1 = cx + w/2*mpp, wyT = cy + h/2*mpp, wyB = cy - h/2*mpp;
-  c.save(); c.filter = 'brightness(1.3)';
+  c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+  c.filter = 'brightness(1.3)';
   var zw = Math.min(WAC.maxZ, zWant);
   for (var z = Math.max(0, zw - 2); z <= zw; z++){
     var T = 256*LRO.PX0/Math.pow(2, z);
@@ -1807,16 +2089,22 @@ function drawLRO(c, w, h, cx, cy, mpp, dpr){
       c.drawImage(im, (cc*T - LRO.TL - cx)/mpp + w/2, (cy - (LRO.TL - r*T))/mpp + h/2, T/mpp + 0.6, T/mpp + 0.6); drawn++;
     }
   }
-  c.globalCompositeOperation = 'lighten';   // NAC detail on top; where the NAC photo is in shadow, the WAC view shows through
-  for (z = Math.max(0, zWant - 3); z <= zWant; z++){   // coarser levels first, so gaps fill while finer tiles arrive
-    T = 256*LRO.PX0/Math.pow(2, z);
-    c0 = Math.floor((wx0 + LRO.TL)/T); c1 = Math.floor((wx1 + LRO.TL)/T); r0 = Math.floor((LRO.TL - wyT)/T); r1 = Math.floor((LRO.TL - wyB)/T);
-    if ((c1 - c0 + 1)*(r1 - r0 + 1) > 80) continue;
+  /* NAC (2 m per pixel) over the WAC: one level only, the finest the screen can show. A tile still loading borrows the matching
+     quarter (or smaller part) of its nearest loaded parent tile, so nothing coarse is left showing once the sharp tiles arrive. */
+  c.filter = 'brightness(1.3) contrast(1.06)';
+  T = 256*LRO.PX0/Math.pow(2, zWant);
+  c0 = Math.floor((wx0 + LRO.TL)/T); c1 = Math.floor((wx1 + LRO.TL)/T); r0 = Math.floor((LRO.TL - wyT)/T); r1 = Math.floor((LRO.TL - wyB)/T);
+  if ((c1 - c0 + 1)*(r1 - r0 + 1) <= 260){
     for (r = r0; r <= r1; r++) for (cc = c0; cc <= c1; cc++){
-      var tx = cc*T - LRO.TL, ty = LRO.TL - r*T;
+      var tx = cc*T - LRO.TL, ty = LRO.TL - r*T, dx = (tx - cx)/mpp + w/2, dy = (cy - ty)/mpp + h/2, ds = T/mpp + 0.6;
       if (tx > LRO.half || tx + T < -LRO.half || ty - T > LRO.half || ty < -LRO.half) continue;
-      im = lroTile(z, r, cc); if (!im) continue;
-      c.drawImage(im, (tx - cx)/mpp + w/2, (cy - ty)/mpp + h/2, T/mpp + 0.6, T/mpp + 0.6); drawn++;
+      im = lroTile(zWant, r, cc);
+      if (im){ c.drawImage(im, dx, dy, ds, ds); drawn++; continue; }
+      for (var up = 1; up <= 4 && zWant - up >= 0; up++){
+        var pim = lroTile(zWant - up, r >> up, cc >> up); if (!pim) continue;
+        var sub = 256 >> up, sx = (cc - ((cc >> up) << up))*sub, sy = (r - ((r >> up) << up))*sub;
+        c.drawImage(pim, sx, sy, sub, sub, dx, dy, ds, ds); drawn++; break;
+      }
     }
   }
   c.restore();
@@ -1912,6 +2200,7 @@ function escH(t){ return String(t).replace(/[&<>"]/g, function(ch){ return {'&':
   });
   orbBtns.forEach(function(b){ b.addEventListener('click', function(){ orbView.w = +b.getAttribute('data-orbw'); syncOrbBtns(); orbDirty = true; }); });
   $('#orbCenter').addEventListener('click', function(){ orbView.dx = 0; orbView.dy = 0; orbDirty = true; });
+  $('#orbFill').addEventListener('click', function(){ LRO.fill = !LRO.fill; this.setAttribute('aria-pressed', String(LRO.fill)); orbDirty = true; });
 })();
 /* descent camera: looking straight down during the landing replay, on the real LRO image */
 function drawAscentCam(c, w, h, site, F){
@@ -1961,13 +2250,28 @@ function drawSurface(){
   if (surfC.width !== Math.round(w*dpr) || surfC.height !== Math.round(h*dpr)){ surfC.width = Math.round(w*dpr); surfC.height = Math.round(h*dpr); }
   var c = surfC.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
   if (!R){ c.fillStyle = '#000'; c.fillRect(0, 0, w, h); surfHud.innerHTML = '<span>Pick a site to stand on it</span>'; drawMinis(); return; }
+  var LL = launchState(performance.now());
+  if (LL){
+    var lo = drawEarthLaunch(c, w, h, LL), wl = wxFor(launchMs), sa = lo.sun.alt;
+    var sunTxt = sa >= 6 ? 'Daylight launch: Sun ' + Math.round(sa) + '° up' : sa >= -6 ? 'Twilight launch: Sun ' + sgn(sa, 0) + '°' : 'Night launch: Sun ' + Math.round(-sa) + '° below the horizon';
+    var wxTxt = wl.src === 'forecast' ? 'Weather forecast: ' + (wl.go ? 'GO' : 'NO-GO' + (wl.why && wl.why.length ? ' (' + wl.why.join(', ') + ')' : '')) : wl.src === 'climate' && wl.p !== null ? 'Weather: ' + pct(wl.p) + ' of past days were GO' : '';
+    var head = '<span class="' + (lo.crew ? 'crewtag' : '') + '"><b>' + (lo.crew ? 'Crewed launch' : 'Robotic launch') + '</b> · ' + fmtDate(launchMs, true) + ' · local ' + localTime(launchMs) + '</span>';
+    var altT = LL.alt < 1000 ? Math.round(LL.alt) + ' m' : (LL.alt/1000).toFixed(1) + ' km';
+    surfHud.innerHTML = LL.ts < 0
+      ? head + '<span>T− <b>' + Math.ceil(-LL.ts) + ' s</b></span>' + (LL.event ? '<span>' + LL.event + '</span>' : '') + '<span>' + sunTxt + '</span>' + (wxTxt ? '<span>' + wxTxt + '</span>' : '')
+      : head + '<span>T+ <b>' + Math.floor(LL.t) + ' s</b></span><span>Altitude <b>' + altT + '</b></span><span>Speed <b>' + Math.round(LL.v*3.6).toLocaleString('en-US') + ' km/h</b></span><span>Downrange <b>' + (LL.x/1000).toFixed(LL.x < 10000 ? 1 : 0) + ' km</b></span><span>' + LL.event + '</span><span>Replay ×' + Math.max(1, Math.round(LL.rate)) + '</span>';
+    $('#surfWho').textContent = lo.LS.name.split(' (')[0];
+    $('#surfNote').textContent = 'Sun: real for this time and place · rocket and ascent: illustrative';
+    return;
+  }
   var site = R.site, fiNow = nowIndex(), LS = landState(performance.now()), LF = liftState(performance.now()), before = !LS && !LF && fiNow < R.iL - 0.5, fi = LS ? R.iL : Math.max(fiNow, R.iL);
   var lifted = !LF && active === 'crewed' && mission && met >= mission.tLift;
   $('#watchLift').hidden = active !== 'crewed';
   if (look.follow === 'sun') look.az = skyInterp(site, fi).sunAz;
   else if (look.follow === 'earth') look.az = skyInterp(site, fi).earthAz;
   else if (look.follow === 'auto' || look.az === null) look.az = autoAz(site, fi);
-  var out = drawPanorama(c, w, h, site, fi, {az: look.az, fov: look.fov, land: LS, lift: LF, baseOnly: lifted, noLander: before});
+  var onSurface = active === 'crewed' && mission && !LS && !LF && met > mission.tLand + 2*3600 && met < mission.tLift - 3600;
+  var out = drawPanorama(c, w, h, site, fi, {az: look.az, fov: look.fov, land: LS, lift: LF, baseOnly: lifted, noLander: before, walk: onSurface});
   if (LF){
     surfHud.innerHTML = LF.ts < 0
       ? '<span><b>Liftoff</b> · ' + site.name + ' · ' + fmtDate(tabTime(0) + fi*3600000) + '</span><span>Ascent engine: ignition in <b>' + Math.ceil(-LF.ts) + ' s</b></span><span>The descent stage stays as the launch pad</span>'
@@ -1996,7 +2300,8 @@ function drawSurface(){
     '<span class="' + (out.earthUp ? 'good' : 'bad') + '">Earth <b>' + sgn(sk.earthEl, 2) + '°</b> az ' + Math.round(sk.earthAz) + '° · ' + (out.earthUp ? 'direct link possible' : 'no direct link') + ' · ' + (earT.up ? 'sets in ' : 'rises in ') + (earT.capped ? '> 60 d' : dh(earT.h)) + '</span>' +
     '<span>Earth phase <b>' + Math.round(out.k*100) + '%</b> · ' + Math.round(sk.D).toLocaleString('en-US') + ' km</span>' +
     (shadow ? '<span>A 3 m lander casts a <b>' + (shadow > 999 ? Math.round(shadow/1000*10)/10 + ' km' : Math.round(shadow) + ' m') + '</b> shadow</span>' : '') +
-    (lifted ? '<span>Crew left on ' + fmtDate(mission.landMs + (mission.tLift - mission.tLand)*1000) + '; the descent stage stays</span>' : '');
+    (lifted ? '<span>Crew left on ' + fmtDate(mission.landMs + (mission.tLift - mission.tLand)*1000) + '; the descent stage stays</span>' : '') +
+    (onSurface ? '<span class="crewtag">Crew on the surface · day ' + (Math.floor((met - mission.tLand)/86400) + 1) + ' of ' + Math.ceil((mission.tLift - mission.tLand)/86400) + '</span>' : '');
   $('#surfNote').textContent = 'Horizon: ' + hzLabel(site) + ' (dashed: flat Moon)' + ' · foreground craters illustrative' + (enlarge > 1 ? ' · Sun and Earth drawn ×' + enlarge : '');
   drawMinis(fi);
 }
@@ -2373,6 +2678,34 @@ function startLanding(fromPlay){
   dirty = true;
 }
 $('#watchLand').addEventListener('click', function(){ startLanding(false); });
+var launchSeen = false;
+function startLaunch(fromPlay){
+  if (!mission) return;
+  launchSeen = true;
+  met = 0; syncMet(); setPlaying(false);
+  landAnim = {kind: 'launch', key: mission.key, start: performance.now(), resume: !!fromPlay};
+  if (fromPlay){
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    surfWrap.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'center'});
+  }
+  dirty = true;
+}
+$('#watchLaunch').addEventListener('click', function(){ startLaunch(false); });
+function goSurface(){ var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; surfWrap.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'center'}); }
+$('#gPlay').addEventListener('click', function(){ launchSeen = false; startLaunch(true); });
+$('#gLaunch').addEventListener('click', function(){ startLaunch(false); goSurface(); });
+$('#gLand').addEventListener('click', function(){ startLanding(false); goSurface(); });
+/* highlight the section in view in the sticky bar */
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('#jump a')), map = {};
+  links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+  if (!window.IntersectionObserver) return;
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if (e.isIntersecting){ links.forEach(function(a){ a.classList.remove('on'); }); var a = map[e.target.id]; if (a){ a.classList.add('on'); a.scrollIntoView({block: 'nearest', inline: 'nearest'}); } } });
+  }, {rootMargin: '-45% 0px -50% 0px'});
+  Object.keys(map).forEach(function(id){ var el = document.getElementById(id); if (el) io.observe(el); });
+  links.forEach(function(a){ a.addEventListener('click', function(){ var el = document.getElementById(a.getAttribute('href').slice(1)); if (el && el.tagName === 'DETAILS') el.open = true; }); });
+})();
 function startLiftoff(fromPlay){
   if (!mission || mission.key !== 'crewed') return;
   met = mission.tLift; syncMet(); setPlaying(false);
@@ -2399,6 +2732,7 @@ metIn.addEventListener('input', function(){ met = +metIn.value*mission.tEnd; mar
 playBtn.addEventListener('click', function(){
   if (landAnim) landAnim = null;
   if (!playing && met >= mission.tEnd - 1) met = 0;
+  if (!playing && met < 1 && !launchSeen){ startLaunch(true); return; }
   setPlaying(!playing);
 });
 $('#warp').addEventListener('change', function(e){ warp = +e.target.value; });
@@ -2428,8 +2762,29 @@ function resize(){
   sc.width = Math.round(W*DPR); sc.height = Math.round(H*DPR); dirty = true; panelsDirty = true;
 }
 var dirty = true, panelsDirty = true;
+/* plain-language summary of the mission on show, with the main actions */
+function renderGlance(){
+  if (!mission) return;
+  var k = active, R = results[k].filter(function(r){ return r.site.id === target[k]; })[0], g = $('#glance');
+  g.classList.toggle('robot', k !== 'crewed');
+  $('#gType').textContent = k === 'crewed' ? 'Crewed mission' : 'Robotic mission';
+  $('#gSite').textContent = R ? R.site.name : 'Pick a site';
+  var v = $('#gVerdict');
+  if (R){
+    v.className = 'g-verdict ' + (R.viable ? 'ok' : 'bad');
+    v.textContent = R.viable ? 'Good landing day: Sun ' + pct(R.stay.sun) + ' and Earth ' + pct(R.stay.earth) + ' of the ' + (k === 'crewed' ? 'stay' : 'mission')
+      : 'Not a good landing day: ' + failText(R.ev, k).replace(/<[^>]+>/g, '') + (R.next >= 0 ? '. Next good day ' + fmtDate(tabTime(R.next), false) : '');
+  } else { v.className = 'g-verdict'; v.textContent = ''; }
+  var M = mission, land = launchMs + M.tLand*1000, lift = launchMs + M.tLift*1000, end = launchMs + M.tEnd*1000;
+  var steps = [['Launch', fmtDate(launchMs), LAUNCH_SITES[launchIdx].name.split(' (')[0]],
+               ['Land', fmtDate(land), 'after ' + t1(M.tLand/86400) + ' days']];
+  if (k === 'crewed'){ steps.push(['On the surface', t1((M.tLift - M.tLand)/86400) + ' days', 'crew outside, then liftoff']); steps.push(['Home', fmtDate(end, false), 'Earth entry after ' + t1(M.tEnd/86400) + ' days']); }
+  else steps.push(['Rover at work', t1((M.tEnd - M.tLand)/86400) + ' days', 'until ' + fmtDate(end, false)]);
+  $('#gSteps').style.setProperty('--n', steps.length);
+  $('#gSteps').innerHTML = steps.map(function(s){ return '<li><b>' + s[0] + '</b><span>' + s[1] + '</span><small>' + s[2] + '</small></li>'; }).join('');
+}
 function renderAll(){
-  syncSetup(); syncLimits(); renderRanks(); renderBudget(); renderPhases(); syncMet();
+  syncSetup(); syncLimits(); renderGlance(); renderRanks(); renderBudget(); renderPhases(); syncMet();
   renderSitesTable(); renderVehicle(); drawMap(); drawYear(); drawSky(); drawSurface(); renderWindows(); dirty = true;
 }
 if (window.ResizeObserver){ new ResizeObserver(resize).observe(vp); new ResizeObserver(function(){ drawMap(); drawYear(); drawSky(); drawLwChart(); orbDirty = true; dirty = true; }).observe(document.body); }
@@ -2453,9 +2808,13 @@ function frame(now){
     if (landAnim) drawSurface();
     if (orbDirty) drawOrbit();
   }
-  if (landAnim && performance.now() - landAnim.start > (landAnim.kind === 'lift' ? LIFT.dur : LAND.dur)){
-    var resume = landAnim.resume; landAnim = null; dirty = true;
+  if (landAnim && performance.now() - landAnim.start > (landAnim.kind === 'lift' ? LIFT.dur : landAnim.kind === 'launch' ? LAUNCH.dur : LAND.dur)){
+    var resume = landAnim.resume, wasLaunch = landAnim.kind === 'launch'; landAnim = null; dirty = true;
     if (resume) setPlaying(true);
+    if (resume && wasLaunch){   // after the launch, back to the flight view for the trip to the Moon
+      var reduce2 = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      vp.scrollIntoView({behavior: reduce2 ? 'auto' : 'smooth', block: 'center'});
+    }
   }
   requestAnimationFrame(frame);
 }
@@ -2491,15 +2850,15 @@ syncDate(); renderAll();
 if (FROMCAL){
   var fs = siteById(FROMCAL.site), fc = $('#fromCal');
   fc.hidden = false;
-  fc.innerHTML = 'From the landing calendar: ' + (FROMCAL.k === 'crewed' ? 'crewed' : 'robotic') + ' landing at <b></b> on <b>' + fmtDate(FROMCAL.land) + '</b>. Launch worked back to ' + fmtDate(launchMs) + ' from ' + LAUNCH_SITES[launchIdx].name.split(' (')[0] + '. The flight plays now; the touchdown is replayed in “Standing at” below.';
+  fc.innerHTML = 'From the landing calendar: ' + (FROMCAL.k === 'crewed' ? 'crewed' : 'robotic') + ' landing at <b></b> on <b>' + fmtDate(FROMCAL.land) + '</b>. Launch worked back to ' + fmtDate(launchMs) + ' from ' + LAUNCH_SITES[launchIdx].name.split(' (')[0] + '. The launch plays first, then the flight; the touchdown is replayed in “Standing at” below.';
   fc.querySelector('b').textContent = fs.name;
   warp = 12; $('#warp').value = '12';
-  met = 0; syncMet(); setPlaying(true);
+  startLaunch(true);
 } else {
   met = mission.tLand + 6*3600; syncMet();
   applyBest();
 }
-window.__mission = {LRO: LRO, lroXY: lroXY, orbView: orbView, evalAt: evalAt, siteSeries: siteSeries, LIMITS: LIMITS, startLanding: startLanding, startLiftoff: startLiftoff, get landAnim(){ return landAnim; }, get mast(){ return mast; }, get target(){ return target; }, get active(){ return active; }, budgets: budgets, results: results, get mission(){ return mission; }, PROFILES: PROFILES, SITES: SITES, picks: picks,
+window.__mission = {LRO: LRO, lroXY: lroXY, orbView: orbView, evalAt: evalAt, siteSeries: siteSeries, LIMITS: LIMITS, startLanding: startLanding, startLiftoff: startLiftoff, startLaunch: startLaunch, launchState: launchState, sunAltAz: sunAltAz, get landAnim(){ return landAnim; }, get mast(){ return mast; }, get target(){ return target; }, get active(){ return active; }, budgets: budgets, results: results, get mission(){ return mission; }, PROFILES: PROFILES, SITES: SITES, picks: picks,
   get windows(){ return lwRes; }, get wx(){ return wx; }, get launchMs(){ return launchMs; }, budget: budget, launchOpps: launchOpps, moonRADec: moonRADec, gmstDeg: gmstDeg};
 requestAnimationFrame(frame);
 })();

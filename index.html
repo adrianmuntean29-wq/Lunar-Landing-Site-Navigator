@@ -59,6 +59,13 @@ body{color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
 .eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
 h1{font-family:var(--f-display);font-weight:600;font-size:clamp(32px,4.6vw,50px);line-height:.98;letter-spacing:.005em;margin:0;text-wrap:balance}
 .lede{max-width:64ch;margin:10px 0 0;color:var(--muted)}
+.howto{list-style:none;counter-reset:st;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.howto li{counter-increment:st;display:grid;grid-template-columns:28px minmax(0,1fr);gap:2px 10px;align-items:start;padding:10px 12px;background:var(--panel);border:1px solid var(--line);border-radius:6px}
+.howto li::before{content:counter(st);grid-row:span 2;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:600 13px/1 var(--f-mono);background:var(--ink);color:var(--bg)}
+.howto b{font-size:14px}
+.howto span{font-size:13px;color:var(--muted)}
+.howto i.cal-c{display:inline-grid;vertical-align:-3px;width:14px;height:14px}
+@media (max-width:760px){.howto{grid-template-columns:minmax(0,1fr)}}
 .badge{font-family:var(--f-mono);font-size:12px;line-height:1.4;border:1px solid var(--line);padding:6px 10px;border-radius:3px;color:var(--muted);margin:0;max-width:34ch}
 h2{font-family:var(--f-display);font-weight:600;font-size:21px;line-height:1.1;letter-spacing:.01em;margin:0;text-wrap:balance}
 .caption{font-size:13px;color:var(--muted);margin:0;line-height:1.45}
@@ -79,10 +86,12 @@ h2{font-family:var(--f-display);font-weight:600;font-size:21px;line-height:1.1;l
 .pin .tag{position:absolute;left:0;top:-24px;transform:translate(-50%,-100%);pointer-events:auto;font:600 12px/1.2 var(--f-mono);color:var(--space);background:var(--space-ink);border:0;border-radius:3px;padding:3px 7px;cursor:pointer;white-space:nowrap}
 .pin.sel .tag{box-shadow:0 0 0 2px var(--space),0 0 0 3.5px var(--space-ink)}
 .pin.out .stem{opacity:.35}
+.pin.up .stem{top:-52px;height:52px}
+.pin.up .tag{top:-52px}
 .pin.out .tag{background:var(--space-veil);color:var(--space-ink);box-shadow:inset 0 0 0 1px var(--space-muted)}
 .pin .tag:focus-visible{outline:2px solid var(--earth-fill);outline-offset:2px}
 .geo{font:500 11px/1 var(--f-mono);color:var(--space-muted);white-space:nowrap}
-.geo span{position:absolute;left:6px;top:-5px}
+.geo span{position:absolute;left:7px;top:-7px;color:var(--space-ink);background:var(--space-veil);padding:1px 4px;border-radius:2px}
 .geo i{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border:1px solid var(--space-muted);border-radius:50%}
 .sky{font:600 11.5px/1.2 var(--f-mono);white-space:nowrap}
 .sky i{position:absolute;left:-7px;top:-7px;width:14px;height:14px;border-radius:50%;border:2px solid currentColor;background:currentColor}
@@ -148,9 +157,9 @@ select{font:500 13px var(--f-body);color:var(--ink);background:var(--panel);bord
 canvas.chart{width:100%;display:block}
 #horizon{height:210px}
 
-:root{--pass:#1D5AA6; --fail:#B45309}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--pass:#86B6EE; --fail:#F2A33A}}
-:root[data-theme="dark"]{--pass:#86B6EE; --fail:#F2A33A}
+:root{--pass:#1D5AA6; --fail:#B45309; --crew:#0F8A7E; --crew-ink:#fff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--pass:#86B6EE; --fail:#F2A33A; --crew:#4FD8C7; --crew-ink:#06201D}}
+:root[data-theme="dark"]{--pass:#86B6EE; --fail:#F2A33A; --crew:#4FD8C7; --crew-ink:#06201D}
 .prov{margin:0;font:500 12.5px/1.5 var(--f-mono);color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:7px 10px;background:var(--panel)}
 .prov a{color:var(--earth)}
 .planner{display:grid;grid-template-columns:340px minmax(0,1fr);gap:20px;align-items:start}
@@ -187,6 +196,15 @@ i.cal-c{display:inline-grid;width:16px;font-style:normal;cursor:default}
 .cal-c.fail{border-color:var(--fail)}
 .cal-c.none{visibility:hidden}
 .cal-c.sel{box-shadow:0 0 0 2px var(--ink)}
+/* days a crewed landing works: crew colour with a small helmet dot */
+.cal-c.crewok{background:var(--crew);border-color:var(--crew);color:var(--crew-ink)}
+.cal-c.crewok::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--crew-ink);opacity:.9}
+.cal-c.crewok.fail{font-size:0;box-shadow:inset 0 -3px 0 var(--fail)}
+.cal-c.crewok.fail.sel{box-shadow:inset 0 -3px 0 var(--fail),0 0 0 2px var(--ink)}
+.crewn{color:var(--crew);font-weight:600}
+.flybtn.crew{background:var(--crew);color:var(--crew-ink)}
+.flybtn.alt{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.flybtns{display:flex;flex-wrap:wrap;gap:8px}
 .tablewrap{overflow-x:auto}
 .rank{width:100%;border-collapse:collapse;font-size:13px}
 .rank th{text-align:left;font:600 11px var(--f-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);padding:6px 8px;white-space:nowrap}
@@ -225,6 +243,12 @@ input[type=date]{font:500 13px var(--f-body);color:var(--ink);background:var(--p
       <p class="badge" id="terrainBadge">Sun and Earth: real positions (JPL Horizons). 3D terrain: loading…</p>
     </div>
   </header>
+
+  <ol class="howto" aria-label="How to use this page">
+    <li><b>Pick a site and a mission</b><span>Crew (6 days) or robotic (13 days), in the planner on the left.</span></li>
+    <li><b>Read the calendar</b><span><i class="cal-c pass crewok"></i> a crew can land that day · <i class="cal-c pass"></i> passes your limits.</span></li>
+    <li><b>Fly it</b><span>Click a day, then “Fly it with a crew” to launch from Canada and watch the landing.</span></li>
+  </ol>
 
   <p class="prov" id="prov">Loading data…</p>
 
@@ -268,6 +292,8 @@ input[type=date]{font:500 13px var(--f-body);color:var(--ink);background:var(--p
     <div class="pmain">
       <div class="block-head"><h2 id="calTitle">Landing windows</h2><p class="caption" id="calNote"></p></div>
       <div class="callegend" aria-hidden="true">
+        <span><i class="cal-c pass crewok"></i>a crewed landing works (crew limits: 6 days, Sun ≥ 95%, no night)</span>
+        <span><i class="cal-c fail crewok"></i>crewed works, your limits fail</span>
         <span><i class="cal-c pass"></i>passes all limits</span>
         <span><i class="cal-c fail">☀</i>too little sun</span>
         <span><i class="cal-c fail">⊕</i>too little Earth contact</span>
@@ -298,6 +324,10 @@ input[type=date]{font:500 13px var(--f-body);color:var(--ink);background:var(--p
           <output id="tOut" for="t">…</output>
         </div>
         <div class="opts">
+          <div class="seg mapsize" id="mapSize" role="group" aria-label="Map size">
+            <button type="button" data-map="sites" aria-pressed="true">All four sites</button>
+            <button type="button" data-map="pole" aria-pressed="false">Close-up of the pole</button>
+          </div>
           <div class="seg" role="group" aria-label="What the map shows">
             <button type="button" data-mode="0" aria-pressed="true">Light now</button>
             <button type="button" data-mode="1" aria-pressed="false" disabled>Sun per year</button>
@@ -352,7 +382,7 @@ input[type=date]{font:500 13px var(--f-body);color:var(--ink);background:var(--p
   <section class="notes" aria-label="What is simulated">
     <h2>What is simulated here and what the competition version would use</h2>
     <dl>
-      <div><dt>Terrain</dt><dd>Real: NASA LOLA heights (PGDA product 90, LDEM_80S_80MPP_ADJ) averaged to 240 m by our Python engine (data/heights.bin), on a 48 × 48 km map around the pole, with 96 × 96 km used for shadows. Site pins sit at the published coordinates; sites farther out are pinned at the map edge with their distance. If the heights file cannot load, the page falls back to a generated demo terrain and says so.</dd></div>
+      <div><dt>Terrain</dt><dd>Real: NASA LOLA heights (PGDA product 90, LDEM_80S_80MPP_ADJ) averaged to 240 m by our Python engine (data/heights.bin), shown two ways: "All four sites", a 170 × 170 km map from the engine's 640 m grid (data/region_heights.bin) that holds C1, S, GR1 and MP1, and "Close-up of the pole", a 48 × 48 km map at 240 m. Shadows also use 46 km of terrain beyond each map edge. Site pins sit at the published coordinates; a site outside the map is pinned at its edge with its distance. If the heights file cannot load, the page falls back to a generated demo terrain and says so.</dd></div>
       <div><dt>Sun and Earth</dt><dd>Real: one JPL Horizons table (2026-2030, every 6 h) of the sub-solar and sub-Earth points in the Moon's mean-Earth frame. The page interpolates it and computes the Sun and Earth direction from any site, including Earth parallax. Checked against Horizons topocentric values.</dd></div>
       <div><dt>Computation</dt><dd>3D demo: each point's horizon in 64 directions out to 46 km, with the Moon's curvature. Real sites: 360-direction horizon masks from LOLA terrain, computed by our Python engine (flat horizon until they load).</dd></div>
     </dl>
@@ -394,8 +424,18 @@ function dateFromJd(jd){ return new Date((jd - 2440587.5)*86400000); }
 function startApp(){
 'use strict';
 var DEG = Math.PI/180, R_MOON = 1737.4, INV2R = 1/(2*R_MOON);
-var N = 129, NV = N*N, BIG_N = 257, OFF = 64, CELL = 0.375, HALF = 24, HALF_BIG = 48;
+/* Two map sizes. "sites" (default) is a 170 x 170 km block that holds all four published sites, on the engine's
+   640 m LOLA grid; "pole" is the original 48 x 48 km close-up on the 240 m grid. The choice lives in the URL (#map=pole). */
+var MAPS = {
+  sites: {cx: -15, cz: -55, half: 85, n: 193, grid: 20, ring: 1, name: 'All four sites', size: '170 × 170 km'},
+  pole:  {cx: 0, cz: 0, half: 24, n: 129, grid: 4, ring: 0.25, name: 'Close-up of the pole', size: '48 × 48 km'}
+};
+var MAPKEY = /(^|[#&])map=pole(&|$)/.test(location.hash) || !REGION ? 'pole' : 'sites', MAP = MAPS[MAPKEY];
 var NAZ = 64, MAX_D = 46, SUN_R = 0.267, EARTH_R = 0.95;
+var N = MAP.n, NV = N*N, HALF = MAP.half, CELL = 2*HALF/(N - 1), CX = MAP.cx, CZ = MAP.cz;
+var OFF = MAPKEY === 'pole' ? 64 : Math.ceil(MAX_D/CELL), BIG_N = N + 2*OFF, HALF_BIG = HALF + OFF*CELL;
+var SC = HALF/24;   // view scale against the original 48 km map (camera distance, labels)
+var TERR = MAPKEY === 'pole' ? LOLA : REGION;
 var MAST = 0.010, GROUND = 0.002, YEAR = 365, SPD = 8, MEAN_S = 730;
 var DAYS = 365;   // planner time span in days (1, 2, 3 or 5 years); YEAR stays 365 for the 3D yearly averages
 
@@ -445,19 +485,19 @@ function terrain(x, z){
 }
 /* scene km: +x toward 90 E, -z toward 0 E (Earth side); heights.bin: +x toward 90 E, +y toward 0 E, metres */
 function lolaAt(x, z){
-  var m = LOLA.m, fc = (x*1000 - m.xmin)/m.px - 0.5, fr = (m.ymax + z*1000)/m.px - 0.5;
+  var m = TERR.m, A0 = TERR.h, fc = (x*1000 - m.xmin)/m.px - 0.5, fr = (m.ymax + z*1000)/m.px - 0.5;
   fc = clamp(fc, 0, m.nx - 1.001); fr = clamp(fr, 0, m.ny - 1.001);
-  var i = fc | 0, j = fr | 0, u = fc - i, w = fr - j, k = j*m.nx + i, A = LOLA.h;
+  var i = fc | 0, j = fr | 0, u = fc - i, w = fr - j, k = j*m.nx + i, A = A0;
   function g(q){ var v = A[q]; return v === v ? v : 0; }
   return ((g(k)*(1 - u) + g(k + 1)*u)*(1 - w) + (g(k + m.nx)*(1 - u) + g(k + m.nx + 1)*u)*w)/1000;
 }
 var H = new Float32Array(BIG_N*BIG_N), HMAX = -1e9;
 for (var gj = 0; gj < BIG_N; gj++) for (var gi = 0; gi < BIG_N; gi++){
-  var hv = LOLA ? lolaAt(-HALF_BIG + gi*CELL, -HALF_BIG + gj*CELL) : terrain(-HALF_BIG + gi*CELL, -HALF_BIG + gj*CELL);
+  var hv = TERR ? lolaAt(CX - HALF_BIG + gi*CELL, CZ - HALF_BIG + gj*CELL) : terrain(-HALF_BIG + gi*CELL, -HALF_BIG + gj*CELL);
   H[gj*BIG_N + gi] = hv; if (hv > HMAX) HMAX = hv;
 }
 function hAt(x, z){
-  var fx = (x + HALF_BIG)/CELL, fz = (z + HALF_BIG)/CELL;
+  var fx = (x - CX + HALF_BIG)/CELL, fz = (z - CZ + HALF_BIG)/CELL;
   fx = clamp(fx, 0, BIG_N - 1.0001); fz = clamp(fz, 0, BIG_N - 1.0001);
   var i = fx | 0, j = fz | 0, u = fx - i, w = fz - j, kk = j*BIG_N + i;
   return (H[kk]*(1 - u) + H[kk + 1]*u)*(1 - w) + (H[kk + BIG_N]*(1 - u) + H[kk + BIG_N + 1]*u)*w;
@@ -466,7 +506,7 @@ function horizonDir(x0, z0, h0, dx, dz, step0, grow){
   var best = -1e9, d = step0, lim = HMAX - h0;
   while (d < MAX_D){
     var x = x0 + dx*d, z = z0 + dz*d;
-    var fx = (x + HALF_BIG)/CELL, fz = (z + HALF_BIG)/CELL;
+    var fx = (x - CX + HALF_BIG)/CELL, fz = (z - CZ + HALF_BIG)/CELL;
     if (fx < 0 || fz < 0 || fx >= BIG_N - 1 || fz >= BIG_N - 1) break;
     var i = fx | 0, j = fz | 0, u = fx - i, w = fz - j, kk = j*BIG_N + i;
     var hh = (H[kk]*(1 - u) + H[kk + 1]*u)*(1 - w) + (H[kk + BIG_N]*(1 - u) + H[kk + BIG_N + 1]*u)*w;
@@ -486,7 +526,7 @@ var HMINr = 1e9, HMAXr = -1e9;
 (function(){
   var L = [-0.45, 0.72, -0.53], ll = Math.hypot(L[0], L[1], L[2]); L = [L[0]/ll, L[1]/ll, L[2]/ll];
   for (var j = 0; j < N; j++) for (var i = 0; i < N; i++){
-    var v = j*N + i, x = -HALF + i*CELL, z = -HALF + j*CELL, kk = (j + OFF)*BIG_N + (i + OFF);
+    var v = j*N + i, x = CX - HALF + i*CELL, z = CZ - HALF + j*CELL, kk = (j + OFF)*BIG_N + (i + OFF);
     var h = H[kk];
     vx[v] = x; vz[v] = z; vh[v] = h;
     if (h < HMINr) HMINr = h; if (h > HMAXr) HMAXr = h;
@@ -497,7 +537,7 @@ var HMINr = 1e9, HMAXr = -1e9;
     nor[v*3] = nx/nl; nor[v*3 + 1] = ny/nl; nor[v*3 + 2] = nz/nl;
     var ex = -dhdx*2.2, ez = -dhdz*2.2, el = Math.hypot(ex, 1, ez);
     hill[v] = clamp((ex*L[0] + L[1] + ez*L[2])/el, 0, 1);
-    tone[v] = 0.5 + 0.5*fbm(x/1.4 + 40, z/1.4 - 12, 3);
+    tone[v] = 0.5 + 0.5*fbm(x/(1.4*CELL/0.375) + 40, z/(1.4*CELL/0.375) - 12, 3);
   }
 })();
 
@@ -648,7 +688,8 @@ var custom = null;
 buildSites();
 var sel = 0;
 
-var cam = {yaw: 0.55, pitch: 0.58, dist: 66};
+var cam = {yaw: 0.55, pitch: 0.58, dist: 66*SC};
+var DMIN = MAPKEY === 'pole' ? 24 : 20, DMAX = 150*SC;
 var dirty = {geo: true, light: true, layer: true, view: true, charts: true, sites: true};
 
 /* ---------- WebGL ---------- */
@@ -676,8 +717,8 @@ if (!gl){
     'else if(uMode<1.5){float t=pow(clamp(vLayer,0.0,1.0),0.7);col=ramp3(t,vec3(0.035,0.04,0.06),vec3(0.62,0.36,0.10),vec3(1.0,0.88,0.58))*(0.72+0.28*vHill);}' +
     'else{float t=clamp(vLayer,0.0,1.0);col=ramp3(t,vec3(0.035,0.04,0.06),vec3(0.13,0.33,0.66),vec3(0.70,0.88,1.0))*(0.72+0.28*vHill);}' +
     '\n#ifdef DERIV\n' +
-    'vec2 gq=vXZ/4.0;vec2 gd=abs(fract(gq-0.5)-0.5)/fwidth(gq);float line=1.0-min(min(gd.x,gd.y),1.0);' +
-    'float r=length(vXZ);float fr=fwidth(r);float ring=max(1.0-min(abs(r-15.162)/fr,1.0),1.0-min(abs(r-7.581)/fr,1.0));' +
+    'vec2 gq=vXZ/' + MAP.grid.toFixed(1) + ';vec2 gd=abs(fract(gq-0.5)-0.5)/fwidth(gq);float line=1.0-min(min(gd.x,gd.y),1.0);' +
+    'float r=length(vXZ);float cq=degrees(2.0*atan(r/3474.8))/' + MAP.ring.toFixed(2) + ';float ring=1.0-min(abs(fract(cq-0.5)-0.5)/fwidth(cq),1.0);' +
     'col+=vec3(0.55,0.62,0.72)*(line*0.06+ring*0.24);' +
     '\n#endif\n' +
     'gl_FragColor=vec4(col,1.0);}';
@@ -749,8 +790,8 @@ function invert(a){
     (a10*b10-a11*b08+a13*b06)*det,(a01*b08-a00*b10-a03*b06)*det,(a30*b04-a31*b02+a33*b00)*det,(a21*b02-a20*b04-a23*b00)*det,
     (a11*b07-a10*b09-a12*b06)*det,(a00*b09-a01*b07+a02*b06)*det,(a31*b01-a30*b03-a32*b00)*det,(a20*b03-a21*b01+a22*b00)*det];
 }
-function eyePos(){ return [cam.dist*Math.cos(cam.pitch)*Math.sin(cam.yaw), cam.dist*Math.sin(cam.pitch), cam.dist*Math.cos(cam.pitch)*Math.cos(cam.yaw)]; }
-function updateVP(){ VP = mul(perspective(40*DEG, W/Hh, 0.5, 600), lookAt(eyePos(), [0, -1, 0])); }
+function eyePos(){ return [CX + cam.dist*Math.cos(cam.pitch)*Math.sin(cam.yaw), cam.dist*Math.sin(cam.pitch), CZ + cam.dist*Math.cos(cam.pitch)*Math.cos(cam.yaw)]; }
+function updateVP(){ VP = mul(perspective(40*DEG, W/Hh, 0.5*Math.max(1, SC/2), 600*SC), lookAt(eyePos(), [CX, -1, CZ])); }
 function project(x, y, z){
   var m = VP, cx = m[0]*x + m[4]*y + m[8]*z + m[12], cy = m[1]*x + m[5]*y + m[9]*z + m[13], cw = m[3]*x + m[7]*y + m[11]*z + m[15];
   if (cw <= 0.05) return null;
@@ -789,11 +830,11 @@ function draw(){
 /* ---------- overlay labels ---------- */
 var labelsEl = $('#labels'), pinEls = [], geoEls = [], sunEl, earthEl;
 /* Site pins at the published coordinates, only on real LOLA terrain (none on the demo terrain).
-   Sites outside the 48 km block are pinned at the block edge in their direction, with the distance. */
+   Sites outside the map block are pinned at the block edge in their direction, with the distance. */
 function siteXZ(s){ var rho = 2*R_MOON*Math.tan(Math.PI/4 + s.lat*DEG/2), L = s.lon*DEG; return [rho*Math.sin(L), -rho*Math.cos(L)]; }
 function buildPins(){
   pinEls.forEach(function(p){ p.el.remove(); }); pinEls = [];
-  if (!LOLA) return;
+  if (!TERR) return;
   sites.forEach(function(s, i){
     var el = document.createElement('div'); el.className = 'mk pin';
     el.innerHTML = '<span class="stem"></span><span class="dot"></span><button type="button" class="tag"></button>';
@@ -805,7 +846,9 @@ function buildPins(){
   });
 }
 function buildGeo(){
-  [[0, 0, 'South Pole'], [0, 15.162, '89.5° S']].forEach(function(g){
+  var rl = function(c){ return 2*R_MOON*Math.tan(c*DEG/2); };
+  (MAPKEY === 'pole' ? [[0, 0, 'South Pole'], [0, rl(0.5), '89.5° S']]
+    : [[0, 0, 'South Pole'], [0.6*rl(1), -0.8*rl(1), '89° S'], [0.6*rl(2), -0.8*rl(2), '88° S'], [0.6*rl(3), -0.8*rl(3), '87° S']]).forEach(function(g){
     var el = document.createElement('div'); el.className = 'mk geo';
     el.innerHTML = '<i></i><span></span>'; el.querySelector('span').textContent = g[2];
     labelsEl.appendChild(el); geoEls.push({el: el, x: g[0], z: g[1]});
@@ -817,20 +860,30 @@ function buildGeo(){
 function place(el, p){ if (!p || p[0] < -60 || p[0] > W + 60 || p[1] < -60 || p[1] > Hh + 60){ el.hidden = true; return; } el.hidden = false; el.style.transform = 'translate(' + p[0].toFixed(1) + 'px,' + p[1].toFixed(1) + 'px)'; }
 function updateLabels(){
   var e = state.exag;
-  if (LOLA && pinEls.length !== sites.length) buildPins();
+  if (TERR && pinEls.length !== sites.length) buildPins();
   pinEls.forEach(function(p){
-    var inside = Math.abs(p.x) <= HALF && Math.abs(p.z) <= HALF, x = p.x, z = p.z;
-    if (!inside){ var k = (HALF - 0.4)/Math.max(Math.abs(p.x), Math.abs(p.z)); x *= k; z *= k; }
-    place(p.el, project(x, hAt(x, z)*e, z));
+    var inside = Math.abs(p.x - CX) <= HALF && Math.abs(p.z - CZ) <= HALF, x = p.x, z = p.z;
+    if (!inside){ var k = (HALF - 0.4*SC)/Math.max(Math.abs(p.x - CX), Math.abs(p.z - CZ)); x = CX + (p.x - CX)*k; z = CZ + (p.z - CZ)*k; }
+    p.sp = project(x, hAt(x, z)*e, z); place(p.el, p.sp);
     p.el.classList.toggle('sel', p.i === sel); p.el.classList.toggle('out', !inside);
     p.b.textContent = p.label + (inside ? '' : ', ' + Math.round(Math.hypot(p.x, p.z)) + ' km out');
     p.b.setAttribute('aria-label', 'Pick site ' + p.label + (inside ? '' : ', ' + Math.round(Math.hypot(p.x, p.z)) + ' km from the pole, outside this map'));
   });
+  /* tags that would overlap on screen: the pin farther back gets a taller stem */
+  var shown = pinEls.filter(function(p){ return p.sp && !p.el.hidden; }).sort(function(a, b){ return b.sp[1] - a.sp[1]; }), boxes = [];
+  shown.forEach(function(p){
+    var wdt = p.b.offsetWidth || 60, up = false;
+    for (var k = 0; k < 2; k++){
+      var top = p.sp[1] - (up ? 52 : 24), hit = boxes.some(function(q){ return Math.abs(q.x - p.sp[0]) < (q.w + wdt)/2 + 6 && Math.abs(q.y - top) < 24; });
+      if (!hit) break; up = true;
+    }
+    p.el.classList.toggle('up', up); boxes.push({x: p.sp[0], y: p.sp[1] - (up ? 52 : 24), w: wdt});
+  });
   geoEls.forEach(function(g){ place(g.el, project(g.x, hAt(g.x, g.z)*e, g.z)); });
-  var su = sunAt(state.t), ea = earthAt(state.t), top = HMAXr*e + 1.2, R = 27;
+  var su = sunAt(state.t), ea = earthAt(state.t), top = HMAXr*e + 1.2*SC, R = MAPKEY === 'pole' ? 27 : 1.35*HALF;
   var st = {sunAz: su.az, sunEl: su.el, sunLit: su.el > 0 ? 1 : 0, earthAz: ea.az, earthEl: ea.el, earthVis: ea.el > 0 ? 1 : 0};
-  var ps = project(Math.sin(st.sunAz*DEG)*R, top + st.sunEl*1.4, -Math.cos(st.sunAz*DEG)*R);
-  var pe = project(Math.sin(st.earthAz*DEG)*R, top + 2 + st.earthEl*0.9, -Math.cos(st.earthAz*DEG)*R);
+  var ps = project(CX + Math.sin(st.sunAz*DEG)*R, top + st.sunEl*1.4*SC, CZ - Math.cos(st.sunAz*DEG)*R);
+  var pe = project(CX + Math.sin(st.earthAz*DEG)*R, top + 2*SC + st.earthEl*0.9*SC, CZ - Math.cos(st.earthAz*DEG)*R);
   [ps, pe].forEach(function(p){ if (p){ p[0] = clamp(p[0], 14, W - 14); p[1] = clamp(p[1], 22, Hh - 64); } });
   place(sunEl, ps); place(earthEl, pe);
   sunEl.classList.toggle('flip', !!ps && ps[0] > W - 130);
@@ -844,7 +897,7 @@ function updateLabels(){
 /* ---------- legend, readout, sites panel ---------- */
 var legendEl = $('#legend');
 function renderLegend(){
-  if (state.mode === 0) legendEl.innerHTML = '<span><i class="sw lit"></i>Sunlit</span><span><i class="sw dark"></i>Shadow</span><span>4 km grid · circles at 89.75° and 89.5° S</span>';
+  if (state.mode === 0) legendEl.innerHTML = '<span><i class="sw lit"></i>Sunlit</span><span><i class="sw dark"></i>Shadow</span><span>' + (MAPKEY === 'pole' ? '4 km grid, a circle every 0.25° of latitude' : '20 km grid, a circle every 1° of latitude') + '</span>';
   else if (state.mode === 1) legendEl.innerHTML = '<span><i class="grad sun"></i>0% → 100% of the year in sunlight</span><span>Average over 365 days</span>';
   else legendEl.innerHTML = '<span><i class="grad earth"></i>0% → 100% of the year with Earth visible</span><span>Average over 365 days</span>';
 }
@@ -1002,7 +1055,17 @@ playBtn.addEventListener('click', function(){
 });
 $('#speed').addEventListener('change', function(e){ state.speed = parseFloat(e.target.value); });
 $('#exag').addEventListener('input', function(e){ state.exag = parseFloat(e.target.value); $('#exagOut').textContent = '×' + num(state.exag, 1); dirty.geo = true; dirty.view = true; });
-var segBtns = Array.prototype.slice.call(document.querySelectorAll('.seg button'));
+var segBtns = Array.prototype.slice.call(document.querySelectorAll('.seg:not(.mapsize) button'));
+Array.prototype.forEach.call(document.querySelectorAll('#mapSize button'), function(b){
+  var k = b.getAttribute('data-map');
+  b.setAttribute('aria-pressed', String(k === MAPKEY));
+  if (k === 'sites' && !REGION){ b.disabled = true; b.title = 'The regional terrain file (data/region_heights.bin) did not load.'; }
+  b.addEventListener('click', function(){
+    if (k === MAPKEY) return;
+    var h = location.hash.replace(/(^#|&)map=[^&]*/, '').replace(/^#?&?/, '');
+    location.hash = (h ? h + '&' : '') + 'map=' + k; location.reload();
+  });
+});
 segBtns.forEach(function(btn){
   btn.addEventListener('click', function(){
     state.mode = parseInt(btn.getAttribute('data-mode'), 10);
@@ -1026,7 +1089,7 @@ canvas.addEventListener('pointermove', function(e){
   if (pointers.size === 1){
     cam.yaw -= dx*0.006; cam.pitch = clamp(cam.pitch + dy*0.005, 0.12, 1.45);
     if (downInfo) downInfo.moved += Math.abs(dx) + Math.abs(dy);
-  } else if (pointers.size === 2 && pinch){ cam.dist = clamp(pinch.dist*pinch.d/pdist(), 24, 150); }
+  } else if (pointers.size === 2 && pinch){ cam.dist = clamp(pinch.dist*pinch.d/pdist(), DMIN, DMAX); }
   dirty.view = true;
 });
 function endPointer(e){
@@ -1034,12 +1097,12 @@ function endPointer(e){
 }
 canvas.addEventListener('pointerup', endPointer);
 canvas.addEventListener('pointercancel', endPointer);
-canvas.addEventListener('wheel', function(e){ e.preventDefault(); cam.dist = clamp(cam.dist*Math.exp(e.deltaY*0.0012), 24, 150); dirty.view = true; }, {passive: false});
+canvas.addEventListener('wheel', function(e){ e.preventDefault(); cam.dist = clamp(cam.dist*Math.exp(e.deltaY*0.0012), DMIN, DMAX); dirty.view = true; }, {passive: false});
 canvas.addEventListener('keydown', function(e){
   var used = true;
   if (e.key === 'ArrowLeft') cam.yaw += 0.08; else if (e.key === 'ArrowRight') cam.yaw -= 0.08;
   else if (e.key === 'ArrowUp') cam.pitch = clamp(cam.pitch + 0.06, 0.12, 1.45); else if (e.key === 'ArrowDown') cam.pitch = clamp(cam.pitch - 0.06, 0.12, 1.45);
-  else if (e.key === '+' || e.key === '=') cam.dist = clamp(cam.dist*0.9, 24, 150); else if (e.key === '-') cam.dist = clamp(cam.dist*1.1, 24, 150);
+  else if (e.key === '+' || e.key === '=') cam.dist = clamp(cam.dist*0.9, DMIN, DMAX); else if (e.key === '-') cam.dist = clamp(cam.dist*1.1, DMIN, DMAX);
   else used = false;
   if (used){ e.preventDefault(); dirty.view = true; }
 });
@@ -1171,12 +1234,20 @@ $('#pMast').addEventListener('click', function(e){
 });
 
 function schedulePlan(){ clearTimeout(planTimer); planTimer = setTimeout(renderPlanner, 30); }
+/* the same site under the crewed example limits (relay and mast as chosen), so crewed landings stand out in any preset */
+function evalCrew(s){
+  var keep = {len: LIM.len, sun: LIM.sun, earth: LIM.earth, night: LIM.night, td: LIM.td}, P = PRESETS.crew;
+  LIM.len = P.len; LIM.sun = P.sun; LIM.earth = P.earth; LIM.night = P.night; LIM.td = P.td;
+  try { return evalSite(s); } finally { LIM.len = keep.len; LIM.sun = keep.sun; LIM.earth = keep.earth; LIM.night = keep.night; LIM.td = keep.td; }
+}
+var crewResults = [];
 function renderPlanner(){
   planResults = sites.map(evalSite);
+  crewResults = sites.map(evalCrew);
   // site picker
   pSite.innerHTML = sites.map(function(s, i){ return '<option value="' + i + '">' + esc(s.name) + '</option>'; }).join('');
   pSite.value = String(sel);
-  var s = sites[sel], res = planResults[sel], n = res.length;
+  var s = sites[sel], res = planResults[sel], n = res.length, cres = crewResults[sel];
   // settings printed on the view
   $('#calTitle').textContent = 'Landing windows: ' + s.name;
   $('#calNote').textContent = 'Landing at 00:00 UTC · ' + LIM.len + '-day mission · sun ≥ ' + LIM.sun + '% · ' +
@@ -1187,12 +1258,13 @@ function renderPlanner(){
   for (var d = 0; d < DAYS; d++){
     var dt = dateFromJd(state.jd0 + d), key = dt.toISOString().slice(0, 7), dom = dt.getUTCDate();
     if (!rows[key]){ rows[key] = []; order.push(key); }
-    var r = res[d], cls, glyph = '', label;
+    var r = res[d], cls, glyph = '', label, cr = cres[d], crewOk = !!(cr && !cr.fail.length);
     var dayIso = dt.toISOString().slice(0, 10);
     if (!r){ cls = 'none'; label = dayIso + ': mission would end after the time span'; }
     else if (!r.fail.length){ cls = 'pass'; label = dayIso + ': passes. Sun ' + num(r.sun, 0) + '%, Earth ' + num(r.earth, 0) + '%, longest night ' + (r.clipped ? '≥ ' : '') + num(r.night, 0) + ' h'; }
     else { cls = 'fail'; glyph = GLYPH[r.fail[0]]; label = dayIso + ': fails, ' + r.fail.map(function(f){ return FAILTXT[f]; }).join(', ') + '. Sun ' + num(r.sun, 0) + '%, Earth ' + num(r.earth, 0) + '%, longest night ' + (r.clipped ? '≥ ' : '') + num(r.night, 0) + ' h, Sun at touchdown ' + num(r.td, 1) + '°'; }
-    rows[key].push('<button type="button" class="cal-c ' + cls + (d === calSelDay ? ' sel' : '') + '" style="grid-column:' + (dom + 1) + '" data-d="' + d + '" aria-label="' + esc(label) + '" title="' + esc(label) + '"' + (cls === 'none' ? ' tabindex="-1"' : '') + '>' + glyph + '</button>');
+    if (crewOk && cls !== 'none') label += '. A crewed landing works on this day (crew limits)';
+    rows[key].push('<button type="button" class="cal-c ' + cls + (crewOk && cls !== 'none' ? ' crewok' : '') + (d === calSelDay ? ' sel' : '') + '" style="grid-column:' + (dom + 1) + '" data-d="' + d + '" aria-label="' + esc(label) + '" title="' + esc(label) + '"' + (cls === 'none' ? ' tabindex="-1"' : '') + '>' + glyph + '</button>');
   }
   calEl.innerHTML = order.map(function(k){ return '<div class="mrow"><span class="mlab">' + k + '</span>' + rows[k].join('') + '</div>'; }).join('');
   // funnel: how many landing days survive each limit, in order
@@ -1213,14 +1285,16 @@ function renderPlanner(){
   // ranking: every site under the same limits
   var rank = sites.map(function(st, i){
     var rr = planResults[i], ok = rr.filter(function(x){ return x && !x.fail.length; }), first = ok.length ? ok[0].d : -1;
-    return {i: i, s: st, pass: ok.length, total: rr.filter(Boolean).length, first: first};
+    var cr = crewResults[i] || [], crewN = cr.filter(function(x){ return x && !x.fail.length; }).length;
+    return {i: i, s: st, pass: ok.length, total: rr.filter(Boolean).length, first: first, crewN: crewN, crewT: cr.filter(Boolean).length};
   }).sort(function(a, b){ return b.pass - a.pass || b.s.pSun - a.s.pSun; });
-  rankEl.innerHTML = '<thead><tr><th>Site</th><th>Landing days that pass</th><th>First that passes</th><th>Sun (span)</th><th>Earth (span)</th><th>Longest night (span)</th><th>Data</th></tr></thead><tbody>' +
+  rankEl.innerHTML = '<thead><tr><th>Site</th><th>Landing days that pass</th><th>Crewed landing days</th><th>First that passes</th><th>Sun (span)</th><th>Earth (span)</th><th>Longest night (span)</th><th>Data</th></tr></thead><tbody>' +
     rank.map(function(x){
       var share = x.total ? x.pass/x.total : 0;
       return '<tr tabindex="0" data-i="' + x.i + '"' + (x.i === sel ? ' class="selr"' : '') + '>' +
         '<td>' + esc(x.s.name) + '</td>' +
         '<td>' + x.pass + ' / ' + x.total + '<span class="bar bar-pass"><b style="width:' + Math.round(share*100) + '%;background:var(--pass)"></b></span></td>' +
+        '<td><span class="crewn">' + x.crewN + '</span> / ' + x.crewT + '</td>' +
         '<td>' + (x.first >= 0 ? isoDay(state.jd0 + x.first) : 'none') + '</td>' +
         '<td>' + pct(x.s.pSun) + '</td><td>' + pct(x.s.pEarth) + '</td>' +
         '<td>' + nightText(x.s.night, x.s.nightClipped) + '</td>' +
@@ -1243,7 +1317,12 @@ function renderFly(){
     '<small>' + (picked ? 'Day chosen in the calendar.' : 'First day that passes. Click any day in the calendar to change it.') + '</small></p>';
   if (!fid){ el.innerHTML = txt + '<span class="caption">The mission page covers the four named sites.</span>'; return; }
   var q = 'site=' + fid + '&land=' + day + '&type=' + type + '&len=' + LIM.len + '&sun=' + LIM.sun + '&earth=' + LIM.earth + '&night=' + LIM.night + '&td=' + LIM.td + '&mast=' + state.mast + '&relay=' + (LIM.relay ? 1 : 0);
-  el.innerHTML = txt + '<a class="flybtn" href="mission.html?' + q + '">Fly this mission from Canada</a>';
+  var cr = (crewResults[sel] || [])[d], crewOk = !!(cr && !cr.fail.length), P = PRESETS.crew;
+  var qc = 'site=' + fid + '&land=' + day + '&type=crewed&len=' + P.len + '&sun=' + P.sun + '&earth=' + P.earth + '&night=' + P.night + '&td=' + P.td + '&mast=' + state.mast + '&relay=' + (LIM.relay ? 1 : 0);
+  var btns = type === 'crewed' ? '<a class="flybtn crew" href="mission.html?' + q + '">Fly it with a crew</a>'
+    : (crewOk ? '<a class="flybtn crew" href="mission.html?' + qc + '">Fly it with a crew</a><a class="flybtn alt" href="mission.html?' + q + '">Fly it robotic</a>'
+              : '<a class="flybtn" href="mission.html?' + q + '">Fly this mission from Canada</a>');
+  el.innerHTML = txt.replace('</small></p>', (type !== 'crewed' ? (crewOk ? ' A crewed landing also works on this day.' : ' Not good enough for a crewed landing.') : '') + '</small></p>') + '<div class="flybtns">' + btns + '</div>';
 }
 calEl.addEventListener('click', function(e){
   var b = e.target.closest('.cal-c'); if (!b || b.classList.contains('none')) return;
@@ -1277,7 +1356,7 @@ applyPreset('robotic'); showEstimate(1, false); renderProv();
 var framed = false;
 function resize(){
   W = viewport.clientWidth; Hh = viewport.clientHeight;
-  if (!framed && W > 0 && Hh > 0){ var asp = W/Hh; cam.dist = asp < 1.25 ? clamp(66*1.25/asp, 66, 140) : 66; framed = true; }
+  if (!framed && W > 0 && Hh > 0){ var asp = W/Hh; cam.dist = SC*(asp < 1.25 ? clamp(66*1.25/asp, 66, 140) : 66); framed = true; }
   var dpr = Math.min(window.devicePixelRatio || 1, 2);
   canvas.width = Math.round(W*dpr); canvas.height = Math.round(Hh*dpr);
   dirty.view = true; dirty.charts = true;
@@ -1340,9 +1419,21 @@ window.__navigator = {get sites(){ return sites; }, state: state, get stage(){ r
 requestAnimationFrame(frame);
 }
 
-/* ---------- real terrain for the 3D view: data/heights.bin from the engine (LOLA, 240 m, +/-60 km, Float32, row 0 = +y) ---------- */
-var LOLA = null;
+/* ---------- real terrain for the 3D view: data/heights.bin from the engine (LOLA, 240 m, +/-60 km, Float32, row 0 = +y) ----------
+   and data/region_heights.bin (LOLA, 640 m, x -150..121 km, y -80..190 km, Int16 metres, row 0 = +y, pipeline/make_region_heights.py) */
+var LOLA = null, REGION = null;
+function b64bytes(s){ var b = atob(s.trim()), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u.buffer; }
+function loadRegion(){
+  var meta = {nx: 424, ny: 422, px: 640, xmin: -150400, ymax: 190080}, n = meta.nx*meta.ny;
+  function take(ab){ if (ab.byteLength === n*2){ var s = new Int16Array(ab), h = new Float32Array(n); for (var i = 0; i < n; i++) h[i] = s[i]; REGION = {h: h, m: meta}; } }
+  var el = document.getElementById('data-region');
+  if (el){ try { take(b64bytes(el.textContent)); } catch (err) {} return Promise.resolve(); }
+  return fetch('data/region_heights.bin').then(function(r){ if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(take).catch(function(){});
+}
 function loadHeights(){
+  return Promise.all([loadPole(), loadRegion()]);
+}
+function loadPole(){
   var meta = {nx: 500, ny: 500, px: 240, xmin: -60000, ymax: 60000};
   var el = document.getElementById('data-heights');
   if (el){
@@ -1353,8 +1444,9 @@ function loadHeights(){
     .then(function(ab){ if (ab.byteLength === meta.nx*meta.ny*4) LOLA = {h: new Float32Array(ab), m: meta}; }).catch(function(){});
 }
 function terrainWording(){
-  document.getElementById('terrainBadge').textContent = 'Sun and Earth: real positions (JPL Horizons). 3D terrain: ' + (LOLA ? 'real LOLA heights (NASA PGDA 90, 240 m).' : 'generated demo (heights file not loaded).');
-  document.getElementById('terrainCaption').textContent = 'Drag to rotate, pinch or scroll to zoom. The 3D view is lit by the real Sun as seen from the pole, on ' + (LOLA ? 'real LOLA terrain. Click a pin to pick that site.' : 'demo terrain.');
+  var real = (/(^|[#&])map=pole(&|$)/.test(location.hash) || !REGION) ? LOLA : REGION;
+  document.getElementById('terrainBadge').textContent = 'Sun and Earth: real positions (JPL Horizons). 3D terrain: ' + (real ? 'real LOLA heights (NASA PGDA 90, ' + (real === LOLA ? '240 m' : '640 m') + ').' : 'generated demo (heights file not loaded).');
+  document.getElementById('terrainCaption').textContent = 'Drag to rotate, pinch or scroll to zoom. The 3D view is lit by the real Sun as seen from the pole, on ' + (LOLA || REGION ? 'real LOLA terrain. Click a pin to pick that site.' : 'demo terrain.');
 }
 /* ---------- boot: load the ephemeris (required) and terrain masks (optional) ---------- */
 fetch('data/subpoints.json').then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); }).then(function(d){
