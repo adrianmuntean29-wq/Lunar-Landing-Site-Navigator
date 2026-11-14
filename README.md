@@ -136,6 +136,16 @@ File: [`index.html`](index.html). A single file, no dependencies, no server. It 
 
 **Tech:** hand-written WebGL (no Three.js), plain JavaScript, Canvas 2D for the charts. The initial computation takes 1–2 seconds on a laptop.
 
+### Mission simulator (`mission.html`, built Saturday 14 Nov)
+
+A second page: a mission from Canada (Spaceport Nova Scotia) to the lunar south pole, crewed or robotic, with up to five landing sites per mission. One file, opens directly in a browser; the weather needs an internet connection.
+
+- **Trajectory and budget:** patched conics (parking orbit, translunar injection, lunar orbit insertion, descent, and the return for the crew); Δv per phase and mass needed in Earth orbit from the rocket equation. Vehicle values are editable.
+- **Real dates:** Sun and Earth positions from Meeus' algorithms with librations, checked against JPL Horizons (Sun within 0.01°, Earth within 0.03°). For each site: Sun and Earth elevation at landing, time to sunset and Earthset, whether a crewed or a robotic landing is viable, the next and best window, and a year strip.
+- **Best launch dates:** the two daily launch times from Nova Scotia when the parking orbit lines up with the Moon, the Δv and propellant for the real Earth–Moon distance on arrival, whether the site is usable at landing, and launch-site weather (Open-Meteo 16-day forecast plus ERA5 statistics 2015–2024). Ranked top 8, one click to use a date.
+- **Views:** 3D trajectory (system, Earth, Moon), south-pole and whole-Moon site maps, a first-person view from the site with the Sun and Earth in the sky.
+- **Limits, stated on the page:** site horizons are assumed (flat, per site) until the engine's LOLA masks (`sites.json`) are plugged in; Artemis region coordinates are reference points of the named features, not official region centres; launch dates come from a simplified model, not a flight trajectory.
+
 ---
 
 ## 5. How the computation works
@@ -329,6 +339,7 @@ The rules allow prior work as long as we declare it and show progress made durin
 |---|---|
 | Prototype, documentation | Claude (AI assistant) |
 | English translation of the UI | Eren |
+| Mission simulator `mission.html` (trajectory, Δv and mass, Sun/Earth at real dates checked against JPL Horizons, best launch dates with Open-Meteo weather), 14 Nov | Claude (AI assistant); Adrian set the requirements and reviewed |
 | _to fill in during the weekend_ | |
 
 ---
