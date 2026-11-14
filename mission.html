@@ -46,6 +46,15 @@ h1{font-family:var(--f-display);font-weight:600;font-size:clamp(32px,4.6vw,50px)
 .lede{max-width:70ch;margin:10px 0 0;color:var(--muted)}
 .navlink{font:500 13px var(--f-mono);color:var(--ink);text-decoration:none;border:1px solid var(--line);padding:7px 11px;border-radius:3px;white-space:nowrap}
 .navlink:hover{border-color:var(--ink)}
+.pages{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--panel)}
+.pages a{font:500 13px/1 var(--f-body);color:var(--ink);text-decoration:none;padding:10px 14px}
+.pages a + a{border-left:1px solid var(--line)}
+.pages a[aria-current="page"]{background:var(--ink);color:var(--bg)}
+.pages a:not([aria-current]):hover{background:var(--line)}
+.prov{margin:0;font:400 12px/1.5 var(--f-mono);color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:7px 10px}
+.fromcal{margin:0;font-size:14px;border-left:3px solid var(--ink);padding:6px 12px;background:var(--panel)}
+.limits{flex-basis:100%;margin:0;font-size:12.5px;color:var(--muted)}
+#watchLand{font-weight:600}
 h2{font-family:var(--f-display);font-weight:600;font-size:22px;line-height:1.1;margin:0;text-wrap:balance}
 h3{font:600 13px/1.3 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;margin:0;color:var(--muted)}
 .caption{font-size:13px;color:var(--muted);margin:0;line-height:1.45}
@@ -194,11 +203,15 @@ canvas.chart{width:100%;display:block}
   <header class="top">
     <div>
       <p class="eyebrow">Peaks of Light · NASA Space Apps 2026 · Lunar Landing Site Navigator</p>
-      <h1>Landing Site &amp; Date Planner</h1>
-      <p class="lede">Pick a launch date from Canada and up to five landing sites per mission. See where the Sun and Earth stand above each site's horizon on the day you land, how long until sunset and Earthset, and whether a crewed or a robotic mission can use the site. If the launch slips, move the date and watch the answer change.</p>
+      <h1>Fly the mission</h1>
+      <p class="lede">Take a landing day from the landing calendar and fly it: launch from Canada, the trip to the Moon, the touchdown, and the sky above the site while you are there. Site numbers use the same JPL Horizons table and LOLA terrain horizons as the calendar, so both pages give the same answer for the same site and day.</p>
     </div>
-    <a class="navlink" href="index.html">← South Pole Navigator</a>
+    <nav class="pages" aria-label="Pages">
+      <a href="index.html">Landing calendar</a><a href="mission.html" aria-current="page">Mission</a>
+    </nav>
   </header>
+  <p class="fromcal" id="fromCal" hidden></p>
+  <p class="prov" id="prov"></p>
 
   <section class="setup" aria-label="Mission setup">
     <div class="seg" role="group" aria-label="Mission shown">
@@ -213,6 +226,9 @@ canvas.chart{width:100%;display:block}
     <button type="button" class="best" id="useBest">Best launch</button>
     <label class="opt" for="tof">Earth → Moon <input id="tof" type="range" min="2.5" max="5" step="0.1"><output id="tofOut" for="tof"></output></label>
     <label class="opt" for="stay"><span id="stayLabel">Surface stay</span> <input id="stay" type="range" min="1" max="30" step="0.25"><output id="stayOut" for="stay"></output></label>
+    <label class="opt" for="mastSel">Mast <select id="mastSel"><option value="0">0 m</option><option value="2" selected>2 m</option><option value="10">10 m</option></select></label>
+    <label class="opt" for="relayChk"><input id="relayChk" type="checkbox"> Relay satellite available</label>
+    <p class="limits" id="limitsLine"></p>
     <p class="landing" id="landingOut"></p>
   </section>
 
@@ -236,6 +252,7 @@ canvas.chart{width:100%;display:block}
           <select id="warp">
             <option value="1">1 h/s</option>
             <option value="6" selected>6 h/s</option>
+            <option value="12">12 h/s</option>
             <option value="24">1 day/s</option>
           </select>
         </label>
@@ -294,6 +311,7 @@ canvas.chart{width:100%;display:block}
         <button type="button" data-look="sun" aria-pressed="false">Look at the Sun</button>
         <button type="button" data-look="earth" aria-pressed="false">Look at Earth</button>
         <button type="button" id="enlarge" aria-pressed="true">Sun &amp; Earth ×3</button>
+        <button type="button" id="watchLand">Watch the landing</button>
       </div>
     </div>
     <div class="rank-head"><h3 id="minisTitle">The same moment at your 5 sites</h3></div>
@@ -344,13 +362,16 @@ canvas.chart{width:100%;display:block}
       <div><dt>Mass</dt><dd>Rocket equation per stage with dry mass as a fraction of propellant. Crewed: capsule + service module (lunar orbit insertion and return), two-stage lander. Robotic: one lander stage. Translunar stage on top. All inputs are editable above.</dd></div>
       <div><dt>Launch site</dt><dd>Spaceport Nova Scotia (45.35° N, 61.02° W) is under development. No heavy-lift rocket is planned there today, so a lunar mission from Canada is hypothetical. Kennedy and Kourou are there for comparison.</dd></div>
       <div><dt>Launch dates and weather</dt><dd>Launch times: the site's latitude must reach the parking-orbit plane that contains the Moon's position on arrival (Moon right ascension and declination from the same ephemeris, sidereal time from the IAU formula). Δv uses the real Earth–Moon distance on arrival. Weather comes live from Open-Meteo: its 16-day forecast and ERA5 reanalysis for 2015–2024 at the launch site. Offline, dates are ranked without weather. Real launch rules also cover upper-level winds, lightning and recovery-zone sea state; those are not modelled.</dd></div>
-      <div><dt>Sites</dt><dd>South pole: NASA's nine Artemis south-pole candidate regions (named for Artemis III in Oct 2024) plus two permanently shadowed craters; coordinates are those of the named feature, so they are reference points, not region centres. Past landings: Apollo, CLPS and other countries' landers at their published landing coordinates.</dd></div>
+      <div><dt>Shared with the landing calendar</dt><dd>Sun and Earth seen from the sites come from the team's JPL Horizons table (DE441, every 6 h, interpolated to each hour). The four published sites (C1, S, MP1, GR1) use the LOLA horizon masks from our engine, at the chosen mast height. A good landing uses the calendar's example limits: sunlight share, Earth contact share, longest night and Sun height at touchdown. Earth counts as visible when any part of its disc clears the terrain; night means the Sun's centre is below the terrain. The trajectory, launch times and the 3D scene use a simplified model (Meeus ephemeris, patched conics) and do not change the site numbers. The landing replay is illustrative: the descent profile is a smooth curve from 1.5 km, shown about 8× faster.</dd></div>
+      <div><dt>Sites</dt><dd>South pole: the four published sites with LOLA terrain horizons (C1 and S from Gläser et al. 2018, MP1 and GR1 from De Rosa et al. 2012), plus the IM-1 and IM-2 landing points. Elsewhere: past landings for reference. Every site except the four published ones uses a flat horizon you can edit in the table (assumed, not measured). Sites you add on the map also use a flat horizon.</dd></div>
     </dl>
     <p class="caption">Sources: <a href="https://ntrs.nasa.gov/citations/20250011660" target="_blank" rel="noopener">NASA NTRS 20250011660 (Artemis candidate regions and criteria)</a> · <a href="https://ssd.jpl.nasa.gov/horizons/" target="_blank" rel="noopener">JPL Horizons (validation)</a> · <a href="https://en.wikipedia.org/wiki/List_of_artificial_objects_on_the_Moon" target="_blank" rel="noopener">Landing coordinates</a> · <a href="https://www.nasa.gov/missions/lro/nasas-lro-images-intuitive-machines-odysseus-lander/" target="_blank" rel="noopener">IM-1 landing site (LRO)</a> · <a href="https://en.wikipedia.org/wiki/Mons_Mouton" target="_blank" rel="noopener">Mons Mouton / IM-2</a> · <a href="https://spaceodysseyhub.com/compare/spaceports/spaceport-nova-scotia" target="_blank" rel="noopener">Spaceport Nova Scotia</a> · <a href="https://open-meteo.com/en/docs" target="_blank" rel="noopener">Open-Meteo forecast</a> · <a href="https://open-meteo.com/en/docs/historical-weather-api" target="_blank" rel="noopener">Open-Meteo historical (ERA5)</a></p>
   </section>
 </div>
 
 <script>
+/* the page boots after its two data files are in: embedded copies (offline build) or data/*.json next to the page */
+function __boot(){
 (function(){
 'use strict';
 
@@ -367,16 +388,7 @@ var LAUNCH_SITES = [
 ];
 /* kind → assumed local horizon in degrees (negative = you see below the flat horizon from a high point) */
 var SITES = [
-  {id: 'cabeusB', g: 'Artemis candidate region', name: 'Peak near Cabeus B', lat: -82.4, lon: -53.0, kind: 'peak', horizon: -1.0, ref: 'Cabeus B crater centre'},
-  {id: 'haworth', g: 'Artemis candidate region', name: 'Haworth', lat: -86.9, lon: -4.0, kind: 'rim', horizon: 0.5, ref: 'Haworth crater centre'},
-  {id: 'malapert', g: 'Artemis candidate region', name: 'Malapert Massif', lat: -86.0, lon: 0.0, kind: 'peak', horizon: -2.0, ref: 'Approx.: SW rim of Malapert, peak near 0° lon'},
-  {id: 'moutonPl', g: 'Artemis candidate region', name: 'Mons Mouton Plateau', lat: -84.7906, lon: 29.1958, kind: 'plateau', horizon: 0.0, ref: 'IM-2 Athena landing point (6 Mar 2025)'},
-  {id: 'mouton', g: 'Artemis candidate region', name: 'Mons Mouton', lat: -84.6, lon: 31.0, kind: 'peak', horizon: -2.0, ref: 'Summit; VIPER target area'},
-  {id: 'nobile', g: 'Artemis candidate region', name: 'Nobile Rim', lat: -85.28, lon: 53.27, kind: 'rim', horizon: 0.5, ref: 'Nobile crater centre'},
-  {id: 'gerlache', g: 'Artemis candidate region', name: 'de Gerlache Rim 2', lat: -88.5, lon: -87.1, kind: 'rim', horizon: 0.5, ref: 'de Gerlache crater centre'},
-  {id: 'slater', g: 'Artemis candidate region', name: 'Slater Plain', lat: -88.08, lon: 111.29, kind: 'plain', horizon: 1.0, ref: 'Slater crater centre'},
-  {id: 'shackleton', g: 'South pole science', name: 'Shackleton floor (ice)', lat: -89.67, lon: 129.78, kind: 'shadowed crater', horizon: 15.0, ref: 'Shackleton crater centre'},
-  {id: 'cabeus', g: 'South pole science', name: 'Cabeus floor (ice)', lat: -84.9, lon: -35.5, kind: 'shadowed crater', horizon: 10.0, ref: 'Cabeus crater centre (LCROSS impact area)'},
+  {id: 'moutonPl', g: 'Past landing', name: 'Mons Mouton Plateau', lat: -84.7906, lon: 29.1958, kind: 'plateau', horizon: 0.0, ref: 'IM-2 Athena landing point (6 Mar 2025)'},
   {id: 'im1', g: 'CLPS / commercial', name: 'IM-1 Odysseus', lat: -80.13, lon: 1.44, kind: 'landing site', horizon: 0.5, ref: 'Landed 22 Feb 2024 (LRO)'},
   {id: 'bg1', g: 'CLPS / commercial', name: 'Blue Ghost M1', lat: 18.5622, lon: 61.8103, kind: 'landing site', horizon: 0.0, ref: 'Mare Crisium, landed 2 Mar 2025'},
   {id: 'ch3', g: 'Other countries', name: 'Chandrayaan-3 (India)', lat: -69.3731, lon: 32.3189, kind: 'landing site', horizon: 0.5, ref: 'Vikram lander, 23 Aug 2023'},
@@ -387,9 +399,16 @@ var SITES = [
   {id: 'a15', g: 'Apollo', name: 'Apollo 15', lat: 26.1322, lon: 3.6339, kind: 'landing site', horizon: 1.0, ref: 'Hadley–Apennine, 1971'},
   {id: 'a17', g: 'Apollo', name: 'Apollo 17', lat: 20.1908, lon: 30.7717, kind: 'landing site', horizon: 1.0, ref: 'Taurus–Littrow valley, 1972'}
 ];
+/* the four published sites with LOLA horizon masks from the team's engine (data/sites.json, ids A-D) */
+SITES.unshift(
+  {id: 'C1', eng: 'A', g: 'Published site', name: 'Connecting Ridge (C1)', lat: -89.4505, lon: -137.16, kind: 'ridge', horizon: 0, ref: 'Gläser et al. 2018, site C1'},
+  {id: 'S', eng: 'B', g: 'Published site', name: 'Shackleton rim (S)', lat: -89.7849, lon: -156.03, kind: 'rim', horizon: 0, ref: 'Gläser et al. 2018, site S'},
+  {id: 'MP1', eng: 'D', g: 'Published site', name: 'Malapert massif (MP1)', lat: -85.9756, lon: -2.1124, kind: 'massif', horizon: 0, ref: 'De Rosa et al. 2012, MP1'},
+  {id: 'GR1', eng: 'C', g: 'Published site', name: 'de Gerlache rim (GR1)', lat: -88.6952, lon: -68.2846, kind: 'rim', horizon: 0, ref: 'De Rosa et al. 2012, GR1'}
+);
 var DEFAULT_PICKS = {
-  crewed: ['malapert', 'mouton', 'haworth', 'nobile', 'gerlache'],
-  robotic: ['moutonPl', 'cabeusB', 'slater', 'shackleton', 'cabeus']
+  crewed: ['C1', 'S', 'MP1', 'GR1'],
+  robotic: ['C1', 'S', 'MP1', 'GR1']
 };
 var PROFILES = {
   crewed: {
@@ -400,7 +419,7 @@ var PROFILES = {
     eng: {tli: {isp: 450, k: 0.12}, sm: {isp: 316, k: 0.25}, desc: {isp: 345, k: 0.20}, asc: {isp: 320, k: 0.25}}
   },
   robotic: {
-    label: 'Robotic', tof: 5.0, stay: 14, stayMin: 1, stayMax: 60, stayLabel: 'Surface mission',
+    label: 'Robotic', tof: 5.0, stay: 13, stayMin: 1, stayMax: 60, stayLabel: 'Surface mission',
     parkingAlt: 185, lloAlt: 100, lloBefore: 1.5,
     midcourse: 0.03, descentLoss: 0.25, hover: 0.04, reserve: 0.05,
     mass: {rover: 0.5},
@@ -653,18 +672,65 @@ var EPH = (function(){
   }
   return {at: at, jd: jd};
 })();
+/* ---------- team data: JPL Horizons table + LOLA horizon masks (the same files as the landing calendar) ---------- */
+var HZD = null, MASKS = null, MASKMETA = null;
+try { HZD = JSON.parse(document.getElementById('data-subpoints').textContent); } catch (err) {}
+try { var SJ = JSON.parse(document.getElementById('data-sites').textContent); MASKS = {}; SJ.sites.forEach(function(o){ MASKS[o.id] = o; }); MASKMETA = {generated: SJ.generated_utc, versions: SJ.versions}; } catch (err) {}
+var mast = '2', relay = false, SUN_R = 0.2666, EARTH_R = 0.95;
+/* Moon-centred Earth and Sun position (km, MOON_ME frame) at time ms: 4-point cubic on the 6 h Horizons table */
+function horizonsAt(ms){
+  if (!HZD) return null;
+  var jdv = ms/86400000 + 2440587.5, f = (jdv - HZD.jd0)/(HZD.step_hours/24), i = Math.floor(f), u = f - i;
+  if (i < 1 || i > HZD.n - 3) return null;
+  var w = [-u*(u - 1)*(u - 2)/6, (u + 1)*(u - 1)*(u - 2)/2, -(u + 1)*u*(u - 2)/2, (u + 1)*u*(u - 1)/6], e = [0, 0, 0], sn = [0, 0, 0];
+  for (var k = 0; k < 4; k++){ var r = (i - 1 + k)*3; for (var c = 0; c < 3; c++){ e[c] += w[k]*HZD.earth_km[r + c]; sn[c] += w[k]*HZD.sun_1000km[r + c]*1000; } }
+  return {earth: e, sun: sn};
+}
+function maskOf(st){ var m = st.eng && MASKS && MASKS[st.eng] && MASKS[st.eng].masks; return m ? (m[mast] || null) : null; }
+/* terrain horizon (deg) toward azimuth az; mask bin k covers [k, k+1) deg and is looked up between bin centres */
+function hzAt(st, az){
+  var m = st._mask; if (!m) return st.horizon;
+  var a = ((az - 0.5) % 360 + 360) % 360, i0 = Math.floor(a), fr = a - i0;
+  return m[i0 % 360]*(1 - fr) + m[(i0 + 1) % 360]*fr;
+}
+function prepSite(st){ st._mask = maskOf(st); st._mastKey = st._mask ? mast : '-'; return st; }
+function hzLabel(st){ prepSite(st); return st._mask ? 'LOLA horizon, ' + mast + ' m mast' : 'flat horizon ' + sgn(st.horizon, 1) + '° (assumed)'; }
+/* visible fraction of the Sun's disc when its centre is alt degrees above the terrain (chord area, as the engine) */
+function sunFrac(alt){ var u = clamp(-alt/SUN_R, -1, 1); return (Math.acos(u) - u*Math.sqrt(1 - u*u))/Math.PI; }
+/* a good landing: the same example limits as the landing calendar (not NASA requirements) */
+var LIMITS = {
+  crewed: {sun: 95, earth: 50, night: 0, td: 0},
+  robotic: {sun: 70, earth: 50, night: 48, td: 0}
+};
+function failText(ev, key){
+  var L = LIMITS[key];
+  return ev.fail.map(function(f){
+    return f === 'sun' ? 'too little sun (' + Math.round(ev.sun) + '%, needs ' + L.sun + '%)'
+      : f === 'earth' ? 'too little Earth contact (' + Math.round(ev.earth) + '%, needs ' + L.earth + '%)'
+      : f === 'night' ? 'a ' + Math.round(ev.night) + ' h night (limit ' + L.night + ' h)'
+      : 'Sun ' + sgn(ev.td, 1) + '° at touchdown (needs ' + sgn(L.td, 1) + '°)';
+  }).join(', ');
+}
 var TAB = null, seriesCache = {};
 function buildTable(t0){
   if (TAB && TAB.t0 === t0) return;
-  var n = MODEL.tableDays*24, su = new Float32Array(n*3), eu = new Float32Array(n*3), ed = new Float32Array(n);
+  var n = MODEL.tableDays*24, su = new Float32Array(n*3), eu = new Float32Array(n*3), ed = new Float32Array(n), fromH = 0;
   for (var i = 0; i < n; i++){
+    var hz = horizonsAt(t0 + i*3600000);
+    if (hz){
+      var sl = Math.hypot(hz.sun[0], hz.sun[1], hz.sun[2]), el2 = Math.hypot(hz.earth[0], hz.earth[1], hz.earth[2]);
+      su[i*3] = hz.sun[0]/sl; su[i*3 + 1] = hz.sun[1]/sl; su[i*3 + 2] = hz.sun[2]/sl;
+      eu[i*3] = hz.earth[0]/el2; eu[i*3 + 1] = hz.earth[1]/el2; eu[i*3 + 2] = hz.earth[2]/el2;
+      ed[i] = el2; fromH++; continue;
+    }
     var e = EPH.at(new Date(t0 + i*3600000)), a = e.sun, b = e.earth;
     var ca = Math.cos(a.lat*DEG), cb = Math.cos(b.lat*DEG);
     su[i*3] = ca*Math.cos(a.lon*DEG); su[i*3 + 1] = ca*Math.sin(a.lon*DEG); su[i*3 + 2] = Math.sin(a.lat*DEG);
     eu[i*3] = cb*Math.cos(b.lon*DEG); eu[i*3 + 1] = cb*Math.sin(b.lon*DEG); eu[i*3 + 2] = Math.sin(b.lat*DEG);
     ed[i] = b.dist;
   }
-  TAB = {t0: t0, n: n, su: su, eu: eu, ed: ed};
+  TAB = {t0: t0, n: n, su: su, eu: eu, ed: ed, horizons: fromH === n, fromH: fromH};
+  window.__tab0 = t0;
   seriesCache = {};
 }
 function siteFrame(s){
@@ -681,54 +747,80 @@ function skyAt(s, i, fr){
           earthEl: Math.asin(clamp(dot(de, fr.n)/dl, -1, 1))/DEG, earthAz: (Math.atan2(dot(de, fr.e), dot(de, fr.no))/DEG + 360) % 360};
 }
 function siteSeries(s){
-  var key = s.id + '|' + s.lat + '|' + s.lon + '|' + s.horizon;
+  prepSite(s);
+  var key = s.id + '|' + s.lat + '|' + s.lon + '|' + s.horizon + '|' + s._mastKey;
   if (seriesCache[key]) return seriesCache[key];
-  var n = TAB.n, N0 = siteFrame(s).n, RM = C.RM;
-  var sunEl = new Float32Array(n), earthEl = new Float32Array(n), sunF = new Float32Array(n), sunOK = new Uint8Array(n), earthOK = new Uint8Array(n);
+  var n = TAB.n, fr = siteFrame(s), N0 = fr.n, E0 = fr.e, NO = fr.no, RM = C.RM;
+  var sunEl = new Float32Array(n), earthEl = new Float32Array(n), sunAlt = new Float32Array(n), earthAlt = new Float32Array(n);
+  var sunF = new Float32Array(n), sunOK = new Uint8Array(n), earthOK = new Uint8Array(n), runs = [], rs = -1;
   for (var i = 0; i < n; i++){
-    var k = i*3, us = TAB.su[k]*N0[0] + TAB.su[k + 1]*N0[1] + TAB.su[k + 2]*N0[2];
-    var ue = TAB.eu[k]*N0[0] + TAB.eu[k + 1]*N0[1] + TAB.eu[k + 2]*N0[2], D = TAB.ed[i];
-    var se = Math.asin(clamp(us, -1, 1))/DEG, ee = Math.asin(clamp((D*ue - RM)/Math.sqrt(D*D - 2*D*RM*ue + RM*RM), -1, 1))/DEG;
+    var k = i*3, a = TAB.su[k], b = TAB.su[k + 1], c = TAB.su[k + 2], D = TAB.ed[i];
+    var se = Math.asin(clamp(a*N0[0] + b*N0[1] + c*N0[2], -1, 1))/DEG;
+    var saz = Math.atan2(a*E0[0] + b*E0[1] + c*E0[2], a*NO[0] + b*NO[1] + c*NO[2])/DEG;
+    var dx = TAB.eu[k]*D - N0[0]*RM, dy = TAB.eu[k + 1]*D - N0[1]*RM, dz = TAB.eu[k + 2]*D - N0[2]*RM, dl = Math.sqrt(dx*dx + dy*dy + dz*dz);
+    var ee = Math.asin(clamp((dx*N0[0] + dy*N0[1] + dz*N0[2])/dl, -1, 1))/DEG;
+    var eaz = Math.atan2(dx*E0[0] + dy*E0[1] + dz*E0[2], dx*NO[0] + dy*NO[1] + dz*NO[2])/DEG;
     sunEl[i] = se; earthEl[i] = ee;
-    var rs = se - s.horizon, re = ee - s.horizon;
-    sunF[i] = clamp((rs + C.sunR)/(2*C.sunR), 0, 1); sunOK[i] = rs > C.sunR ? 1 : 0; earthOK[i] = re > 0 ? 1 : 0;
+    var sa = se - hzAt(s, saz), ea = ee - hzAt(s, eaz);
+    sunAlt[i] = sa; earthAlt[i] = ea;
+    sunF[i] = sunFrac(sa); sunOK[i] = sa > 0 ? 1 : 0; earthOK[i] = ea > -EARTH_R ? 1 : 0;
+    if (!sunOK[i]){ if (rs < 0) rs = i; } else if (rs >= 0){ runs.push(rs, i); rs = -1; }
   }
-  var res = {sunEl: sunEl, earthEl: earthEl, sunF: sunF, sunOK: sunOK, earthOK: earthOK};
+  if (rs >= 0) runs.push(rs, n);
+  var cs = new Float64Array(n + 1), ce = new Float64Array(n + 1);
+  for (i = 0; i < n; i++){ cs[i + 1] = cs[i] + sunF[i]; ce[i + 1] = ce[i] + earthOK[i]; }
+  var res = {sunEl: sunEl, earthEl: earthEl, sunAlt: sunAlt, earthAlt: earthAlt, sunF: sunF, sunOK: sunOK, earthOK: earthOK, runs: Int32Array.from(runs), cs: cs, ce: ce};
   seriesCache[key] = res;
   return res;
+}
+/* landing at table hour i for S hours: sunlight %, Earth contact %, longest night (h), Sun height at touchdown, failed limits */
+function evalAt(Y, i, S, key){
+  var L = LIMITS[key], n = Y.sunF.length;
+  if (i < 0 || i + S > n) return null;
+  var sun = (Y.cs[i + S] - Y.cs[i])/S*100, earth = (Y.ce[i + S] - Y.ce[i])/S*100;
+  var runs = Y.runs, nr = runs.length/2, lo = 0, hi = nr;
+  while (lo < hi){ var mid = (lo + hi) >> 1; if (runs[mid*2 + 1] <= i) lo = mid + 1; else hi = mid; }
+  var night = 0, clipped = false;
+  for (var r = lo; r < nr; r++){
+    var a = runs[r*2], b = runs[r*2 + 1]; if (a >= i + S) break;
+    var l = Math.min(b, i + S) - Math.max(a, i); if (l > night){ night = l; clipped = a < i || b > i + S; }
+  }
+  var td = Y.sunAlt[i], fail = [];
+  if (sun < L.sun) fail.push('sun');
+  if (!relay && earth < L.earth) fail.push('earth');
+  if (night > L.night) fail.push('night');
+  if (td < L.td) fail.push('td');
+  return {sun: sun, earth: earth, night: night, clipped: clipped, td: td, fail: fail, ok: fail.length === 0};
 }
 function landIndex(k){ return Math.round(missionTimes(k).land*24 + (launchMs - TAB.t0)/3600000); }
 function runLen(arr, i, want, max){ var j = i; while (j < max && arr[j] === want) j++; return j - i; }
 function analyse(site, key){
   var Y = siteSeries(site), P = PROFILES[key], S = Math.max(1, Math.round(P.stay*24)), n = TAB.n;
   var iL = clamp(landIndex(key), 0, n - S - 1), end = Math.min(n - S, iL + MODEL.year*24);
-  var noSun = new Int32Array(n + 1), earthC = new Int32Array(n + 1), sunC = new Float64Array(n + 1);
-  for (var i = 0; i < n; i++){ noSun[i + 1] = noSun[i] + (Y.sunOK[i] ? 0 : 1); earthC[i + 1] = earthC[i] + Y.earthOK[i]; sunC[i + 1] = sunC[i] + Y.sunF[i]; }
-  function ok(s){ return key === 'crewed' ? (noSun[s + S] - noSun[s] === 0 && Y.earthOK[s] === 1) : (Y.sunOK[s] === 1 && Y.earthOK[s] === 1); }
-  function val(s){ return key === 'crewed' ? (earthC[s + S] - earthC[s])/S : (sunC[s + S] - sunC[s])/S; }
   var valid = new Uint8Array(n), best = -1, bestVal = -1, windows = 0, prev = 0, next = -1;
   for (var s = iL; s < end; s++){
-    var o = ok(s); valid[s] = o ? 1 : 0;
+    var ev = evalAt(Y, s, S, key), o = !!(ev && ev.ok); valid[s] = o ? 1 : 0;
     if (o && !prev) windows++;
     prev = o ? 1 : 0;
     if (o && next < 0) next = s;
-    if (o){ var v = val(s); if (v > bestVal){ bestVal = v; best = s; } }
+    if (o){ var v = (key === 'crewed' ? ev.earth : ev.sun)/100; if (v > bestVal){ bestVal = v; best = s; } }
   }
   var yEnd = Math.min(n, iL + MODEL.year*24), sS = 0, sE = 0, run = 0, longest = 0;
-  for (var q = iL; q < yEnd; q++){ sS += Y.sunF[q]; sE += Y.earthOK[q]; if (Y.sunF[q] < 0.5){ run++; if (run > longest) longest = run; } else run = 0; }
+  for (var q = iL; q < yEnd; q++){ sS += Y.sunF[q]; sE += Y.earthOK[q]; if (!Y.sunOK[q]){ run++; if (run > longest) longest = run; } else run = 0; }
   var yl = Math.max(1, yEnd - iL), sunYear = sS/yl, earthYear = sE/yl, night = longest/24;
   var look = Math.min(n, iL + 60*24);
-  var at = {sunEl: Y.sunEl[iL], earthEl: Y.earthEl[iL], sunUp: Y.sunOK[iL] === 1, earthUp: Y.earthOK[iL] === 1};
+  var at = {sunEl: Y.sunEl[iL], earthEl: Y.earthEl[iL], sunAlt: Y.sunAlt[iL], earthAlt: Y.earthAlt[iL], sunUp: Y.sunOK[iL] === 1, earthUp: Y.earthOK[iL] === 1};
   at.sunNext = runLen(Y.sunOK, iL, Y.sunOK[iL], look); at.sunCapped = iL + at.sunNext >= look;
   at.earthNext = runLen(Y.earthOK, iL, Y.earthOK[iL], look); at.earthCapped = iL + at.earthNext >= look;
-  var minSun = 99; for (var m = iL; m < iL + S; m++) minSun = Math.min(minSun, Y.sunEl[m] - site.horizon);
-  var stay = {sun: (sunC[iL + S] - sunC[iL])/S, earth: (earthC[iL + S] - earthC[iL])/S, minSun: minSun};
+  var minSun = 99; for (var m = iL; m < iL + S; m++) minSun = Math.min(minSun, Y.sunAlt[m]);
+  var evL = evalAt(Y, iL, S, key) || {sun: 0, earth: 0, night: 0, td: 0, fail: ['sun'], ok: false};
+  var stay = {sun: evL.sun/100, earth: evL.earth/100, minSun: minSun, night: evL.night};
   var W = SCORE[key], score;
   if (key === 'crewed') score = windows === 0 ? 0 : W.windows*Math.min(1, windows/W.windowsFull) + W.earthStay*Math.max(0, bestVal) + W.sunYear*sunYear;
   else score = windows === 0 ? 0 : W.sunYear*sunYear + W.earthYear*earthYear + W.night*(1 - Math.min(1, night/W.nightFull));
   return {site: site, key: key, Y: {sunYear: sunYear, earthYear: earthYear, night: night, sunF: Y.sunF, earthOK: Y.earthOK},
           valid: valid, windows: windows, best: best, bestVal: Math.max(0, bestVal), next: next, iL: iL, S: S,
-          at: at, stay: stay, viable: ok(iL), score: score};
+          at: at, stay: stay, ev: evL, viable: evL.ok, score: score};
 }
 function tabTime(i){ return TAB.t0 + i*3600000; }
 var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -1196,7 +1288,7 @@ function renderRanks(){
       var earthTxt = (A.earthUp ? 'Earthset in ' : 'Earthrise in ') + (A.earthCapped ? '> 60 d' : dh(A.earthNext));
       var verdict = r.viable
         ? '<span class="verdict ok">✓ Viable for a landing on ' + fmtDate(landMs, false) + '</span>'
-        : '<span class="verdict bad">✗ Not viable on ' + fmtDate(landMs, false) + (r.next >= 0 ? ' · next window ' + fmtDate(tabTime(r.next), false) + ' (+' + t1((r.next - r.iL)/24) + ' d)' : ' · no window in the next year') + '</span>';
+        : '<span class="verdict bad">✗ Not viable on ' + fmtDate(landMs, false) + ': ' + failText(r.ev, k) + (r.next >= 0 ? ' · next window ' + fmtDate(tabTime(r.next), false) + ' (+' + t1((r.next - r.iL)/24) + ' d)' : ' · no window in the next year') + '</span>';
       li.innerHTML = '<span class="rnum">' + (i + 1) + '</span><span class="rname"></span>' +
         '<span class="rscore">' + Math.round(r.score) + '<small>score</small></span>' +
         '<span class="status"><span class="chip ' + (A.sunUp ? 'up' : 'down') + '">Sun <b class="big">' + sgn(A.sunEl, 1) + '°</b></span><span>' + sunTxt + '</span>' +
@@ -1208,7 +1300,7 @@ function renderRanks(){
         '<span>longest night <b>' + (Y.night >= 364 ? 'all year' : t1(Y.night) + ' d') + '</b></span></span>';
       var rn = li.querySelector('.rname');
       var nm = document.createElement('span'); nm.textContent = r.site.name; rn.appendChild(nm);
-      var sm = document.createElement('small'); sm.textContent = fmt(r.site.lat, 2) + '°, ' + fmt(r.site.lon, 2) + '° · ' + (r.site.g || '') + ' · horizon ' + sgn(r.site.horizon, 1) + '° (assumed)'; rn.appendChild(sm);
+      var sm = document.createElement('small'); sm.textContent = fmt(r.site.lat, 2) + '°, ' + fmt(r.site.lon, 2) + '° · ' + (r.site.g || '') + ' · ' + hzLabel(r.site); rn.appendChild(sm);
       var btns = document.createElement('span'); btns.className = 'btns';
       function btn(label, fn, primary){ var b = document.createElement('button'); b.type = 'button'; b.className = 'fly'; if (primary) b.style.cssText = ''; b.textContent = label; b.addEventListener('click', fn); btns.appendChild(b); }
       btn(target[k] === r.site.id && active === k ? 'Shown in the simulation' : 'Show in the simulation', function(){ target[k] = r.site.id; setActive(k); });
@@ -1294,7 +1386,7 @@ function renderSitesTable(){
       '<td><input type="checkbox" class="robotcol" data-k="robotic" aria-label="Robotic pick"' + (picks.robotic.indexOf(s.id) >= 0 ? ' checked' : '') + '></td>' +
       '<td><span class="nm"></span><br><small>' + (s.g ? s.g + ' · ' : '') + s.kind + '</small></td>' +
       '<td class="num">' + fmt(s.lat, 2) + '</td><td class="num">' + fmt(s.lon, 2) + '</td>' +
-      '<td class="num"><input type="number" step="0.5" value="' + s.horizon + '" aria-label="Local horizon in degrees"></td>' +
+      '<td class="num">' + (prepSite(s)._mask ? '<small>LOLA</small>' : '<input type="number" step="0.5" value="' + s.horizon + '" aria-label="Local horizon in degrees">') + '</td>' +
       '<td class="num">' + pct(Y.sunYear) + '</td><td class="num">' + pct(Y.earthYear) + '</td><td class="num">' + (Y.night >= 364 ? 'all year' : t1(Y.night) + ' d') + '</td>' +
       '<td><small class="rf"></small></td>' +
       '<td>' + (s.custom ? '<button type="button" class="del" aria-label="Remove custom site">×</button>' : '') + '</td></tr>');
@@ -1312,7 +1404,8 @@ function renderSitesTable(){
         recompute(); renderAll();
       });
     });
-    tr.querySelector('input[type=number]').addEventListener('change', function(e){ var v = parseFloat(e.target.value); if (isFinite(v)){ s.horizon = v; recompute(); renderAll(); } });
+    var hin = tr.querySelector('input[type=number]');
+    if (hin) hin.addEventListener('change', function(e){ var v = parseFloat(e.target.value); if (isFinite(v)){ s.horizon = v; recompute(); renderAll(); } });
     var del = tr.querySelector('.del');
     if (del) del.addEventListener('click', function(){
       SITES.splice(SITES.indexOf(s), 1);
@@ -1372,7 +1465,9 @@ function drawSky(){
   if (!R){ $('#skyWho').textContent = 'the site'; $('#skyCaption').textContent = 'Pick a site to see its sky.'; return; }
   var s = R.site, fr = siteFrame(s), S = R.S, iL = R.iL, step = S > 240 ? 6 : 2;
   var K = {ink: tok('--ink'), muted: tok('--muted'), line: tok('--line'), sun: tok('--sun-fill'), earth: tok('--earth-fill'), sunT: tok('--sun'), earthT: tok('--earth'), mono: tok('--f-mono'), sky: tok('--panel'), ground: tok('--line')};
-  var sunP = [], earP = [], hi = s.horizon + 4, lo = Math.min(-4, s.horizon - 2);
+  prepSite(s);
+  var pMin = 99, pMax = -99; for (var pa = 0; pa < 360; pa += 2){ var pv = hzAt(s, pa); pMin = Math.min(pMin, pv); pMax = Math.max(pMax, pv); }
+  var sunP = [], earP = [], hi = pMax + 4, lo = Math.min(-4, pMin - 2);
   for (var i = iL; i <= iL + S; i += step){ var k = skyAt(s, i, fr); sunP.push([k.sunAz, k.sunEl, i]); earP.push([k.earthAz, k.earthEl, i]); hi = Math.max(hi, k.sunEl + 2, k.earthEl + 2); }
   var yMax = clamp(Math.ceil(hi), 6, 90), yMin = Math.max(-12, Math.floor(lo));
   var nowI = clamp(Math.round((launchMs - TAB.t0)/3600000 + met/3600), iL, iL + S), now = skyAt(s, nowI, fr);
@@ -1383,8 +1478,12 @@ function drawSky(){
   var st = (yMax - yMin) > 40 ? 15 : (yMax - yMin) > 16 ? 5 : 2;
   c.font = '500 10.5px ' + K.mono; c.textAlign = 'right'; c.textBaseline = 'middle';
   for (var g = Math.ceil(yMin/st)*st; g <= yMax; g += st){ c.strokeStyle = K.line; c.lineWidth = 1; c.beginPath(); c.moveTo(pl, Yv(g) + 0.5); c.lineTo(pl + pw, Yv(g) + 0.5); c.stroke(); c.fillStyle = K.muted; c.fillText((g > 0 ? '+' : g < 0 ? '−' : '') + Math.abs(g) + '°', pl - 5, Yv(g)); }
-  c.globalAlpha = 0.85; c.fillStyle = K.ground; c.fillRect(pl, Yv(s.horizon), pw, pt + ph - Yv(s.horizon)); c.globalAlpha = 1;
-  c.strokeStyle = K.ink; c.lineWidth = 1.2; c.beginPath(); c.moveTo(pl, Yv(s.horizon) + 0.5); c.lineTo(pl + pw, Yv(s.horizon) + 0.5); c.stroke();
+  c.beginPath(); c.moveTo(pl, pt + ph);
+  for (var xx = 0; xx <= pw; xx += 2) c.lineTo(pl + xx, Yv(hzAt(s, xx/pw*360 - 180)));
+  c.lineTo(pl + pw, pt + ph); c.closePath(); c.globalAlpha = 0.85; c.fillStyle = K.ground; c.fill(); c.globalAlpha = 1;
+  c.strokeStyle = K.ink; c.lineWidth = 1.2; c.beginPath();
+  for (xx = 0; xx <= pw; xx += 2){ var yy0 = Yv(hzAt(s, xx/pw*360 - 180)) + 0.5; if (xx) c.lineTo(pl + xx, yy0); else c.moveTo(pl, yy0); }
+  c.stroke();
   c.setLineDash([3, 3]); c.strokeStyle = K.muted; c.beginPath(); c.moveTo(pl, Yv(0) + 0.5); c.lineTo(pl + pw, Yv(0) + 0.5); c.stroke(); c.setLineDash([]);
   function track(P, color){
     c.strokeStyle = color; c.lineWidth = 2; c.beginPath(); var started = false, px = 0;
@@ -1399,13 +1498,13 @@ function drawSky(){
     c.font = '600 11px ' + K.mono; c.textBaseline = 'middle'; var tw = c.measureText(label).width, tx = x + 10;
     c.textAlign = 'left'; if (tx + tw > pl + pw) tx = x - 10 - tw; c.fillStyle = txtCol; c.fillText(label, tx, yy - (el > yMax || el < yMin ? 0 : 0));
   }
-  body(now.earthAz, now.earthEl, K.earth, 'Earth ' + sgn(now.earthEl, 1) + '°' + (now.earthEl < yMin ? ' (below)' : ''), now.earthEl - s.horizon > 0, K.earthT);
-  body(now.sunAz, now.sunEl, K.sun, 'Sun ' + sgn(now.sunEl, 1) + '°', now.sunEl - s.horizon > C.sunR, K.sunT);
+  body(now.earthAz, now.earthEl, K.earth, 'Earth ' + sgn(now.earthEl, 1) + '°' + (now.earthEl < yMin ? ' (below)' : ''), now.earthEl - hzAt(s, now.earthAz) > -EARTH_R, K.earthT);
+  body(now.sunAz, now.sunEl, K.sun, 'Sun ' + sgn(now.sunEl, 1) + '°', now.sunEl - hzAt(s, now.sunAz) > 0, K.sunT);
   c.strokeStyle = K.line; c.strokeRect(pl + 0.5, pt + 0.5, pw - 1, ph - 1);
   c.font = '500 10.5px ' + K.mono; c.fillStyle = K.muted; c.textBaseline = 'top';
   [[-180, 'S'], [-90, 'W'], [0, 'N'], [90, 'E'], [180, 'S']].forEach(function(o){ var x = pl + (o[0] + 180)/360*pw; c.textAlign = o[0] === -180 ? 'left' : o[0] === 180 ? 'right' : 'center'; c.fillText(o[1] + (o[0] === 0 ? ' (lunar north)' : ''), x, pt + ph + 6); });
   $('#skyWho').textContent = s.name;
-  $('#skyCaption').textContent = 'Tracks over the ' + (active === 'crewed' ? 'stay' : 'mission') + ' from ' + fmtDate(tabTime(iL), false) + ' (dot = landing). Circles: ' + fmtDate(tabTime(nowI)) + '. Grey: assumed flat horizon at ' + sgn(s.horizon, 1) + '°; dashed: 0°.';
+  $('#skyCaption').textContent = 'Tracks over the ' + (active === 'crewed' ? 'stay' : 'mission') + ' from ' + fmtDate(tabTime(iL), false) + ' (dot = landing). Circles: ' + fmtDate(tabTime(nowI)) + '. Grey: ' + (s._mask ? 'LOLA terrain horizon (' + mast + ' m mast)' : 'assumed flat horizon at ' + sgn(s.horizon, 1) + '°') + '; dashed: 0°.';
 }
 /* =====================================================================
    first-person view from the landing site
@@ -1445,18 +1544,22 @@ function phaseDisk(c, x, y, r, k, theta){
 }
 /* draws the panorama; returns the sky state used */
 function drawPanorama(c, w, h, site, fi, o){
+  prepSite(site);
   var fr = siteFrame(site), sk = skyInterp(site, fi, fr), mini = !!o.mini;
   var centerAz = o.az, fov = o.fov, pxDeg = w/fov, yH = h*(mini ? 0.66 : 0.72);
   function X(az){ return w/2 + wrap180(az - centerAz)*pxDeg; }
   function Y(el){ return yH - el*pxDeg; }
-  var sunUp = sk.sunEl - site.horizon > -C.sunR, earthUp = sk.earthEl - site.horizon > 0;
-  var sunLit = clamp((sk.sunEl - site.horizon + C.sunR)/(2*C.sunR), 0, 1);
+  function skyY(x){ return Y(hzAt(site, centerAz + (x - w/2)/pxDeg)); }
+  var sunAlt = sk.sunEl - hzAt(site, sk.sunAz), earthAlt = sk.earthEl - hzAt(site, sk.earthAz);
+  var sunLit = sunFrac(sunAlt), sunUp = sunLit > 0, sunCentre = sunAlt > 0, earthUp = earthAlt > -EARTH_R;
+  var prof = [], pst = mini ? 3 : 2, yLow = 0;
+  for (var px = 0; px <= w + pst; px += pst){ var py = skyY(px); prof.push(px, py); if (py > yLow) yLow = py; }
   // sky (no atmosphere: black)
   c.fillStyle = '#000'; c.fillRect(0, 0, w, h);
   var rot = (fi/24)*360/C.siderealMonth;
   for (var i = 0; i < SKYSTARS.length; i++){
     var st = SKYSTARS[i], sx = X(st[0] + rot), sy = Y(st[1]*0.9 + 0.5);
-    if (sx < 0 || sx > w || sy > Y(site.horizon)) continue;
+    if (sx < 0 || sx > w || sy > skyY(sx)) continue;
     c.globalAlpha = 0.25 + st[2]*0.6; c.fillStyle = '#DCE6F2'; c.fillRect(sx, sy, st[2] > 0.92 ? 1.6 : 1, st[2] > 0.92 ? 1.6 : 1);
   }
   c.globalAlpha = 1;
@@ -1475,11 +1578,14 @@ function drawPanorama(c, w, h, site, fi, o){
   var theta = Math.atan2(-(sk.sunEl - sk.earthEl), wrap180(sk.sunAz - sk.earthAz));
   if (Math.abs(wrap180(sk.earthAz - centerAz)) < fov/2 + 10) phaseDisk(c, ex, ey, er, k, theta);
   // ground
-  var yT = Y(site.horizon), light = sunUp ? 0.25 + 0.75*sunLit : 0, shine = !sunUp && earthUp ? 1 : 0;
+  var yT = Math.min(yLow, h - 6), light = sunUp ? 0.25 + 0.75*sunLit : 0, shine = !sunUp && earthUp ? 1 : 0;
   var top = sunUp ? 'rgb(' + Math.round(70 + 90*light) + ',' + Math.round(68 + 86*light) + ',' + Math.round(64 + 78*light) + ')' : shine ? '#1C2430' : '#0B0D10';
   var bot = sunUp ? 'rgb(' + Math.round(26 + 40*light) + ',' + Math.round(25 + 38*light) + ',' + Math.round(24 + 34*light) + ')' : shine ? '#0D1219' : '#050607';
-  var gg = c.createLinearGradient(0, yT, 0, h); gg.addColorStop(0, top); gg.addColorStop(1, bot);
-  c.fillStyle = gg; c.fillRect(0, yT, w, h - yT);
+  var yTop = h; for (var pi = 1; pi < prof.length; pi += 2) yTop = Math.min(yTop, prof[pi]);
+  var gg = c.createLinearGradient(0, yTop, 0, h); gg.addColorStop(0, top); gg.addColorStop(1, bot);
+  c.fillStyle = gg; c.beginPath(); c.moveTo(0, h);
+  for (pi = 0; pi < prof.length; pi += 2) c.lineTo(prof[pi], prof[pi + 1]);
+  c.lineTo(w, h); c.closePath(); c.fill();
   // illustrative craters, lit on the Sun side
   var rnd = seeded(site.id), sunDx = Math.sin(wrap180(sk.sunAz - centerAz)*DEG), sunDy = -Math.cos(wrap180(sk.sunAz - centerAz)*DEG);
   for (var q = 0; q < (mini ? 14 : 34); q++){
@@ -1489,44 +1595,26 @@ function drawPanorama(c, w, h, site, fi, o){
     if (sunUp){ c.strokeStyle = 'rgba(255,250,235,' + (0.25*light) + ')'; c.lineWidth = 1.2; c.beginPath(); c.ellipse(cx, cy, rx, ry, 0, Math.PI*(sunDx > 0 ? 1.15 : -0.15), Math.PI*(sunDx > 0 ? 1.85 : 0.65)); c.stroke(); }
   }
   // flat-Moon reference
-  if (Math.abs(site.horizon) > 0.05){ c.setLineDash([4, 5]); c.strokeStyle = 'rgba(200,210,220,.35)'; c.lineWidth = 1; c.beginPath(); c.moveTo(0, Y(0) + 0.5); c.lineTo(w, Y(0) + 0.5); c.stroke(); c.setLineDash([]); }
-  c.strokeStyle = 'rgba(230,236,242,.55)'; c.lineWidth = 1; c.beginPath(); c.moveTo(0, yT + 0.5); c.lineTo(w, yT + 0.5); c.stroke();
-  // lander + shadow (full view only)
-  if (!mini){
-    var bx = w*0.5, by = h*0.94, lh = h*0.11, lw = lh*0.9;
-    if (sunUp && sk.sunEl > 0.05){
-      var rel = wrap180(sk.sunAz + 180 - centerAz)*DEG, L = Math.min(lh/Math.tan(Math.max(sk.sunEl, 0.3)*DEG)*0.35, h*3);
-      var tx = bx + Math.sin(rel)*L, ty = by - Math.cos(rel)*L*0.22;
-      ty = Math.max(ty, yT + 2);
-      c.fillStyle = 'rgba(0,0,0,.55)'; c.beginPath(); c.moveTo(bx - lw*0.42, by); c.lineTo(bx + lw*0.42, by); c.lineTo(tx + lw*0.12, ty); c.lineTo(tx - lw*0.12, ty); c.closePath(); c.fill();
-    }
-    var lit = sunUp ? 0.55 + 0.45*light : shine ? 0.25 : 0.12, sideX = sunDx;
-    c.save(); c.translate(bx, by);
-    c.strokeStyle = 'rgba(200,205,212,' + lit + ')'; c.lineWidth = 2.2;
-    c.beginPath(); c.moveTo(-lw*0.42, 0); c.lineTo(-lw*0.22, -lh*0.42); c.moveTo(lw*0.42, 0); c.lineTo(lw*0.22, -lh*0.42); c.moveTo(-lw*0.18, 0); c.lineTo(-lw*0.1, -lh*0.4); c.moveTo(lw*0.18, 0); c.lineTo(lw*0.1, -lh*0.4); c.stroke();
-    var bg = c.createLinearGradient(-lw*0.3, 0, lw*0.3, 0);
-    bg.addColorStop(sideX > 0 ? 0 : 1, 'rgba(70,64,40,' + lit + ')'); bg.addColorStop(sideX > 0 ? 1 : 0, 'rgba(232,196,96,' + lit + ')');
-    c.fillStyle = bg; c.fillRect(-lw*0.3, -lh*0.72, lw*0.6, lh*0.34);
-    c.fillStyle = 'rgba(120,130,150,' + lit + ')'; c.fillRect(-lw*0.04, -lh*1.05, lw*0.08, lh*0.34);
-    c.fillStyle = 'rgba(40,70,140,' + Math.min(1, lit + 0.1) + ')'; c.fillRect(-lw*0.42, -lh*1.12, lw*0.84, lh*0.14);
-    c.strokeStyle = 'rgba(160,190,240,' + lit + ')'; c.lineWidth = 1; for (var p = -3; p <= 3; p++){ c.beginPath(); c.moveTo(p*lw*0.12, -lh*1.12); c.lineTo(p*lw*0.12, -lh*0.98); c.stroke(); }
-    var dish = wrap180(sk.earthAz - centerAz) > 0 ? 1 : -1;
-    c.strokeStyle = 'rgba(220,225,232,' + lit + ')'; c.lineWidth = 2; c.beginPath(); c.arc(lw*0.22*dish, -lh*0.82, lh*0.1, dish > 0 ? -2.4 : -0.7, dish > 0 ? 0.7 : 2.4, dish < 0); c.stroke();
-    c.restore();
-  }
+  if (site._mask || Math.abs(site.horizon) > 0.05){ c.setLineDash([4, 5]); c.strokeStyle = 'rgba(200,210,220,.35)'; c.lineWidth = 1; c.beginPath(); c.moveTo(0, Y(0) + 0.5); c.lineTo(w, Y(0) + 0.5); c.stroke(); c.setLineDash([]); }
+  c.strokeStyle = sunUp ? 'rgba(255,244,222,' + (0.35 + 0.4*light) + ')' : 'rgba(230,236,242,.55)'; c.lineWidth = 1; c.beginPath();
+  for (pi = 0; pi < prof.length; pi += 2){ if (pi) c.lineTo(prof[pi], prof[pi + 1] + 0.5); else c.moveTo(prof[pi], prof[pi + 1] + 0.5); }
+  c.stroke();
   // compass along the horizon
   c.font = (mini ? '500 9.5px ' : '500 11px ') + tok('--f-mono'); c.textAlign = 'center'; c.textBaseline = 'top';
   var stepT = fov > 90 ? 30 : 10;
   for (var az = 0; az < 360; az += stepT){
     var x = X(az); if (x < 0 || x > w) continue;
     var name = az === 0 ? 'N' : az === 90 ? 'E' : az === 180 ? 'S' : az === 270 ? 'W' : (mini ? '' : az + '°');
-    c.strokeStyle = 'rgba(230,236,242,.4)'; c.beginPath(); c.moveTo(x + 0.5, yT); c.lineTo(x + 0.5, yT + (name.length === 1 ? 7 : 4)); c.stroke();
-    if (name){ c.fillStyle = name.length === 1 ? 'rgba(240,244,248,.85)' : 'rgba(200,210,220,.6)'; c.fillText(name, x, yT + 9); }
+    var yk = skyY(x);
+    c.strokeStyle = 'rgba(230,236,242,.4)'; c.beginPath(); c.moveTo(x + 0.5, yk); c.lineTo(x + 0.5, yk + (name.length === 1 ? 7 : 4)); c.stroke();
+    if (name){ c.fillStyle = name.length === 1 ? 'rgba(240,244,248,.85)' : 'rgba(200,210,220,.6)'; c.fillText(name, x, yk + 9); }
   }
+  // lander + shadow (full view only): absent before touchdown, flying during the replay, on the ground after
+  if (!mini && !o.noLander) drawLander(c, w, h, yT, sk, {light: light, shine: shine, sunUp: sunUp, sunDx: sunDx, centerAz: centerAz}, o.land || null);
   // labels and off-screen / below-horizon hints
   function tag(x, y, txt, col, below){
     c.font = (mini ? '600 10px ' : '600 11.5px ') + tok('--f-mono'); var tw = c.measureText(txt).width;
-    x = clamp(x, tw/2 + 4, w - tw/2 - 4); y = below ? Math.min(yT - 8, h - 8) : Math.max(y, mini ? 14 : 72);
+    x = clamp(x, tw/2 + 4, w - tw/2 - 4); y = below ? Math.min(skyY(x) - 10, h - 8) : Math.max(y, mini ? 14 : 72);
     c.fillStyle = 'rgba(0,0,0,.6)'; c.fillRect(x - tw/2 - 4, y - 8, tw + 8, 16);
     c.fillStyle = col; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(txt, x, y);
   }
@@ -1535,13 +1623,95 @@ function drawPanorama(c, w, h, site, fi, o){
   var eLab = 'Earth ' + sgn(sk.earthEl, 1) + '°' + (eIn ? '' : (wrap180(sk.earthAz - centerAz) > 0 ? ' →' : ' ←'));
   tag(sIn ? sx : (wrap180(sk.sunAz - centerAz) > 0 ? w : 0), sunUp ? sy - sr*2.2 - 10 : 0, sLab, sunUp ? '#FFE3A3' : '#9AA4AF', !sunUp);
   tag(eIn ? ex : (wrap180(sk.earthAz - centerAz) > 0 ? w : 0), earthUp ? ey - er - 14 : 0, eLab, earthUp ? '#A9D2FF' : '#9AA4AF', !earthUp);
-  return {sk: sk, sunUp: sunUp, earthUp: earthUp, k: k, sunLit: sunLit};
+  return {sk: sk, sunUp: sunCentre, earthUp: earthUp, k: k, sunLit: sunLit, sunAlt: sunAlt, earthAlt: earthAlt};
+}
+/* ---------- the lander, and the landing replay ----------
+   Descent profile (illustrative): altitude h = t + 0.0958 t^2 metres at t seconds before touchdown,
+   so 1.5 km and 24 m/s down two minutes out, 1 m/s at contact. Shown about 8x faster than real time. */
+var LAND = {pre: 120, post: 8, dur: 15000, c2: 0.0958};
+var landAnim = null;
+function descentAt(tau){ tau = Math.max(0, tau); return {alt: tau + LAND.c2*tau*tau, vs: 1 + 2*LAND.c2*tau}; }
+function landState(now){
+  if (!landAnim) return null;
+  var p = clamp((now - landAnim.start)/LAND.dur, 0, 1), ts = -LAND.pre + p*(LAND.pre + LAND.post), tau = Math.max(0, -ts), d = descentAt(tau);
+  var af = Math.sqrt(clamp(d.alt/1500, 0, 1));
+  return {p: p, ts: ts, tau: tau, alt: tau > 0 ? d.alt : 0, vs: tau > 0 ? d.vs : 0, af: af, flying: ts < 0,
+          dust: ts < 0 ? clamp(1 - d.alt/35, 0, 1) : clamp(1 - ts/5, 0, 1)*0.9, engine: ts < 0 ? 1 : clamp(1 - ts/0.6, 0, 1)};
+}
+function drawLander(c, w, h, yT, sk, E, L){
+  var bx = w*0.5, by = h*0.93, lh = Math.min(h*0.17, 110), lw = lh*0.9, light = E.light, sunDx = E.sunDx;
+  var ax = bx, ay = by, sc = 1;
+  if (L && L.flying){ ax = bx - Math.pow(L.tau/LAND.pre, 1.6)*w*0.3; ay = by - L.af*(by - h*0.16); sc = 0.5 + 0.5*(1 - L.af); }
+  var groundY = by;
+  // shadow
+  if (E.sunUp && sk.sunEl > 0.05){
+    var rel = wrap180(sk.sunAz + 180 - E.centerAz)*DEG;
+    if (L && L.flying){
+      var off = Math.min((by - ay)/Math.tan(Math.max(sk.sunEl, 0.3)*DEG)*0.15, w);
+      var shx = ax + Math.sin(rel)*off, sa = 0.5*(1 - L.af);
+      c.fillStyle = 'rgba(0,0,0,' + sa.toFixed(3) + ')'; c.beginPath(); c.ellipse(shx, groundY, lw*0.5*sc, lw*0.09*sc, 0, 0, Math.PI*2); c.fill();
+    } else {
+      var Ls = Math.min(lh/Math.tan(Math.max(sk.sunEl, 0.3)*DEG)*0.35, h*3);
+      var tx = bx + Math.sin(rel)*Ls, ty = Math.max(by - Math.cos(rel)*Ls*0.22, yT + 2);
+      c.fillStyle = 'rgba(0,0,0,.55)'; c.beginPath(); c.moveTo(bx - lw*0.42, by); c.lineTo(bx + lw*0.42, by); c.lineTo(tx + lw*0.12, ty); c.lineTo(tx - lw*0.12, ty); c.closePath(); c.fill();
+    }
+  }
+  // engine glow on the ground as the lander comes close
+  if (L && L.engine > 0){
+    var near = L.flying ? clamp(1 - L.alt/120, 0, 1) : 1, gr = w*0.18*(0.4 + near);
+    var gl0 = c.createRadialGradient(ax, groundY, 0, ax, groundY, gr);
+    gl0.addColorStop(0, 'rgba(255,214,150,' + (0.35*near*L.engine).toFixed(3) + ')'); gl0.addColorStop(1, 'rgba(255,200,140,0)');
+    c.fillStyle = gl0; c.beginPath(); c.ellipse(ax, groundY, gr, gr*0.22, 0, 0, Math.PI*2); c.fill();
+  }
+  // dust blown sideways by the engine near the ground, settling after touchdown
+  if (L && L.dust > 0){
+    var dd = L.dust, t0 = performance.now()/1000;
+    var cloudR = w*0.34*(0.35 + dd), cg = c.createRadialGradient(ax, groundY - lh*0.05, 0, ax, groundY - lh*0.05, cloudR);
+    cg.addColorStop(0, 'rgba(214,208,196,' + (0.75*dd).toFixed(3) + ')'); cg.addColorStop(0.5, 'rgba(200,194,182,' + (0.35*dd).toFixed(3) + ')'); cg.addColorStop(1, 'rgba(190,184,172,0)');
+    c.fillStyle = cg; c.beginPath(); c.ellipse(ax, groundY - lh*0.05, cloudR, lh*(0.25 + 0.5*dd), 0, 0, Math.PI*2); c.fill();
+    for (var q = 0; q < 70; q++){
+      var side = q % 2 ? 1 : -1, ph = (q*0.6180339 + t0*(0.9 + (q % 7)*0.08)) % 1;
+      var dist = ph*cloudR*1.25, yy = groundY - 2 - Math.sin(ph*Math.PI)*lh*0.08*((q % 5) + 1)/5;
+      c.fillStyle = 'rgba(225,220,208,' + (0.6*dd*(1 - ph)).toFixed(3) + ')';
+      c.fillRect(ax + side*dist, yy, 2 + (q % 3), 1.5);
+    }
+    for (q = 0; q < 18; q++){
+      var a2 = (q/18)*Math.PI, ln = cloudR*(0.6 + 0.4*Math.sin(q*3.7 + t0*3));
+      c.strokeStyle = 'rgba(220,214,202,' + (0.22*dd).toFixed(3) + ')'; c.lineWidth = 1.5 + 3*dd;
+      c.beginPath(); c.moveTo(ax, groundY - 3); c.lineTo(ax + Math.cos(a2)*ln, groundY - 3 - Math.sin(a2)*ln*0.04); c.stroke();
+    }
+  }
+  var lit = E.sunUp ? 0.55 + 0.45*light : E.shine ? 0.25 : 0.12;
+  c.save(); c.translate(ax, ay); c.scale(sc, sc);
+  // engine plume: faint in vacuum, brightest at the nozzle
+  if (L && L.engine > 0){
+    var fl = 0.88 + 0.12*Math.sin(performance.now()/37) + 0.05*Math.sin(performance.now()/11);
+    var pl = (L.flying ? Math.min((groundY - ay)/sc + lh*0.05, lh*2.2) : lh*0.45)*fl;
+    var pg = c.createLinearGradient(0, -lh*0.3, 0, -lh*0.3 + pl);
+    pg.addColorStop(0, 'rgba(255,250,235,' + (1*L.engine).toFixed(3) + ')'); pg.addColorStop(0.2, 'rgba(255,200,130,' + (0.6*L.engine).toFixed(3) + ')'); pg.addColorStop(1, 'rgba(255,170,100,0)');
+    c.fillStyle = pg; c.beginPath(); c.moveTo(-lw*0.07, -lh*0.3); c.lineTo(lw*0.07, -lh*0.3); c.lineTo(lw*0.3, -lh*0.3 + pl); c.lineTo(-lw*0.3, -lh*0.3 + pl); c.closePath(); c.fill();
+    var ng = c.createRadialGradient(0, -lh*0.28, 0, 0, -lh*0.28, lh*0.35);
+    ng.addColorStop(0, 'rgba(255,240,210,' + (0.7*L.engine).toFixed(3) + ')'); ng.addColorStop(1, 'rgba(255,220,170,0)');
+    c.fillStyle = ng; c.beginPath(); c.arc(0, -lh*0.28, lh*0.35, 0, Math.PI*2); c.fill();
+  }
+  c.strokeStyle = 'rgba(200,205,212,' + lit + ')'; c.lineWidth = 2.2;
+  c.beginPath(); c.moveTo(-lw*0.42, 0); c.lineTo(-lw*0.22, -lh*0.42); c.moveTo(lw*0.42, 0); c.lineTo(lw*0.22, -lh*0.42); c.moveTo(-lw*0.18, 0); c.lineTo(-lw*0.1, -lh*0.4); c.moveTo(lw*0.18, 0); c.lineTo(lw*0.1, -lh*0.4); c.stroke();
+  c.fillStyle = 'rgba(90,92,98,' + lit + ')'; c.beginPath(); c.moveTo(-lw*0.06, -lh*0.38); c.lineTo(lw*0.06, -lh*0.38); c.lineTo(lw*0.08, -lh*0.3); c.lineTo(-lw*0.08, -lh*0.3); c.closePath(); c.fill();
+  var bg = c.createLinearGradient(-lw*0.3, 0, lw*0.3, 0);
+  bg.addColorStop(sunDx > 0 ? 0 : 1, 'rgba(70,64,40,' + lit + ')'); bg.addColorStop(sunDx > 0 ? 1 : 0, 'rgba(232,196,96,' + lit + ')');
+  c.fillStyle = bg; c.fillRect(-lw*0.3, -lh*0.72, lw*0.6, lh*0.34);
+  c.fillStyle = 'rgba(120,130,150,' + lit + ')'; c.fillRect(-lw*0.04, -lh*1.05, lw*0.08, lh*0.34);
+  c.fillStyle = 'rgba(40,70,140,' + Math.min(1, lit + 0.1) + ')'; c.fillRect(-lw*0.42, -lh*1.12, lw*0.84, lh*0.14);
+  c.strokeStyle = 'rgba(160,190,240,' + lit + ')'; c.lineWidth = 1; for (var p = -3; p <= 3; p++){ c.beginPath(); c.moveTo(p*lw*0.12, -lh*1.12); c.lineTo(p*lw*0.12, -lh*0.98); c.stroke(); }
+  var dish = wrap180(sk.earthAz - E.centerAz) > 0 ? 1 : -1;
+  c.strokeStyle = 'rgba(220,225,232,' + lit + ')'; c.lineWidth = 2; c.beginPath(); c.arc(lw*0.22*dish, -lh*0.82, lh*0.1, dish > 0 ? -2.4 : -0.7, dish > 0 ? 0.7 : 2.4, dish < 0); c.stroke();
+  c.restore();
 }
 function autoAz(site, fi){
   var sk = skyInterp(site, fi);
   var d = wrap180(sk.earthAz - sk.sunAz);
   if (Math.abs(d) < look.fov - 16) return (sk.sunAz + d/2 + 360) % 360;
-  return sk.sunEl - site.horizon > 0 ? sk.sunAz : sk.earthAz;
+  return sk.sunEl - hzAt(prepSite(site), sk.sunAz) > 0 ? sk.sunAz : sk.earthAz;
 }
 function drawSurface(){
   var R = results[active].filter(function(r){ return r.site.id === target[active]; })[0];
@@ -1549,21 +1719,30 @@ function drawSurface(){
   if (surfC.width !== Math.round(w*dpr) || surfC.height !== Math.round(h*dpr)){ surfC.width = Math.round(w*dpr); surfC.height = Math.round(h*dpr); }
   var c = surfC.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
   if (!R){ c.fillStyle = '#000'; c.fillRect(0, 0, w, h); surfHud.innerHTML = '<span>Pick a site to stand on it</span>'; drawMinis(); return; }
-  var site = R.site, fiNow = nowIndex(), before = fiNow < R.iL, fi = Math.max(fiNow, R.iL);
+  var site = R.site, fiNow = nowIndex(), LS = landState(performance.now()), before = !LS && fiNow < R.iL - 0.5, fi = LS ? R.iL : Math.max(fiNow, R.iL);
   if (look.follow === 'sun') look.az = skyInterp(site, fi).sunAz;
   else if (look.follow === 'earth') look.az = skyInterp(site, fi).earthAz;
   else if (look.follow === 'auto' || look.az === null) look.az = autoAz(site, fi);
-  var out = drawPanorama(c, w, h, site, fi, {az: look.az, fov: look.fov});
+  var out = drawPanorama(c, w, h, site, fi, {az: look.az, fov: look.fov, land: LS, noLander: before});
+  if (LS){
+    var tmm = Math.floor(LS.tau/60), tss = Math.round(LS.tau % 60);
+    surfHud.innerHTML = LS.flying
+      ? '<span><b>Powered descent</b> · ' + site.name + '</span><span>Altitude <b>' + Math.round(LS.alt).toLocaleString('en-US') + ' m</b></span><span>Descending <b>' + LS.vs.toFixed(1) + ' m/s</b></span><span>Touchdown in <b>' + (tmm ? tmm + ' min ' : '') + tss + ' s</b></span><span>Replay about 8× real time</span>'
+      : '<span class="good"><b>Touchdown</b> · ' + site.name + ' · ' + fmtDate(tabTime(R.iL)) + '</span><span class="' + (out.sunUp ? 'good' : 'bad') + '">Sun <b>' + Math.abs(out.sunAlt).toFixed(2) + '°</b> ' + (out.sunAlt >= 0 ? 'above' : 'below') + ' the terrain horizon</span><span class="' + (out.earthUp ? 'good' : 'bad') + '">' + (out.earthUp ? 'Earth in view: direct link' : 'Earth below the terrain') + '</span><span>Engine off</span>';
+    $('#surfWho').textContent = site.name;
+    $('#surfNote').textContent = 'Horizon: ' + hzLabel(site) + ' · lander and dust illustrative';
+    return;
+  }
   var sk = out.sk, sunT = hoursTo(site, fi, 'sun'), earT = hoursTo(site, fi, 'earth');
   var shadow = sk.sunEl > 0.05 && out.sunUp ? 3/Math.tan(sk.sunEl*DEG) : null;
   $('#surfWho').textContent = site.name;
   surfHud.innerHTML =
-    '<span><b>' + fmtDate(tabTime(0) + fi*3600000) + '</b>' + (before ? ' · landing moment' : '') + '</span>' +
+    '<span><b>' + fmtDate(tabTime(0) + fi*3600000) + '</b>' + (before ? ' · lander arrives in ' + dh(R.iL - fiNow) : '') + '</span>' +
     '<span class="' + (out.sunUp ? 'good' : 'bad') + '">Sun <b>' + sgn(sk.sunEl, 2) + '°</b> az ' + Math.round(sk.sunAz) + '° · ' + (sunT.up ? 'sets in ' : 'rises in ') + (sunT.capped ? '> 60 d' : dh(sunT.h)) + '</span>' +
     '<span class="' + (out.earthUp ? 'good' : 'bad') + '">Earth <b>' + sgn(sk.earthEl, 2) + '°</b> az ' + Math.round(sk.earthAz) + '° · ' + (out.earthUp ? 'direct link possible' : 'no direct link') + ' · ' + (earT.up ? 'sets in ' : 'rises in ') + (earT.capped ? '> 60 d' : dh(earT.h)) + '</span>' +
     '<span>Earth phase <b>' + Math.round(out.k*100) + '%</b> · ' + Math.round(sk.D).toLocaleString('en-US') + ' km</span>' +
     (shadow ? '<span>A 3 m lander casts a <b>' + (shadow > 999 ? Math.round(shadow/1000*10)/10 + ' km' : Math.round(shadow) + ' m') + '</b> shadow</span>' : '');
-  $('#surfNote').textContent = 'Horizon: ' + sgn(site.horizon, 1) + '° assumed' + (Math.abs(site.horizon) > 0.05 ? ' (dashed: flat Moon)' : '') + ' · foreground craters illustrative' + (enlarge > 1 ? ' · Sun and Earth drawn ×' + enlarge : '');
+  $('#surfNote').textContent = 'Horizon: ' + hzLabel(site) + ' (dashed: flat Moon)' + ' · foreground craters illustrative' + (enlarge > 1 ? ' · Sun and Earth drawn ×' + enlarge : '');
   drawMinis(fi);
 }
 var minisEl = $('#minis'), minisKey = '';
@@ -1743,8 +1922,6 @@ function scanWindows(){
   var key = active, site = siteById(target[active]);
   if (!site) return null;
   var P = PROFILES[key], S = Math.max(1, Math.round(P.stay*24)), Y = siteSeries(site), n = TAB.n;
-  var noSun = new Int32Array(n + 1), earthC = new Int32Array(n + 1), sunC = new Float64Array(n + 1);
-  for (var i = 0; i < n; i++){ noSun[i + 1] = noSun[i] + (Y.sunOK[i] ? 0 : 1); earthC[i + 1] = earthC[i] + Y.earthOK[i]; sunC[i + 1] = sunC[i] + Y.sunF[i]; }
   var landH = missionTimes(key).land*24, today = Math.floor(Date.now()/86400000)*86400000, start = Math.max(today + 86400000, TAB.t0 + 86400000);
   var cands = [], days = [];
   for (var d = 0; d < lwRange; d++){
@@ -1752,10 +1929,11 @@ function scanWindows(){
     opps.forEach(function(o){
       var iL = Math.round((o.t - TAB.t0)/3600000 + landH);
       if (iL < 0 || iL + S >= n) return;
-      var viable = key === 'crewed' ? (noSun[iL + S] - noSun[iL] === 0 && Y.earthOK[iL] === 1) : (Y.sunOK[iL] === 1 && Y.earthOK[iL] === 1);
+      var ev = evalAt(Y, iL, S, key); if (!ev) return;
+      var viable = ev.ok;
       var B = budget(key, o.t), dv = {D: B.D, space: B.dv.space, ascent: B.dv.ascent, leo: B.mass.leo}, w = wxFor(o.t);
-      var siteQ = key === 'crewed' ? (earthC[iL + S] - earthC[iL])/S : (sunC[iL + S] - sunC[iL])/S;
-      var c = {t: o.t, o: o, iL: iL, viable: viable, dv: dv, w: w, siteQ: siteQ, sunStay: (sunC[iL + S] - sunC[iL])/S, earthStay: (earthC[iL + S] - earthC[iL])/S};
+      var siteQ = (key === 'crewed' ? ev.earth : ev.sun)/100;
+      var c = {t: o.t, o: o, iL: iL, viable: viable, dv: dv, w: w, siteQ: siteQ, sunStay: ev.sun/100, earthStay: ev.earth/100};
       if (viable) cands.push(c);
       if (!dayBest || (c.viable && !dayBest.viable)) dayBest = c;
     });
@@ -1779,7 +1957,7 @@ function localTime(ms){
   try { return new Intl.DateTimeFormat('en-GB', {timeZone: tz, day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZoneName: 'short'}).format(new Date(ms)); } catch (e) { return ''; }
 }
 function renderWindows(){
-  var k = [active, target[active], launchIdx, PROFILES[active].tof, PROFILES[active].stay, lwRange, wx.version, TAB && TAB.t0, (siteById(target[active]) || {}).horizon].join('|');
+  var k = [active, target[active], launchIdx, PROFILES[active].tof, PROFILES[active].stay, lwRange, wx.version, TAB && TAB.t0, (siteById(target[active]) || {}).horizon, mast, relay, JSON.stringify(LIMITS[active])].join('|');
   if (k !== lwKey){ lwKey = k; lwRes = scanWindows(); }
   var R = lwRes, tb = $('#lwTable');
   $('#wxStatus').textContent = wx.status;
@@ -1922,14 +2100,39 @@ missionBtns.forEach(function(b){ b.addEventListener('click', function(){ setActi
 var viewBtns = Array.prototype.slice.call(document.querySelectorAll('[data-view]'));
 viewBtns.forEach(function(b){ b.addEventListener('click', function(){ view = b.getAttribute('data-view'); cam.zoom = 1; cam.pitch = view === 'moon' ? -0.75 : 0.62; viewBtns.forEach(function(o){ o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); }); dirty = true; }); });
 var metIn = $('#met'), playBtn = $('#play'), playIcon = $('#playIcon');
-function syncMet(){ metIn.value = (met/mission.tEnd).toFixed(4); markPhase(); }
-metIn.addEventListener('input', function(){ met = +metIn.value*mission.tEnd; markPhase(); dirty = true; });
-playBtn.addEventListener('click', function(){
-  playing = !playing;
-  if (playing && met >= mission.tEnd - 1) met = 0;
+function setPlaying(v){
+  playing = v;
   playIcon.setAttribute('d', playing ? 'M3.5 2.5h3.2v11H3.5zM9.3 2.5h3.2v11H9.3z' : 'M4 2.5v11l9-5.5z');
   playBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play the mission');
   last = performance.now();
+}
+function startLanding(fromPlay){
+  if (!mission) return;
+  met = mission.tLand; syncMet(); setPlaying(false);
+  look.follow = 'auto'; look.az = null;
+  landAnim = {start: performance.now(), resume: !!fromPlay};
+  if (fromPlay && !landAnim.scrolled){
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    surfWrap.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'center'});
+  }
+  dirty = true;
+}
+$('#watchLand').addEventListener('click', function(){ startLanding(false); });
+function setMast(v){ mast = v; seriesCache = {}; lwKey = ''; autoBest = false; recompute(); renderAll(); }
+$('#mastSel').addEventListener('change', function(e){ setMast(e.target.value); });
+$('#relayChk').addEventListener('change', function(e){ relay = e.target.checked; seriesCache = {}; lwKey = ''; autoBest = false; recompute(); renderAll(); });
+function syncLimits(){
+  var a = LIMITS.crewed, b = LIMITS.robotic;
+  function one(L){ return 'Sun ≥ ' + L.sun + '%, ' + (relay ? 'Earth not required (relay)' : 'Earth ≥ ' + L.earth + '%') + ', ' + (L.night ? 'night ≤ ' + L.night + ' h' : 'no night') + ', Sun ≥ ' + sgn(L.td, 1) + '° at touchdown'; }
+  $('#limitsLine').textContent = 'Good landing, same example limits as the landing calendar (not NASA requirements). Crewed: ' + one(a) + '. Robotic: ' + one(b) + '.';
+  $('#mastSel').value = mast; $('#relayChk').checked = relay;
+}
+function syncMet(){ metIn.value = (met/mission.tEnd).toFixed(4); markPhase(); }
+metIn.addEventListener('input', function(){ met = +metIn.value*mission.tEnd; markPhase(); dirty = true; });
+playBtn.addEventListener('click', function(){
+  if (landAnim) landAnim = null;
+  if (!playing && met >= mission.tEnd - 1) met = 0;
+  setPlaying(!playing);
 });
 $('#warp').addEventListener('change', function(e){ warp = +e.target.value; });
 var pointers = new Map(), pinch = null;
@@ -1959,7 +2162,7 @@ function resize(){
 }
 var dirty = true, panelsDirty = true;
 function renderAll(){
-  syncSetup(); renderRanks(); renderBudget(); renderPhases(); syncMet();
+  syncSetup(); syncLimits(); renderRanks(); renderBudget(); renderPhases(); syncMet();
   renderSitesTable(); renderVehicle(); drawMap(); drawYear(); drawSky(); drawSurface(); renderWindows(); dirty = true;
 }
 if (window.ResizeObserver){ new ResizeObserver(resize).observe(vp); new ResizeObserver(function(){ drawMap(); drawYear(); drawSky(); drawLwChart(); dirty = true; }).observe(document.body); }
@@ -1971,20 +2174,77 @@ var last = performance.now();
 function frame(now){
   var dt = Math.min(0.1, (now - last)/1000); last = now;
   if (playing && mission){
+    var metBefore = met;
     met += dt*warp*3600;
+    if (metBefore < mission.tLand && met >= mission.tLand){ startLanding(true); }
     if (met >= mission.tEnd){ met = mission.tEnd; playing = false; playIcon.setAttribute('d', 'M4 2.5v11l9-5.5z'); playBtn.setAttribute('aria-label', 'Play the mission'); }
     syncMet(); dirty = true;
   }
   if (dirty){ render(); drawSky(); drawSurface(); dirty = false; }
+  else if (landAnim) drawSurface();
+  if (landAnim && performance.now() - landAnim.start > LAND.dur){
+    var resume = landAnim.resume; landAnim = null; dirty = true;
+    if (resume) setPlaying(true);
+  }
   requestAnimationFrame(frame);
 }
+/* opened from the landing calendar: mission.html?site=C1&land=2027-01-13&type=robotic&len=13&sun=70&earth=50&night=48&td=0&mast=2&relay=0 */
+var FROMCAL = null;
+(function(){
+  var Q; try { Q = new URLSearchParams(location.search); } catch (err) { return; }
+  var sid = Q.get('site'), land = Q.get('land'); if (!sid || !land || !siteById(sid)) return;
+  var k = Q.get('type') === 'robotic' ? 'robotic' : 'crewed';
+  ['sun', 'earth', 'night', 'td'].forEach(function(f){ var v = parseFloat(Q.get(f)); if (isFinite(v)) LIMITS[k][f] = v; });
+  var len = parseFloat(Q.get('len')); if (isFinite(len) && len > 0) PROFILES[k].stay = clamp(len, PROFILES[k].stayMin, PROFILES[k].stayMax);
+  if (['0', '2', '10'].indexOf(Q.get('mast')) >= 0) mast = Q.get('mast');
+  relay = Q.get('relay') === '1';
+  var ms = Date.parse(land.length <= 10 ? land + 'T00:00:00Z' : land); if (!isFinite(ms)) return;
+  if (picks[k].indexOf(sid) < 0){ picks[k].unshift(sid); if (picks[k].length > 5) picks[k].pop(); }
+  target[k] = sid; active = k; autoBest = false;
+  FROMCAL = {k: k, site: sid, land: ms};
+})();
 recompute(); resize();
+if (FROMCAL){
+  launchMs = Math.round((FROMCAL.land - missionTimes(FROMCAL.k).land*86400000)/60000)*60000;
+  recompute();
+  missionBtns.forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-mission') === active ? 'true' : 'false'); });
+}
 syncDate(); renderAll();
-met = mission.tLand + 6*3600; syncMet();
-applyBest();
-window.__mission = {budgets: budgets, results: results, get mission(){ return mission; }, PROFILES: PROFILES, SITES: SITES, picks: picks,
+(function(){
+  var p = [];
+  if (HZD) p.push('Sun and Earth at the sites: ' + (HZD.versions && HZD.versions.ephemeris || 'JPL Horizons') + ', table made ' + String(HZD.generated_utc).replace('T', ' ') + (TAB.horizons ? '' : ' (dates outside 2026–2035 fall back to the Meeus model)'));
+  if (MASKMETA) p.push('Terrain horizons: LOLA masks from ' + (MASKMETA.versions && MASKMETA.versions.dem || 'PGDA') + ', made ' + String(MASKMETA.generated).replace('T', ' '));
+  p.push('Trajectory, launch times and 3D scene: simplified model');
+  $('#prov').textContent = p.join(' · ');
+})();
+if (FROMCAL){
+  var fs = siteById(FROMCAL.site), fc = $('#fromCal');
+  fc.hidden = false;
+  fc.innerHTML = 'From the landing calendar: ' + (FROMCAL.k === 'crewed' ? 'crewed' : 'robotic') + ' landing at <b></b> on <b>' + fmtDate(FROMCAL.land) + '</b>. Launch worked back to ' + fmtDate(launchMs) + ' from ' + LAUNCH_SITES[launchIdx].name.split(' (')[0] + '. The flight plays now; the touchdown is replayed in “Standing at” below.';
+  fc.querySelector('b').textContent = fs.name;
+  warp = 12; $('#warp').value = '12';
+  met = 0; syncMet(); setPlaying(true);
+} else {
+  met = mission.tLand + 6*3600; syncMet();
+  applyBest();
+}
+window.__mission = {evalAt: evalAt, siteSeries: siteSeries, LIMITS: LIMITS, startLanding: startLanding, get landAnim(){ return landAnim; }, get mast(){ return mast; }, get target(){ return target; }, get active(){ return active; }, budgets: budgets, results: results, get mission(){ return mission; }, PROFILES: PROFILES, SITES: SITES, picks: picks,
   get windows(){ return lwRes; }, get wx(){ return wx; }, get launchMs(){ return launchMs; }, budget: budget, launchOpps: launchOpps, moonRADec: moonRADec, gmstDeg: gmstDeg};
 requestAnimationFrame(frame);
+})();
+}
+(function(){
+  if (document.getElementById('data-subpoints')){ __boot(); return; }
+  function get(u){ return fetch(u).then(function(r){ if (!r.ok) throw new Error(u + ': HTTP ' + r.status); return r.text(); }); }
+  Promise.all([get('data/subpoints.json'), get('data/sites.json')]).then(function(t){
+    [['data-subpoints', t[0]], ['data-sites', t[1]]].forEach(function(x){ var e = document.createElement('script'); e.type = 'application/json'; e.id = x[0]; e.textContent = x[1]; document.head.appendChild(e); });
+    __boot();
+  }).catch(function(err){
+    var p = document.createElement('p'); p.className = 'fromcal';
+    p.textContent = 'Could not load data/subpoints.json and data/sites.json (' + err.message + '). Open the page through a web server (for example python -m http.server), not as a local file. Showing the simplified model with flat horizons.';
+    document.querySelector('.app').insertBefore(p, document.querySelector('.app').children[1]);
+    __boot();
+  });
 })();
 </script>
 </body>
