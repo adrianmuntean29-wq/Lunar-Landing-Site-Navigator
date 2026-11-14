@@ -38,7 +38,8 @@ def code_version():
     root = Path(__file__).resolve().parents[1]
     try:
         h = subprocess.run(["git", "-C", str(root), "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
-        dirty = subprocess.run(["git", "-C", str(root), "status", "--porcelain", "pipeline"], capture_output=True, text=True).stdout.strip()
+        dirty = subprocess.run(["git", "-C", str(root), "status", "--porcelain", "--untracked-files=no", "pipeline"],
+                               capture_output=True, text=True).stdout.strip()
         return f"{h}{'+uncommitted' if dirty else ''}"
     except OSError:
         return "unknown"
