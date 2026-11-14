@@ -136,15 +136,16 @@ File: [`index.html`](index.html). A single file, no dependencies, no server. It 
 
 **Tech:** hand-written WebGL (no Three.js), plain JavaScript, Canvas 2D for the charts. The initial computation takes 1–2 seconds on a laptop.
 
-### Mission simulator (`mission.html`, built Saturday 14 Nov)
+### Landing calendar + mission view (branch `mission-simulator`, Saturday 14 Nov afternoon)
 
-A second page: a mission from Canada (Spaceport Nova Scotia) to the lunar south pole, crewed or robotic, with up to five landing sites per mission. One file, opens directly in a browser; the weather needs an internet connection.
+On this branch the two pages work as one product. Serve the folder over HTTP (for example `python -m http.server 8000`, then open `http://localhost:8000/`); GitHub Pages works too.
 
-- **Trajectory and budget:** patched conics (parking orbit, translunar injection, lunar orbit insertion, descent, and the return for the crew); Δv per phase and mass needed in Earth orbit from the rocket equation. Vehicle values are editable.
-- **Real dates:** Sun and Earth positions from Meeus' algorithms with librations, checked against JPL Horizons (Sun within 0.01°, Earth within 0.03°). For each site: Sun and Earth elevation at landing, time to sunset and Earthset, whether a crewed or a robotic landing is viable, the next and best window, and a year strip.
-- **Best launch dates:** the two daily launch times from Nova Scotia when the parking orbit lines up with the Moon, the Δv and propellant for the real Earth–Moon distance on arrival, whether the site is usable at landing, and launch-site weather (Open-Meteo 16-day forecast plus ERA5 statistics 2015–2024). Ranked top 8, one click to use a date.
-- **Views:** 3D trajectory (system, Earth, Moon), south-pole and whole-Moon site maps, a first-person view from the site with the Sun and Earth in the sky.
-- **Limits, stated on the page:** site horizons are assumed (flat, per site) until the engine's LOLA masks (`sites.json`) are plugged in; Artemis region coordinates are reference points of the named features, not official region centres; launch dates come from a simplified model, not a flight trajectory.
+- **`index.html`, landing calendar:** Eren's page as of his `frontend-snapshot` branch (15:07): planner, landing-window calendar, filter funnel and site ranking on the LOLA horizons. Added here: page navigation at the top; a bar under the calendar with the chosen landing day and a **Fly this mission from Canada** button; the 3D view now uses the engine's real LOLA heights (`data/heights.bin`, 240 m) instead of the generated terrain, with pins for the four sites (C1 and S on the map, GR1 and MP1 pinned at the edge with their distance). If the heights file does not load, the view falls back to the generated terrain without pins and says so.
+- **`mission.html`, mission view:** opens with the site, landing day, mission type and limits from the calendar. Works back the launch time from Spaceport Nova Scotia, plays the flight in 3D, then replays the touchdown from the site: powered descent from about 1.5 km, engine plume and dust, under the real Sun and Earth over the LOLA horizon. **Watch the landing** replays it. For a crewed mission the page also replays the liftoff when the stay ends (**Watch the liftoff**): the ascent stage lifts off on its own engine, insulation flakes fly, the descent stage stays on the surface, and an ascent camera looks down on the real LRO image.
+- **Real images from orbit:** a **Seen from orbit** view shows the chosen site on the LRO NAC south-pole photo mosaic (about 1 m/px) over the LRO WAC mosaic (100 m/px), loaded live from NASA Moon Trek, with the directions to the Sun and Earth at the time shown, nearby sites, the pole and a scale bar (drag to move, scroll to zoom). During the landing replay a **descent camera** inset looks straight down on the same real image. The tiles need an internet connection; offline the views say so. Shadows in the photos are from when LRO took them, not from the date shown. Projection checked against the mosaic itself: Shackleton's permanently dark floor falls where our formula puts it.
+- **Same data and rules as the calendar:** Sun and Earth from `data/subpoints.json` (JPL Horizons, DE441), terrain horizons from `data/sites.json` (LOLA masks from the engine, mast 0/2/10 m), relay switch, and the calendar's example limits (sunlight %, Earth contact %, longest night, Sun at touchdown). Checked day by day over a year at C1, S, MP1 and GR1: 1,411 of 1,412 landing days get the same verdict on both pages; the one difference is a grazing Sun at touchdown (0.02° vs −0.0°).
+- **Simplified, and labelled so on the page:** trajectory, launch times, Δv and the 3D scene (patched conics, Meeus ephemeris), the best-launch-date list (Open-Meteo weather) and the landing replay (smooth descent curve, shown about 8× faster). None of these change the site numbers.
+- Removed from the simulator: the crater-centre points for the Artemis regions and the "(ice)" sites. The four published sites, plus past landings for reference, remain.
 
 ---
 
@@ -340,6 +341,8 @@ The rules allow prior work as long as we declare it and show progress made durin
 | First version, documentation | Claude (AI assistant) |
 | English translation of the UI | Eren |
 | Mission simulator `mission.html` (trajectory, Δv and mass, Sun/Earth at real dates checked against JPL Horizons, best launch dates with Open-Meteo weather), 14 Nov | Claude (AI assistant); Adrian set the requirements and reviewed |
+| Real LRO imagery in the mission view (Seen from orbit, descent camera; Moon Trek tiles), 14 Nov | Claude (AI assistant); Adrian set the requirements |
+| Calendar + mission view combined (mission page on the team's Horizons and LOLA data, hand-off bar on the calendar, landing replay), 14 Nov | Claude (AI assistant); Adrian set the requirements and reviewed; calendar page by Eren |
 | _to fill in during the weekend_ | |
 
 ---
