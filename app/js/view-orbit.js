@@ -50,10 +50,18 @@ function buildSpace(){
   sL = add(new THREE.DirectionalLight('#FFF6E8', 3.2)); space.add(new THREE.AmbientLight('#8FA3C0', 0.05));
   eSys = add(new THREE.Group()); sL.target = eSys;   // Earth + Moon ride together on Earth's path
   const etex = new THREE.TextureLoader().load('assets/earth_bmng_2k.jpg'); etex.colorSpace = THREE.SRGBColorSpace; etex.anisotropy = 4;   // NASA Blue Marble Next Generation, Dec 2004
-  sEarth = add(new THREE.Mesh(new THREE.SphereGeometry(RE, 96, 48), new THREE.MeshStandardMaterial({map: etex, roughness: 0.75, metalness: 0, emissive: '#04080F'})), eSys);
+  // Earth's spin axis: 23.44 deg from ecliptic north, leaning towards ecliptic longitude 270 deg (north pole towards 90 deg), so the seasons show in the day/night line
+  const eTilt = add(new THREE.Group(), eSys); eTilt.rotation.x = -23.44*D2R;
+  sEarth = add(new THREE.Mesh(new THREE.SphereGeometry(RE, 96, 48), new THREE.MeshStandardMaterial({map: etex, roughness: 0.75, metalness: 0, emissive: '#04080F'})), eTilt);
+  // spin-axis lines (explainer): Earth leans 23.4 deg -> seasons; the Moon leans 1.5 deg -> at its poles the Sun always skims the horizon.
+  // Children of the bodies, so they follow the real orientation; hidden behind the body where they pass through it.
+  const axis = (len, parent) => { const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, -len, 0), new THREE.Vector3(0, len, 0)]);
+    return add(new THREE.Line(g, new THREE.LineBasicMaterial({color: '#FFD08A', transparent: true, opacity: 0.85})), parent); };
+  axis(RE*1.7, eTilt);
   const atm = add(glow('rgba(130,190,255,0.55)', 'rgba(70,130,255,0.16)'), eSys); atm.scale.set(RE*3.4, RE*3.4, 1);
   const sGeo = new THREE.SphereGeometry(1, 96, 48); sGeo.computeTangents();
   sMoon = add(new THREE.Mesh(sGeo,new THREE.MeshStandardMaterial({map: moonTex(), normalMap: moonNrm(), roughness: 1, metalness: 0})), eSys);
+  axis(1.7, sMoon);
   mMark = add(glow('rgba(240,238,230,1)', 'rgba(220,220,210,0.35)', {blending: THREE.NormalBlending}), eSys);   // map markers when a body is too small to see
   eMark = add(glow('rgba(140,200,255,1)', 'rgba(90,150,255,0.35)', {blending: THREE.NormalBlending}), eSys);
   const line = (n, op, col, parent) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n*3), 3));
@@ -94,8 +102,8 @@ function updateSpace(){
   const st = App.state, j = st.jd0 + st.t, eh = earthHelio(j), p = App.ephAt(j), mr = mrel(j);
   eSys.position.copy(hpos(eh)); sMoon.position.copy(mr.v);
   sMoon.quaternion.copy(mr.q);   // Moon frame -> scene: north on its real fixed axis, Earth-facing side towards Earth
-  // spin Earth with the clock: the Sun is overhead at longitude (12 - UTC hours) x 15 deg; Earth's axial tilt is not shown
-  sEarth.rotation.y = eh.phi + Math.PI - (12 - ((j + 0.5) % 1)*24)*15*D2R;
+  // inside the tilted frame (x = March equinox direction, y = Earth's north), Greenwich faces the Greenwich sidereal angle (IAU 1982 linear term)
+  sEarth.rotation.y = ((280.46061837 + 360.98564736629*(j - 2451545.0)) % 360)*D2R;
   const mk = Math.round(j*4);
   if (mk !== moonKey){ moonKey = mk; let lo = null, hi = null;   // the Moon's real path, redrawn every 6 h of model time
     [[sTrack, 1], [sPast, -1]].forEach(([ln, sg]) => { const at = ln.geometry.attributes.position;

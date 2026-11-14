@@ -3,7 +3,8 @@
 #scene .labels,#scene .skylabels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 #scene .zoom{position:absolute;left:12px;top:12px;display:grid;gap:4px}
 #scene .zoom button{width:30px;height:30px;font:500 16px "IBM Plex Mono";color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;cursor:pointer}
-#scene .layers{position:absolute;right:12px;top:56px;z-index:4;background:rgba(23,25,28,.88);border:1px solid var(--line);border-radius:6px;padding:8px 10px;display:grid;gap:4px;font:500 12px "IBM Plex Mono";color:var(--muted)}
+#scene .layers{position:absolute;right:12px;top:12px;z-index:4;background:rgba(23,25,28,.88);border:1px solid var(--line);border-radius:6px;padding:8px 10px;display:grid;gap:4px;font:500 12px "IBM Plex Mono";color:var(--muted)}
+#scene.layers-low .layers{top:var(--tabs-b,56px)}   /* scene too narrow for tabs + box on one row (scene-core.js layersSpot) */
 #scene .layers label{display:flex;gap:6px;align-items:center;cursor:pointer}
 #scene .psrsw{display:inline-block;width:14px;height:0;border-top:2px dashed var(--psr)}
 #scene .views{position:absolute;left:50%;top:12px;transform:translateX(-50%);display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:rgba(23,25,28,.92);z-index:3}
@@ -20,14 +21,7 @@
 #scene .sky.sun{color:var(--sun)} #scene .sky.earth{color:var(--earth)} #scene .sky.card{color:#8C939B;font-weight:500}
 #scene .missw{display:inline-block;width:10px;height:10px;border:1.5px dashed #F2876B;border-radius:50%}
 #scene .layers .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
-/* (i) pattern, reusable: <span class="info-wrap"><button type="button" class="info-i" aria-label="About X" aria-describedby="ID">i</button><span class="info-tip" id="ID" role="tooltip">text</span></span>
-   The tip shows on hover and keyboard focus, below the i, right-aligned (so it stays on screen at the right edge). */
-#scene .info-wrap{position:relative;display:inline-flex}
-#scene .info-i{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--muted);background:none;color:var(--muted);font:italic 700 10px/1 Georgia,serif;cursor:help;padding:0;flex:none}
-#scene .info-i:hover{border-color:var(--ink);color:var(--ink)}
-#scene .info-i:focus-visible{outline:2px solid var(--earth);outline-offset:2px}
-#scene .info-tip{position:absolute;right:-4px;top:calc(100% + 8px);z-index:5;width:300px;background:rgba(23,25,28,.96);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font:500 11.5px "IBM Plex Mono";color:var(--muted);display:none;gap:3px;box-shadow:0 4px 16px rgba(0,0,0,.5);cursor:default}
-#scene .info-i:hover + .info-tip,#scene .info-i:focus + .info-tip{display:grid}
+/* (i) info pattern (.info-wrap / .info-i / .info-tip) lives in base.css (coordinator). */
 #scene .pin{position:absolute;transform:translate(-50%,-100%);font:600 11.5px "IBM Plex Mono";color:var(--bg);background:var(--ink);border-radius:3px;padding:2px 6px;white-space:nowrap;cursor:pointer;pointer-events:auto}
 #scene .pin.sel{background:var(--earth)}
 #scene .pin.edge{border:1px dashed var(--bg);outline:1px solid var(--ink)} #scene .pin.edge::after{display:none}
@@ -39,7 +33,7 @@
 #scene .legend .msw{color:#F2876B} #scene .legend .mout{color:var(--muted)} #scene .legend .mlabel{font-size:10px;opacity:.8}
 #scene .pin::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:14px;background:var(--ink)}
 
-#scene .obbar{position:absolute;left:12px;top:56px;display:flex;align-items:center;gap:6px;background:rgba(10,12,16,.82);border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:500 11px "IBM Plex Mono";color:var(--muted);z-index:3}
+#scene .obbar{position:absolute;left:12px;top:var(--tabs-b,56px);display:flex;align-items:center;gap:6px;background:rgba(10,12,16,.82);border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:500 11px "IBM Plex Mono";color:var(--muted);z-index:3}
 #scene .obbar[hidden]{display:none}
 #scene .obbar button{font:600 12px "IBM Plex Sans";color:var(--muted);background:none;border:1px solid transparent;border-radius:4px;padding:4px 9px;cursor:pointer}
 #scene .obbar button[aria-pressed=true]{color:#4FC3F7;border-color:rgba(79,195,247,.5);background:rgba(79,195,247,.08)}

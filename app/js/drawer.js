@@ -30,7 +30,7 @@
   const why = (o) => o.fail.map(f => f === 'sun' ? 'sunlight ' + pc(o.sun, S().lim.sun) + ' (need ' + S().lim.sun + '%)' : f === 'earth' ? 'Earth contact ' + pc(o.earth, S().lim.earth) + ' (need ' + S().lim.earth + '%)' : 'darkness ' + o.night + ' h (allow ' + S().lim.night + ' h)').join(', ');
   const sentence = o => '<b>' + App.dayDate(o.d) + '</b>: ' + (o.fail.length ? '<span class="no">not good</span> · ' + why(o)
                    : '<span class="ok">good day to land</span> · sunlight ' + o.sun.toFixed(0) + '%, Earth ' + o.earth.toFixed(0) + '%, darkness ' + o.night + ' h');
-  const siteName = () => App.sites[S().site].name;
+  const siteName = () => { const s = App.sites[S().site]; return s.custom ? s.name + ' (' + s.label + ')' : s.name; };   // custom spot: always say it is approximate
   const dt = jd => App.date(jd + 1e-6).toLocaleString('en-GB', {weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'UTC'}) + ' UTC';
   /* the landing day the mission/slip tabs talk about: the chosen one, else the next good day from the clock */
   function chosen(){

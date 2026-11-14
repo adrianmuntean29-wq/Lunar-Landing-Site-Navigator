@@ -3,7 +3,7 @@
    Reads App.state; changes state only with App.set (e.g. clicking a pin selects a site). */
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import {$, R, D2R, root, renderer, meta, HGT, cams, register} from './scene-core.js';
+import {$, R, D2R, root, renderer, meta, HGT, cams, register, view} from './scene-core.js';
 
 let scene, camera, controls, sunLight, mesh, psrGroup, ringGroup;
 
@@ -12,6 +12,18 @@ function heightAt(x, z){
   if (i < 0 || j < 0 || i >= meta.nx || j >= meta.ny) return null;
   return mesh.geometry.attributes.position.getY(j*meta.nx + i);
 }
+// ground height anywhere on the visible cap: detailed square first, then the outer 1.19 km grid (null beyond OUTER_KM or before it loads)
+let outerH = null, outerM = null;
+function groundAt(x, z){
+  const y = heightAt(x, z); if (y != null || !outerH) return y;
+  if (Math.hypot(x, z) > OUTER_KM) return null;
+  const i = Math.floor((x*1000 - outerM.x_min)/outerM.pixel_m), j = Math.floor((outerM.y_max + z*1000)/outerM.pixel_m);
+  if (i < 0 || j < 0 || i >= outerM.nx || j >= outerM.ny) return null;
+  const h = outerH[j*outerM.nx + i]; return (isFinite(h) ? h : 0)/1000*2 - (x*x + z*z)/(2*R);
+}
+// lat/lon (east) of a point on the map: polar stereographic on the 1737.4 km sphere, +x toward 90 E, +y (= -z) toward 0 E
+function xzLatLon(x, z){ const X = x, Y = -z, rho = Math.hypot(X, Y);
+  return {lat: -90 + 2*Math.atan(rho/(2*R))/D2R, lon: ((Math.atan2(X, Y)/D2R) + 360) % 360, km: rho}; }
 // label width from its text (no layout read: reading offsetWidth every frame forced a full-page layout per label)
 const estW = (s, cpx) => s.length*cpx + 12;
 function siteXZ(s){ const rho = 2*R*Math.tan((90 + s.lat)*D2R/2); return [rho*Math.sin(s.lon*D2R), -rho*Math.cos(s.lon*D2R)]; }
@@ -59,18 +71,31 @@ function misTip(m){ return [m.name + ' (' + m.agency + ')', m.date_text, 'Status
    Same frame and curvature drop as the inner mesh, so the ground bends away toward the horizon (~26 km lower at 300 km).
    The square stays the detailed layer on top (outer pushed back with polygonOffset, its cells inside +/-59 km skipped). Display only. */
 const OUTER_KM = 300;
+/* focus fog: ground and lines fade toward the background with distance FROM THE POLE (not from the camera), so the detailed
+   area stays clear at any zoom and the rest of the cap reads as context. Clear to FOG0 km, FOGMAX at FOG1 km and beyond. */
+const FOG0 = 55, FOG1 = 120, FOGMAX = 0.82;
+function focusFog(mat){
+  mat.onBeforeCompile = sh => {
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying float vPoleKm;')
+      .replace('#include <project_vertex>', '#include <project_vertex>\nvPoleKm = length((modelMatrix * vec4(transformed, 1.0)).xz);');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying float vPoleKm;')
+      .replace('#include <fog_fragment>', `#include <fog_fragment>\ngl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.043, 0.047, 0.055), smoothstep(${FOG0.toFixed(1)}, ${FOG1.toFixed(1)}, vPoleKm)*${FOGMAX});`);
+  };
+  mat.customProgramCacheKey = () => 'focusFog';
+  return mat;
+}
 let outer = null;
 async function buildOuter(EX){
   try {
     const [om, buf] = await Promise.all([fetch('assets/site_outer_meta.json').then(r => r.json()), fetch('assets/site_outer_heights.bin').then(r => r.arrayBuffer())]);
-    const H = new Float32Array(buf), nx = om.nx, ny = om.ny, px = om.pixel_m/1000, pos = new Float32Array(nx*ny*3), idx = [];
+    const H = new Float32Array(buf); outerH = H; outerM = om; const nx = om.nx, ny = om.ny, px = om.pixel_m/1000, pos = new Float32Array(nx*ny*3), idx = [];
     for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++){ const k = j*nx + i, x = om.x_min/1000 + (i + 0.5)*px, z = -(om.y_max/1000 - (j + 0.5)*px);
       let h = H[k]; if (!isFinite(h)) h = 0; pos[k*3] = x; pos[k*3 + 1] = h/1000*EX - (x*x + z*z)/(2*R); pos[k*3 + 2] = z; }
     const inSq = k => Math.abs(pos[k*3]) < 59 && Math.abs(pos[k*3 + 2]) < 59, out = k => Math.hypot(pos[k*3], pos[k*3 + 2]) > OUTER_KM;
     for (let j = 0; j < ny - 1; j++) for (let i = 0; i < nx - 1; i++){ const a = j*nx + i, b = a + 1, c = a + nx, d = c + 1;
       if ((inSq(a) && inSq(b) && inSq(c) && inSq(d)) || out(a) || out(b) || out(c) || out(d)) continue; idx.push(a, c, b, b, c, d); }
     const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
-    outer = new THREE.Mesh(g, new THREE.MeshStandardMaterial({color: '#B9B6AE', roughness: 0.97, metalness: 0, polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 4}));
+    outer = new THREE.Mesh(g, focusFog(new THREE.MeshStandardMaterial({color: '#B9B6AE', roughness: 0.97, metalness: 0, polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 4})));
     outer.receiveShadow = true; scene.add(outer); labKey = '';
   } catch (e){ console.warn('view-site: outer cap not loaded', e); }   // the square still works on its own
 }
@@ -87,7 +112,7 @@ function buildScene(){
   g.computeVertexNormals();
   // 80 m relief finer than this 240 m mesh (assets/site_detail_normal.jpg, baked from LDEM_80S_80MPP_ADJ): sharper craters, no extra vertices
   const dn = new THREE.TextureLoader().load('assets/site_detail_normal.jpg'); dn.colorSpace = THREE.NoColorSpace; dn.anisotropy = 8;
-  mesh = new THREE.Mesh(g, new THREE.MeshStandardMaterial({color: '#B9B6AE', roughness: 0.97, metalness: 0, normalMap: dn}));
+  mesh = new THREE.Mesh(g, focusFog(new THREE.MeshStandardMaterial({color: '#B9B6AE', roughness: 0.97, metalness: 0, normalMap: dn})));
   mesh.receiveShadow = true; mesh.castShadow = true; scene.add(mesh);
   buildOuter(EX);
   scene.add(new THREE.HemisphereLight('#4A5568', '#14161A', 0.9));
@@ -95,11 +120,15 @@ function buildScene(){
   sunLight.shadow.mapSize.set(4096, 4096); const c = sunLight.shadow.camera; c.left = -90; c.right = 90; c.top = 90; c.bottom = -90; c.near = 1; c.far = 900;
   sunLight.shadow.bias = -0.0004; scene.add(sunLight); scene.add(sunLight.target);
   const ringMat = new THREE.LineBasicMaterial({color: '#4A5058'}); ringGroup = new THREE.Group(); scene.add(ringGroup);
-  [89.5, 89, 88.5, 88].forEach(lat => { const rho = 2*R*Math.tan((90 - lat)*D2R/2), pts = [];
+  // 88 S (60.6 km) dropped: it nearly sits on the focus edge ring (59.5 km) and read as a double line
+  [89.5, 89, 88.5].forEach(lat => { const rho = 2*R*Math.tan((90 - lat)*D2R/2), pts = [];
     for (let a = 0; a <= 360; a += 3){ const x = rho*Math.sin(a*D2R), z = -rho*Math.cos(a*D2R); pts.push(new THREE.Vector3(x, 1.5 - (x*x + z*z)/(2*R), z)); }
     ringGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), ringMat)); });
+  // focus edge: one quiet ring where the detailed area ends (59.5 km, just inside the +/-60 km square), draped on the terrain; no text
+  { const pts = []; for (let a = 0; a <= 360; a += 1){ const x = 59.5*Math.sin(a*D2R), z = -59.5*Math.cos(a*D2R), y = heightAt(x, z); pts.push(new THREE.Vector3(x, (y == null ? 0 : y) + 0.3, z)); }
+    scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color: '#C9CED6', transparent: true, opacity: 0.55}))); }
   psrGroup = new THREE.Group(); scene.add(psrGroup);
-  const psrMat = new THREE.LineDashedMaterial({color: '#7FD1C7', dashSize: 0.6, gapSize: 0.4});
+  const psrMat = focusFog(new THREE.LineDashedMaterial({color: '#7FD1C7', dashSize: 0.6, gapSize: 0.4}));
   App.psr.polygons.forEach(pg => pg.rings.forEach((part, pi) => {
     const ring = Array.isArray(part[0][0]) ? part[0] : part; if (Array.isArray(part[0][0]) && pi > 0) return;
     const pts = [];
@@ -112,6 +141,32 @@ function buildScene(){
   $('#lyShadow').onchange = e => { renderer.shadowMap.enabled = e.target.checked; mesh.material.needsUpdate = true; };
   $('#zin').onclick = () => camera.position.lerp(controls.target, 0.25);
   $('#zout').onclick = () => camera.position.sub(controls.target).multiplyScalar(1.3).add(controls.target);
+  // note box (bottom left, never mid-screen): spot status, errors, and "outside the detailed map" for the selected site
+  note = document.createElement('div'); note.id = 'siteNote'; note.setAttribute('role', 'status');
+  Object.assign(note.style, {position: 'absolute', left: '12px', bottom: '12px', maxWidth: '360px', font: '12px/1.4 "IBM Plex Sans", sans-serif',
+    color: 'var(--ink)', background: 'rgba(11,12,14,0.82)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '4px', padding: '6px 9px', pointerEvents: 'none', zIndex: 3});
+  note.hidden = true; root.appendChild(note);
+  // double-click the ground = test a custom landing spot there (single clicks and drags still orbit)
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  renderer.domElement.addEventListener('dblclick', async e => {
+    if (view !== 'region') return;
+    const r = renderer.domElement.getBoundingClientRect(); ndc.set((e.clientX - r.left)/r.width*2 - 1, -((e.clientY - r.top)/r.height)*2 + 1);
+    ray.setFromCamera(ndc, camera); const hit = ray.intersectObjects([mesh, outer].filter(Boolean), false)[0]; if (!hit) return;
+    const p = xzLatLon(hit.point.x, hit.point.z);
+    flash = 'Measuring this spot (' + p.lat.toFixed(3) + '°, ' + p.lon.toFixed(2) + '° E, ' + p.km.toFixed(1) + ' km from the pole)…'; noteText();
+    try { await App.addSpot(p.lat, p.lon); flash = ''; }
+    catch (err){ flash = err.message; setTimeout(() => { if (flash === err.message){ flash = ''; noteText(); } }, 5000); }
+    noteText(); });
+}
+let note = null, flash = '';
+function noteText(){
+  if (!note) return;
+  const s = App.sites[App.state.site], [x, z] = s ? siteXZ(s) : [0, 0], far = s && heightAt(x, z) == null, km = Math.hypot(x, z);
+  let t = flash;
+  if (!t && far) t = (s.custom ? 'Your spot' : s.name) + ' is ' + Math.round(km) + ' km from the pole, outside the detailed 3D map (shown faded). '
+    + (s.custom ? 'Its numbers use an approximate terrain horizon (' + s.label + ').' : 'The numbers still use its full terrain horizon.');
+  if (!t) t = 'Double-click the ground to test any spot.';
+  if (note.textContent !== t) note.textContent = t;
 }
 
 function updateScene(){
@@ -120,7 +175,7 @@ function updateScene(){
   sunLight.position.set(d*Math.cos(el)*Math.sin(az), d*Math.sin(el), -d*Math.cos(el)*Math.cos(az)); sunLight.target.position.set(0, 0, 0);
   sunLight.intensity = su.el > -0.3 ? 2.6 : 0.15;
   const w = renderer.domElement.clientWidth, h = renderer.domElement.clientHeight, out = [];
-  const key = camera.matrixWorld.elements.map(v => v.toFixed(3)).join() + '|' + w + 'x' + h + '|' + st.site + '|' + misIn.length + '|' + misGroups.length;
+  const key = camera.matrixWorld.elements.map(v => v.toFixed(3)).join() + '|' + w + 'x' + h + '|' + st.site + '|' + App.sites.length + '|' + !!outerH + '|' + misIn.length + '|' + misGroups.length;
   if (key === labKey){ legendText(labOut); return; } labKey = key; labOut = out;   // labels only move with the camera: no DOM rebuild on still frames
   const lab = $('#labels'); lab.innerHTML = '';
   const r0 = root.getBoundingClientRect(), placed = [...root.querySelectorAll('#layersBox, .zoom, .views')].map(e => e.getBoundingClientRect()).filter(b => b.width)
@@ -131,7 +186,7 @@ function updateScene(){
       const right = b.L + (b.w + ew)/2 + 2, below = b.T + (b.h + eh)/2 + 2;
       if (right - L <= below - T) L = right; else T = below; }
     return [L, T]; };
-  App.sites.forEach((s, i) => { const [x, z] = siteXZ(s), y = heightAt(x, z);
+  App.sites.forEach((s, i) => { const [x, z] = siteXZ(s), y = groundAt(x, z);   // sites beyond the detailed square sit on the faded outer cap
     if (y == null){ out.push(s.short);   // outside the terrain: a clickable pin at the edge, pointing its way (the map is the only site picker)
       const km = (90 + s.lat)*D2R*R, ex = 50*Math.sin(s.lon*D2R), ez = -50*Math.cos(s.lon*D2R), ey = heightAt(ex, ez), v = new THREE.Vector3(ex, (ey == null ? 0 : ey) + 0.6, ez).project(camera);
       if (v.z > 1) return; const e = document.createElement('div'); e.className = 'pin edge' + (i === st.site ? ' sel' : ''); e.textContent = s.short + ' · ' + Math.round(km) + ' km ➜'; e.title = s.name + ' (outside this terrain view): click to select';
@@ -139,8 +194,10 @@ function updateScene(){
       [L, T] = clearUI(L, T - 9, ew, 18); T += 9;
       e.style.left = L + 'px'; e.style.top = T + 'px'; e.onclick = () => App.set({site: i, selDay: -1}, 'scene'); lab.appendChild(e);
       placed.push({L, T: T - 9, w: estW(e.textContent, 7.2), h: 18}); return; }
-    const v = new THREE.Vector3(x, y + 0.6, z).project(camera); if (v.z > 1) return;
+    const v = new THREE.Vector3(x, y + 0.6, z).project(camera); if (v.z > 1 || Math.abs(v.x) > 1 || v.y > 0.97 || v.y < -1) return;   // off the frame: no pin
     const e = document.createElement('div'); e.className = 'pin' + (i === st.site ? ' sel' : ''); e.textContent = s.short;
+    if (s.custom){ e.style.background = 'var(--bg)'; e.style.color = i === st.site ? 'var(--earth)' : 'var(--ink)';   // custom spot: hollow pin
+      e.style.border = '1.5px solid ' + (i === st.site ? 'var(--earth)' : 'var(--ink)'); e.title = 'Your spot (' + s.label + ')'; }
     let L = (v.x*0.5 + 0.5)*w, T = (-v.y*0.5 + 0.5)*h - 14;
     [L, T] = clearUI(L, T - 9, estW(e.textContent, 7.2), 18); T += 9;
     e.style.left = L + 'px'; e.style.top = T + 'px'; e.onclick = () => App.set({site: i, selDay: -1}, 'scene'); lab.appendChild(e);
@@ -176,11 +233,12 @@ function updateScene(){
 }
 function legendText(out){
   const mOut = misOut.map(m => m.name.replace(/ \(.*\)$/, ''));
-  const lg = 'LOLA terrain (PGDA 90): ±60 km around the pole at 240 m with 80 m relief shading, the rest of the cap to 300 km at 1.2 km<br>vertical ×2 · shadows are visual only<br>numbers come from 360° horizon masks' + (out.length ? '<br>outside this view: ' + out.join(', ') : '')
-    + (misIn.length || misOut.length ? '<span class="msw">other missions: circle = position uncertainty, dashed = region only, filled dot = on the surface</span>'
+  // the (i) on the "other missions" row explains other missions only (Eren); the terrain note lives in the right panel
+  const lg = (misIn.length || misOut.length ? '<span class="msw">other missions: circle = position uncertainty, dashed = region only, filled dot = on the surface</span>'
       + '<span class="msw">faint outer ring = keep-out: 2.0 km from a lander, 0.5 km from an impact (NASA 2011, non-binding), '
       + ((App.state.missions || {}).caution ?? Missions.DEFAULTS.caution) + ' km for a large lander (our assumption), measured from the circle edge</span>'
-      + (mOut.length ? '<span class="mout">' + mOut.length + ' more missions outside this view (arrows at the edge): ' + mOut.join(', ') + '</span>' : '') + '<span class="mlabel">' + Missions.LABEL + '</span>' : '');
+      + (mOut.length ? '<span class="mout">' + mOut.length + ' more missions further out (arrows at the edge of the detailed area): ' + mOut.join(', ') + '</span>' : '') + '<span class="mlabel">' + Missions.LABEL + '</span>'
+    : '<span class="msw">Other missions are hidden. Tick the box to show them.</span><span class="mlabel">' + Missions.LABEL + '</span>');
   if (lg !== lastLegend){ lastLegend = lg; $('#legend').innerHTML = lg; }   // only touch the DOM when the text changes
 }
 let lastLegend = '', labKey = '', labOut = [];
@@ -188,8 +246,10 @@ const misShort = m => m.id === 'mip' ? 'Ch-1 impact est. 1' : m.id === 'mip_alt'
 
 register('region', {
   build: buildScene,
-  show(on){ $('#layersBox').hidden = !on; $('#labels').hidden = !on; root.querySelector('.zoom').hidden = !on; controls.enabled = on; },
+  show(on){ $('#layersBox').hidden = !on; $('#labels').hidden = !on; root.querySelector('.zoom').hidden = !on; controls.enabled = on; if (note){ note.hidden = !on; noteText(); } },
   frame(){ controls.update(); updateScene(); renderer.render(scene, camera); },
-  onState(keys){ if (keys.has('missions')){ buildMissions(); $('#lyMis').checked = (App.state.missions || {}).on !== false; } },
+  onState(keys){ if (keys.has('missions')){ buildMissions(); $('#lyMis').checked = (App.state.missions || {}).on !== false; }
+    if (keys.has('spot') || keys.has('sites')){ labKey = ''; buildMissions(); }   // App.sites changed length: pins rebuild on the next frame
+    if (keys.has('site') || keys.has('spot') || keys.has('sites')) noteText(); },
   ready(){ $('#lyMis').checked = (App.state.missions || {}).on !== false; buildMissions(); },
 });

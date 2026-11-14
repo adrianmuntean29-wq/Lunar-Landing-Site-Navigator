@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import {$, D2R, renderer, view, cams, glowTex, register} from './scene-core.js';
 
+let markGroup = null, markKey = '', marks = [];   // other missions + permanent-shadow directions
 let sky, skyCam, sunCore, sunGlow, earthBall, skyLight, horizonMesh, ridgeLine, sunGhost, earthGhost, look = {yaw: 0, pitch: 2, fov: 40};
 const OPEN_FOV = 16;   // opening zoom: ~27 px per degree on a 430 px pane, so a 1-3 deg gap between Sun and ridge is visible (true scale, no exaggeration)
 const DSKY = 1000;
@@ -67,6 +68,65 @@ function updateSky(){
   place('earth', ed, 'Earth', 34, w, h, true, !x.earthVis);
   const m = App.mask(s);
   [['N', 0], ['E', 90], ['S', 180], ['W', 270]].forEach(([t, az]) => place(t, dirv(az, App.profAt(m, az) + 0.3), t, -18, w, h, false));
+  const mk = st.site + '/' + st.mast + '/' + JSON.stringify(st.missions || {}); if (mk !== markKey){ markKey = mk; buildMarks(); }
+  placeMarks(w, h, [sd, ed]);
+}
+/* ---------- where other missions and permanent shadow are: DIRECTION indicators on the horizon ----------
+   From a 2-10 m mast they are beyond the horizon or inside crater floors, so they are NOT drawn as visible; we only mark which way they lie.
+   Missions: Missions.near (same rows + on/off + Chang'e switch as Landing Site), tick on the ridge + short name and distance.
+   Permanent shadow: "permanently shadowed (LOLA model)" areas (App.psr; never call them ice, DECISIONS 11) within PSR_KM: teal strip under the ridge. */
+const MCOL = '#F2876B', PCOL = '#7FD1C7', MIS_KM = 100, PSR_KM = 20;   // colours = Landing Site legend
+const misShort = m => m.id === 'mip' ? 'Ch-1 impact est. 1' : m.id === 'mip_alt' ? 'Ch-1 impact est. 2' : m.name.replace(/ \(.*\)$/, '').replace(/ Endurance$/, '');
+function bearing(lat1, lon1, lat2, lon2){   // initial great-circle bearing, deg clockwise from north (display direction only)
+  const p1 = lat1*D2R, p2 = lat2*D2R, dl = (lon2 - lon1)*D2R;
+  return (Math.atan2(Math.sin(dl)*Math.cos(p2), Math.cos(p1)*Math.sin(p2) - Math.sin(p1)*Math.cos(p2)*Math.cos(dl))/D2R + 360) % 360; }
+function buildMarks(){
+  if (markGroup){ sky.remove(markGroup); markGroup.traverse(o => o.geometry && o.geometry.dispose()); }
+  markGroup = new THREE.Group(); sky.add(markGroup);
+  marks.forEach(k => { k.e.remove(); }); marks = [];
+  const st = App.state, s = App.sites[st.site], m = App.mask(s);
+  // missions
+  if (window.Missions && (st.missions || {}).on !== false){
+    const tick = [];
+    for (const n of Missions.near(s, {withinKm: MIS_KM})){
+      const az = bearing(s.lat, s.lon, n.m.lat, n.m.lon), el = App.profAt(m, az);
+      for (const [da, de] of [[-0.25, 0.05], [0.25, 0.05], [0, 0.75]]){ const v = dirv(az + da, el + de).multiplyScalar(796); tick.push(v.x, v.y, v.z); }   // small pin standing on the ridge
+      const e = document.createElement('div'); e.className = 'sky card'; e.style.color = MCOL; e.style.font = '500 11px "IBM Plex Mono"';
+      e.textContent = misShort(n.m) + ' · ' + (n.km < 10 ? n.km.toFixed(1) : Math.round(n.km)) + ' km' + (n.m.precision === 'region' ? ' · region' : '');
+      $('#skylabels').appendChild(e); marks.push({e, dir: dirv(az, el + 0.75), km: n.km});
+    }
+    if (tick.length){ const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(tick, 3));
+      const pin = new THREE.Mesh(g, new THREE.MeshBasicMaterial({color: MCOL, depthTest: false, side: THREE.DoubleSide})); pin.renderOrder = 6; markGroup.add(pin); }
+  }
+  // permanent shadow: nearest PSR distance per 1 deg bin (outline edges sampled every ~150 m, polar stereographic metres, conformal so bearings hold)
+  const rho = 2*1737400*Math.tan((90 + s.lat)*D2R/2), sx = rho*Math.sin(s.lon*D2R), sy = rho*Math.cos(s.lon*D2R);
+  const N = [Math.sin(s.lon*D2R), Math.cos(s.lon*D2R)], E = [Math.cos(s.lon*D2R), -Math.sin(s.lon*D2R)], near = new Float32Array(360).fill(Infinity), LIM = PSR_KM*1000;
+  const hit = (x, y) => { const dx = x - sx, dy = y - sy, d = Math.hypot(dx, dy); if (d > LIM) return;
+    const k = Math.floor((Math.atan2(dx*E[0] + dy*E[1], dx*N[0] + dy*N[1])/D2R + 360) % 360); if (d < near[k]) near[k] = d; };
+  for (const pg of App.psr.polygons) for (const ring of pg.rings){
+    if (!ring.some(([x, y]) => Math.hypot(x - sx, y - sy) < LIM + 5000)) continue;
+    for (let i = 0; i < ring.length; i++){ const [x0, y0] = ring[i], [x1, y1] = ring[(i + 1) % ring.length], n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0)/150));
+      for (let q = 0; q < n; q++) hit(x0 + (x1 - x0)*q/n, y0 + (y1 - y0)*q/n); }
+  }
+  const pos = [], col = [], idx = [], c = new THREE.Color(PCOL);
+  for (let k = 0; k < 360; k++){ if (!isFinite(near[k])) continue;
+    const al = 0.45 + 0.5*(1 - near[k]/LIM), i = pos.length/3;   // closer = stronger
+    for (const az of [k, k + 1]){ const hz = App.profAt(m, az), t = dirv(az, hz - 0.1).multiplyScalar(797), bt = dirv(az, hz - 1.1).multiplyScalar(797);
+      pos.push(t.x, t.y, t.z, bt.x, bt.y, bt.z); col.push(c.r, c.g, c.b, al, c.r, c.g, c.b, al); }
+    idx.push(i, i + 1, i + 2, i + 1, i + 3, i + 2); }
+  if (idx.length){ const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 4)); g.setIndex(idx);
+    markGroup.add(new THREE.Mesh(g, new THREE.MeshBasicMaterial({vertexColors: true, transparent: true, depthWrite: false, depthTest: false, side: THREE.DoubleSide}))); markGroup.children[markGroup.children.length - 1].renderOrder = 5; }
+}
+/* mission names above their ticks; nearest first, a label that would overlap one already placed is hidden (the tick stays) */
+function placeMarks(w, h, bodies){
+  const used = [];   // Sun and Earth (disc + name) block mission names, so names never cover a body
+  for (const d of bodies){ const q = d.clone().multiplyScalar(DSKY).project(skyCam); if (q.z <= 1) used.push({x: (q.x*0.5 + 0.5)*w, y: (-q.y*0.5 + 0.5)*h + 10, hw: 34}); }
+  for (const k of marks){
+    const q = k.dir.clone().multiplyScalar(DSKY).project(skyCam), x = (q.x*0.5 + 0.5)*w, y = (-q.y*0.5 + 0.5)*h - 14, hw = k.e.textContent.length*3.4 + 4;
+    const ok = q.z <= 1 && Math.abs(q.x) <= 1 && Math.abs(q.y) <= 1 && !used.some(u => Math.abs(u.y - y) < (u.hw === 34 ? 30 : 14) && Math.abs(u.x - x) < u.hw + hw);
+    k.e.style.display = ok ? '' : 'none'; if (!ok) continue;
+    k.e.style.left = x + 'px'; k.e.style.top = y + 'px'; used.push({x, y, hw});
+  }
 }
 /* one persistent label per key; bodies off screen get an arrow at the screen edge pointing to them */
 const LAB = {}, EDGE = 26;

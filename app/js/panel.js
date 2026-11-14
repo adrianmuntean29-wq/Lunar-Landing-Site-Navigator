@@ -14,15 +14,15 @@
         <div><span>Earth to Sun</span><b id="oES"></b></div>
       </section>
       <section class="blk">
-        <h3>At <span class="siteName plain"></span> now</h3>
+        <h3>At <span class="siteName plain"></span> now</h3><small class="apx" hidden></small>
         <div class="stline"><span class="ic sunc">☀</span><div><b id="oSun"></b></div></div>
         <div class="stline"><span class="ic earthc">⊕</span><div><b id="oEarth"></b></div></div>
       </section>
       <p class="rl">A lunar day (sunrise to sunrise) lasts 29.5 Earth days. At the south pole the Sun circles the horizon once in that time.</p>
-      <details class="how"><summary>About this view</summary><p>Click the Sun, Earth or Moon to focus; drag to turn, right-drag to move, scroll to zoom.</p><p>Sun, Earth and Moon at true size and true distance (the view centres on the Sun and shows Earth's yearly path). Earth's path from a standard solar-position formula (~0.01°); Moon positions: JPL Horizons table. Earth image: NASA Blue Marble; Earth's axial tilt not shown. Stars decorative.</p></details>
+      <details class="how"><summary>About this view</summary><p>Click the Sun, Earth or Moon to focus; drag to turn, right-drag to move, scroll to zoom.</p><p>Sun, Earth and Moon at true size and true distance (the view centres on the Sun and shows Earth's yearly path). Earth's path from a standard solar-position formula (~0.01°); Moon positions: JPL Horizons table. Earth image: NASA Blue Marble. Stars decorative.</p><p>Gold lines = spin axes. Earth leans 23.4°, which gives it seasons. The Moon leans only 1.5°, so at its south pole the Sun always skims the horizon and crater rims decide light and shadow.</p></details>
     </div>
     <div class="scroll" id="pGround" hidden>
-      <div class="sitepick"><span>Standing at</span><h2 class="siteName"></h2></div>
+      <div class="sitepick"><span>Standing at</span><h2 class="siteName"></h2><small class="apx" hidden></small></div>
       <section class="blk">
         <h3>Now <span id="nowT"></span></h3>
         <div class="stline"><span class="ic sunc">☀</span><div><b id="nSun"></b><small id="nSunS"></small><small class="ht" id="nSunH"></small></div></div>
@@ -40,10 +40,11 @@
         <p class="dark" id="gDark"></p>
         <p class="note">Can shift by up to a day near a ridge.</p>
       </section>
-      <details class="how"><summary>About this view</summary><p>Drag to look around, scroll to zoom.</p><p>14-day strip: one column per hour. Sun % = average share of the Sun's disc above the terrain; Earth % = share of hours with Earth in view. Dark = less than half the Sun's disc visible.</p><p>Horizon = NASA LOLA terrain mask (360 directions). Height = angle above a flat, level horizon; the terrain decides if the Sun or Earth is actually visible.</p></details>
+      <details class="how"><summary>About this view</summary><p>Drag to look around, scroll to zoom.</p><p>14-day strip: one column per hour. Sun % = average share of the Sun's disc above the terrain; Earth % = share of hours with Earth in view. Dark = less than half the Sun's disc visible.</p><p>Horizon = NASA LOLA terrain mask (360 directions). Height = angle above a flat, level horizon; the terrain decides if the Sun or Earth is actually visible.</p><p>Orange pins: other missions. Teal strip under the ridge: permanently shadowed areas (LOLA model) within 20 km. Direction only: from the mast they are beyond the horizon or inside crater floors, not in view.</p></details>
     </div>
     <div class="scroll" id="pMission" hidden>
-      <div class="sitepick"><span>Landing site</span><h2 class="siteName"></h2></div>
+      <div class="sitepick"><span>Landing site</span><h2 class="siteName"></h2><small class="apx" hidden></small></div>
+      <section class="blk shut"><h3>Your own spot</h3><div class="spotf"></div></section>
       <section class="verdict" id="verdict" aria-live="polite">
         <div class="vn"><b id="rN"></b><span id="rNs"></span></div>
         <div class="share" aria-hidden="true"><i id="rBar"></i></div>
@@ -70,9 +71,10 @@
         <p class="rl" id="rPsr"></p>
       </section>
       <details class="how"><summary>How this is computed</summary><p>Sunlight: average share of the Sun's disc above the real terrain horizon (NASA LOLA). Darkness: the Sun's centre is below that horizon. Earth contact: any part of Earth is above it (geometry only, not a radio link). Sun and Earth positions: JPL Horizons. Each day means a landing at 00:00 UTC.</p></details>
+      <details class="how"><summary>About this view</summary><p>Terrain: NASA LOLA heights (PGDA 90, Barker et al. 2023). Within 60 km of the pole: 240 m grid with 80 m relief shading. The rest of the cap, out to 300 km: 1.2 km grid. Heights ×2, and the ground curves with the Moon.</p><p>Shadows in this view are visual only; every number comes from the 360-direction horizon masks.</p></details>
     </div>
     <div class="scroll" id="pSites" hidden>
-      <div class="sitepick"><span>Selected site</span><h2 class="siteName"></h2><small id="gLoc"></small></div>
+      <div class="sitepick"><span>Selected site</span><h2 class="siteName"></h2><small id="gLoc"></small><small class="apx" hidden></small></div>
       <section class="blk gsite">
         <div class="stline"><span class="ic sunc">☀</span><div><b id="gSun"></b><small id="gSunS"></small></div></div>
         <div class="stline"><span class="ic earthc">⊕</span><div><b id="gEarth"></b><small id="gEarthS"></small></div></div>
@@ -85,12 +87,29 @@
       </section>
       <p class="rl">Drag to turn, scroll to zoom. "South pole" and "Whole Moon" (top left) move the camera.</p>
       <div class="sec"><h3>ALL SITES · SAME LIMITS · CLICK ONE OR A MARKER ON THE MOON</h3><div id="siteList" class="sitelist"></div></div>
-      <div class="sec"><h3>ADD A SPOT</h3><div class="addspot"><label>LAT<br><input id="aLat" type="number" step="0.01" value="-89.2"></label><label>LON E<br><input id="aLon" type="number" step="0.1" value="120"></label><button class="btn" type="button" id="aGo" title="Draft: not wired yet">ADD</button></div>
-      <p class="note" style="margin-top:6px">Added spots get an approximate horizon from the 640 m whole-pole terrain (draft: not wired yet).</p></div>
+      <div class="sec"><h3>YOUR OWN SPOT</h3><div class="spotf"></div></div>
       <div class="sec"><h3>DATA</h3><div class="prov" id="prov"></div></div>
       <details class="how"><summary>About this view</summary><p>3D terrain: LOLA polar DEM (PGDA 90, 240 m), heights ×2, edge eased into the globe. Shadows and fill light are visual only; all numbers come from the 360-direction horizon masks. Surface colour: NASA SVS CGI Moon Kit (made for looks, not science). Malapert lies outside the terrain area (122 km from the pole). Only our precomputed sites have numbers.</p></details>
     </div>`;
 
+  /* Custom landing spot (Eren via engine, 14 Nov; core App.addSpot). Same form in the Plan and Moon views.
+     Every number for a custom spot carries site.label + an (i): approximate horizon, up to ~20 points off in sun % (engine MEASURED). */
+  const APX_TIP = 'Horizon from coarse terrain grids, not the exact masks of the named sites. It misses nearby bumps, so sun and Earth % can be far off. Distance to permanent shadow is not computed.';
+  let tipN = 0;
+  root.querySelectorAll('.spotf').forEach(f => { f.innerHTML = '<div class="addspot"><label>Latitude<br><input class="sLat" type="number" step="0.01" value="-89.2" aria-label="Latitude, degrees (negative = south)"></label><label>Longitude E<br><input class="sLon" type="number" step="0.1" value="120" aria-label="East longitude, degrees"></label><button class="btn sAdd" type="button">Add</button><button class="btn sDel" type="button" hidden>Remove</button></div><p class="note sMsg">Any spot within 290 km of the pole. Its horizon is approximate.</p>'; });
+  function approxLines(){
+    const s = App.sites[App.state.site], on = !!s.custom;
+    root.querySelectorAll('.apx').forEach(el => { el.hidden = !on; if (!on) return; const id = 'apxTip' + (tipN++);
+      el.innerHTML = '<span>' + s.label.charAt(0).toUpperCase() + s.label.slice(1) + '</span> <span class="info-wrap"><button type="button" class="info-i" aria-label="About approximate numbers" aria-describedby="' + id + '">i</button><span class="info-tip left" id="' + id + '" role="tooltip">' + (s.why ? s.why + ' Distance to permanent shadow is not computed.' : APX_TIP) + '</span></span>'; });
+    root.querySelectorAll('.sDel').forEach(b => b.hidden = !App.state.spot);
+  }
+  async function addSpot(f){
+    const msg = f.querySelector('.sMsg'), btn = f.querySelector('.sAdd');
+    btn.disabled = true; msg.classList.remove('err'); msg.textContent = 'Computing the horizon (about 1 s)...';
+    try { const s = await App.addSpot(f.querySelector('.sLat').value, f.querySelector('.sLon').value); msg.textContent = 'Added and selected: ' + Math.abs(s.lat).toFixed(2) + '° S, ' + s.lon.toFixed(1) + '° E (' + s.label + ').'; }
+    catch (e){ msg.classList.add('err'); msg.textContent = e.message; }
+    finally { btn.disabled = false; }
+  }
   const pressed = (sel, v) => root.querySelectorAll(sel + ' button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === String(v)));
   function sliders(){
     const st = App.state;
@@ -201,10 +220,13 @@
   function siteList(){
     const st = App.state, sj = App.sitesJson;
     const rows = App.sites.map((s, i) => { const w = App.wins(i); return {i, s, ok: w.filter(o => !o.fail.length).length, n: w.length, rs: s.raw.reference_stats.by_mast[st.mast]}; }).sort((a, b) => b.ok - a.ok);
-    $('#siteList').innerHTML = rows.map(r => { const raw = r.s.raw, ref = (raw.reference || []).find(x => String(x.mast_m) === st.mast), out = st.psr && raw.psr_km > st.psr;
+    // custom spot listed apart, below the named sites (coordinator 14 Nov: approximate numbers are not ranked with exact ones)
+    const card = r => { const raw = r.s.raw, ref = (raw.reference || []).find(x => String(x.mast_m) === st.mast), out = st.psr && raw.psr_km > st.psr;
       return '<div class="sitecard' + (r.i === st.site ? ' sel' : '') + (out ? ' out' : '') + '" data-i="' + r.i + '"><div class="n"><span>' + r.s.name + '</span><span class="mono">' + r.ok + ' / ' + r.n + ' days</span></div>' +
         '<div class="nums"><div><span>SUN 2027</span>' + r.rs.sun_pct.toFixed(1) + '%</div><div><span>EARTH</span>' + r.rs.earth_pct.toFixed(1) + '%</div><div><span>LONGEST NIGHT</span>' + r.rs.longest_night_h + ' h</div><div><span>TO PSR</span>' + (raw.psr_km != null ? raw.psr_km.toFixed(1) + ' km' : '?') + '</div></div>' +
-        '<div class="q">' + Math.abs(raw.lat).toFixed(4) + '° S, ' + raw.lon_e.toFixed(2) + '° E · ' + (ref ? ref.paper + ': ' + ref.sun_pct + '% vs ours ' + ref.ours_5y_sun_pct.toFixed(1) + '% (5 y)' : 'no published value at this mast height') + (raw.truncated ? ' · far terrain cut at the map edge' : '') + (out ? ' · outside your shadow filter' : '') + '</div></div>'; }).join('');
+        '<div class="q">' + Math.abs(raw.lat).toFixed(4) + '° S, ' + raw.lon_e.toFixed(2) + '° E · ' + (ref ? ref.paper + ': ' + ref.sun_pct + '% vs ours ' + ref.ours_5y_sun_pct.toFixed(1) + '% (5 y)' : 'no published value at this mast height') + (r.s.custom ? ' · ' + r.s.label : '') + (raw.truncated ? ' · far terrain cut at the map edge' : '') + (out ? ' · outside your shadow filter' : '') + '</div></div>'; };
+    const named = rows.filter(r => !r.s.custom), mine = rows.filter(r => r.s.custom);
+    $('#siteList').innerHTML = named.map(card).join('') + (mine.length ? '<div class="subh">Your spot (approximate)</div>' + mine.map(card).join('') : '');
     $('#prov').innerHTML = 'Terrain masks: ' + sj.versions.dem + '; near field ' + sj.versions.dem_near + '; computed ' + sj.generated_utc + '<br>Sun/Earth: JPL Horizons DE441 table, computed ' + App.eph.generated_utc + '<br>Permanent shadow: PGDA 90 outlines, ' + App.psr.polygons.length + ' regions ≥ 1 km²<br><a href="#" onclick="return false">Request a newer precalculation</a> (GitHub issue; about 2-6 min to run)';
   }
   // One panel section per scene view (Eren 14 Nov): the view tabs on the Moon decide what the panel answers.
@@ -218,12 +240,12 @@
   function render(keys, source){
     const light = keys && [...keys].every(k => ['t', 'selDay', 'playing', 'speed', 'panelOpen', 'drawerOpen'].includes(k));
     if (light){ if (performance.now() - lastNow > 250){ lastNow = performance.now(); live(); } return; }   // only the time moved: update the live numbers of the visible view
-    showView(); root.querySelectorAll('.siteName').forEach(h => h.textContent = App.sites[App.state.site].name); sliders(); now(); heights(); if (App.state.view === 'ground') ahead(); orbit(); globeSite(); result(); others(); siteList();
+    showView(); approxLines(); root.querySelectorAll('.siteName').forEach(h => h.textContent = App.sites[App.state.site].name); sliders(); now(); heights(); if (App.state.view === 'ground') ahead(); orbit(); globeSite(); result(); others(); siteList();
   }
 
   // Fold any section to its heading (Eren 14 Nov): chevron on each .blk heading; the verdict card never folds.
   root.querySelectorAll('.blk > h3').forEach(h => {
-    h.setAttribute('role', 'button'); h.tabIndex = 0; h.setAttribute('aria-expanded', 'true');
+    h.setAttribute('role', 'button'); h.tabIndex = 0; h.setAttribute('aria-expanded', String(!h.parentElement.classList.contains('shut')));
     h.insertAdjacentHTML('beforeend', '<i class="chev" aria-hidden="true"></i>');
     const flip = () => { const shut = h.parentElement.classList.toggle('shut'); h.setAttribute('aria-expanded', !shut); };
     h.onclick = flip; h.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); flip(); } };
@@ -236,6 +258,8 @@
     $('#psrf').onclick = e => { const b = e.target.closest('button'); if (b) App.set({psr: +b.dataset.v}, 'panel'); };
     $('#siteList').onclick = e => { const c = e.target.closest('.sitecard'); if (c) App.set({site: +c.dataset.i, selDay: -1}, 'panel'); };
     $('#gMastSeg').onclick = e => { const b = e.target.closest('button'); if (b) App.set({mast: b.dataset.v}, 'panel'); };
+    root.querySelectorAll('.spotf').forEach(f => { f.querySelector('.sAdd').onclick = () => addSpot(f); f.querySelector('.sDel').onclick = () => { App.clearSpot(); f.querySelector('.sMsg').textContent = 'Removed.'; };
+      f.querySelectorAll('input').forEach(i => i.onkeydown = e => { if (e.key === 'Enter') addSpot(f); }); });
     $('#gPlan').onclick =() => App.set({view: 'region'}, 'panel');
     $('#closeP').onclick =() => App.set({panelOpen: false}, 'panel');
     App.on(render); render();

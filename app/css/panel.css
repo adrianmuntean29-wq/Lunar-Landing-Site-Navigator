@@ -165,3 +165,9 @@
 #panel .addspot input{width:90px;font:500 12.5px "IBM Plex Mono";color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:5px 6px}
 #panel .prov{font:500 11.5px "IBM Plex Mono";color:var(--muted);line-height:1.7}
 #panel .prov a{color:var(--earth)}
+/* custom landing spot: approximate label + (i), form messages */
+#panel .apx{display:flex;align-items:center;gap:6px;font:500 12px "IBM Plex Mono";color:#E8B04A}
+#panel .apx[hidden]{display:none}
+#panel .addspot .btn[hidden]{display:none}
+#panel .sMsg{margin-top:6px} #panel .sMsg.err{color:var(--bad)}
+#panel .sitelist .subh{font:500 12px "IBM Plex Mono";color:#E8B04A;margin:10px 0 4px}

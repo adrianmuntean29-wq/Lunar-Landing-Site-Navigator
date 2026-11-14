@@ -38,12 +38,18 @@ const views = {}, ORDER = ['region', 'ground', 'globe', 'system'];   // build or
 export function register(name, hooks){ views[name] = hooks; }
 
 function size(){ if (!renderer) return; const w = root.clientWidth, h = root.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false);
-  cams.forEach(c => { c.aspect = w/h; c.updateProjectionMatrix(); }); }
+  cams.forEach(c => { c.aspect = w/h; c.updateProjectionMatrix(); }); layersSpot(); }
+// layers box: top-right corner; drops below the view tabs only when the scene is too narrow for both on one row
+let boxW = 310;
+function layersSpot(){ const box = $('#layersBox'), tabs = root.querySelector('.views'); if (box.offsetWidth) boxW = box.offsetWidth;
+  const w = root.clientWidth; root.classList.toggle('layers-low', w/2 + tabs.offsetWidth/2 + 12 > w - 12 - boxW);
+  root.style.setProperty('--tabs-b', (tabs.offsetTop + tabs.offsetHeight + 8) + 'px'); }   // row under the tabs (they wrap to 2 lines when narrow): camera bars + low layers box
 
 export function setView(v){
   view = v; root.querySelectorAll('.views button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === v));
   if (App.state.view !== v) App.set({view: v}, 'scene');   // shared: the panel shows different content per view (CONTRACT)
   ORDER.forEach(n => views[n] && views[n].show && views[n].show(n === v));
+  layersSpot();   // the box is measurable only while shown
 }
 
 function loop(){

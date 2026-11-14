@@ -2,7 +2,8 @@
 
 Folder: `design-drafts\app\` (a design draft, NOT the team repo). Open it at `http://localhost:8766/design-drafts/app/index.html`
 (a local server serves the event folder; if it is down: `python -m http.server 8766 --bind 127.0.0.1` in the event folder).
-Data comes read-only from `..\..\Lunar-Landing-Site-Navigator\data\`. Never edit the data files or anything in the repo or the engine.
+Data comes read-only from `app\data\` (`App.DATA = 'data/'`, since 2026-11-14 ~17:50): copies of the engine's files (origin/main, PR #4)
++ `subpoints.json` + `missions.csv`; see `data\README.txt`. Never edit the data files or anything in the repo or the engine.
 
 ## Ownership (one chat per file set; never edit a file you do not own)
 
@@ -26,6 +27,10 @@ COORDINATOR with the exact change. It lands once, for everyone. Do not work arou
 Each view calls `register(name, {build, show(on), frame(), onState(keys, src), ready()})` from `scene-core.js`.
 A view edits only its own file. Anything shared (root markup, helpers, renderer, terrain load, `css/scene.css`) goes
 through the SCENE CORE owner. Views never call each other.
+
+**Shared (i) info tooltip (base.css, any area, since 2026-11-14):** `.info-wrap` > `button.info-i` + `span.info-tip.role=tooltip`
+(markup in the base.css comment). Tip opens below, right-aligned; add `left` to the tip to align it left. Put an (i) on every field
+that needs one explanation (Eren). Do not restyle it per area; ask the coordinator for changes.
 
 ## How areas talk: only through `window.App` (core.js)
 
@@ -51,6 +56,13 @@ Checked against the engine: 0 of 1,460 landing days disagree (vault log 1440 / f
   +/-15 days). Orbit-view numbers live in the RIGHT PANEL; the middle screen stays as free of text as possible (Eren, 15:5x).
 - `App.series(i)` -> hourly `{sun, earth}` arrays from `jd0`; `App.mask(site)`, `App.profAt(mask, az)`; `App.ephAt(jd)`, `App.azel(lat, lon, v)`
 - Data: `App.sites` (name, short, lat, lon, masks, psr_km, raw), `App.sitesJson`, `App.psr` (outlines), `App.eph` (table dates)
+- **Custom landing spot:** `await App.addSpot(lat, lonEast)` adds ONE spot (replaces the previous), selects it and emits `'spot'` (+ `'site'`).
+  It rejects with a plain-English `Error` (show `err.message`) if the spot is more than `App.MAX_SPOT_KM` (290) km from the pole.
+  `App.clearSpot()` removes it. The row has `custom: true, approx: true, label`, `why` (one-line reason, use it in the (i) tip) ("approximate, 240 m + 640 m terrain" or "... 640 m ..."),
+  `psr_km: null` (show "unknown"), `poleKm`, `ground_m`, `edge_rays`. Every number for it MUST show `site.label`: the engine measured up to
+  ~20 points sun % error at the named sites (e.g. Shackleton 65 vs 84). ~0.4-0.7 s per spot (MEASURED). **On `'spot'`, rebuild anything
+  built per site (pins, lists): `App.sites` changed length.** Do not rank a custom spot among the named sites without its label
+  (engine, MEASURED: Malapert Earth 63% exact vs 100% on the coarse grid; a 640 m grid averages away a nearby bump on the summit). `App.state.spot` = null | {lat, lon, label, n}.
 - Words: `App.iso(jd)`, `App.dayDate(d)`, `App.plainH(h)`; presets `App.PRESETS` (example values, not NASA's)
 
 Rules that stay true everywhere: sunlight % = mean visible share of the Sun's disc; night/darkness = Sun centre below the
