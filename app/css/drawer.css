@@ -1,0 +1,86 @@
+/* drawer.css: OWNER "bottom panel" chat. Style only things inside #drawer. */
+#drawer{background:var(--panel);border-top:1px solid var(--line)}
+/* time row (clock, play, speed, Sun/Earth now) */
+#drawer .trow{display:flex;align-items:center;gap:16px;height:34px;padding:0 14px;border-bottom:1px solid var(--line);font:500 12.5px "IBM Plex Mono";white-space:nowrap;overflow:hidden}
+#drawer .trow .k{color:var(--muted)} #drawer .trow b{color:var(--ink);font-weight:600}
+#drawer .trow .tsun b{color:var(--sun)} #drawer .trow .tearth b{color:var(--earth)}
+#drawer .trow .tplay{min-width:92px} #drawer .trow .tplay.on{background:var(--ink);color:var(--bg)}
+#drawer .trow .tsite{font-family:"IBM Plex Sans"}
+#drawer .dtabs{align-items:center;flex-wrap:wrap;row-gap:4px;padding-top:4px}
+#drawer .dtabs .sp{margin-left:auto}
+#drawer .period{display:inline-flex;align-items:center;gap:8px;font:500 12px "IBM Plex Mono";color:var(--muted);margin-right:8px}
+#drawer .tokd{font:500 13px "IBM Plex Mono";color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:4px 6px;color-scheme:dark}
+#drawer .dbody{height:256px;overflow:hidden;padding:10px 14px;min-width:0}
+#drawer.hid .dbody{display:none}
+#drawer .mut{color:var(--muted)}
+/* shared tab header */
+#drawer .calhead .site{color:var(--ink);font-weight:700}
+#drawer .calhead{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font:500 13px "IBM Plex Sans";color:var(--ink);margin-bottom:8px}
+#drawer .sw2{display:inline-block;width:16px;height:12px;border-radius:2px}
+#drawer .sw2.g{background:var(--go)}
+#drawer .caldet{margin:0 0 0 auto;font:500 13px "IBM Plex Sans";color:var(--muted);text-align:right}
+#drawer .caldet b{color:var(--ink)} #drawer .caldet .ok{color:var(--go)} #drawer .caldet .no{color:var(--bad)}
+#drawer .pnav{background:var(--panel2);border:1px solid var(--line);border-radius:6px;color:var(--ink);font-size:16px;cursor:pointer;width:26px}
+/* calendar: year at a glance. Top = controls, middle = grid, bottom = text that changes */
+#drawer .sw2.n{background:#2A2E33;margin-left:8px}
+#drawer [data-pane=price]:not([hidden]){height:100%}
+#drawer .cal{display:flex;flex-direction:column;height:100%;gap:6px}
+#drawer #cMode{gap:0}
+#drawer #cMode button{padding:3px 10px;font-size:11px}
+#drawer #cMode button[data-c=sun][aria-pressed=true]{background:#F2B33D;color:#2A1D05}
+#drawer #cMode button[data-c=earth][aria-pressed=true]{background:#62AEF2;color:#0B2236}
+#drawer #cMode button[data-c=mis][aria-pressed=true]{background:#F2876B;color:#3A160C}
+#drawer .ctl{display:inline-flex;align-items:center;gap:8px;margin-left:8px;font:500 11px "IBM Plex Mono";color:var(--muted)} #drawer .ctl[hidden]{display:none}
+#drawer .yp{display:inline-flex;align-items:center;gap:8px;font:500 12px "IBM Plex Mono";color:var(--ink)}
+#drawer .yp .pnav{width:24px;height:22px;font-size:14px;line-height:1}
+#drawer .yg{flex:1;min-height:0;display:grid;grid-template-columns:76px 1fr 60px;grid-template-rows:12px;grid-auto-rows:minmax(0,1fr);column-gap:12px;row-gap:2px;overflow:hidden}
+#drawer .yd{display:grid;grid-template-columns:repeat(31,1fr);gap:3px;min-width:0}
+#drawer .yg > .yd:first-of-type span{font:500 10px/12px "IBM Plex Mono";color:#6B727A;padding-left:1px}
+#drawer .ym{font:500 11px "IBM Plex Mono";color:var(--ink);align-self:center;white-space:nowrap} #drawer .ym i{font-style:normal;color:var(--muted)}
+#drawer .yc{font:500 11px "IBM Plex Mono";color:var(--muted);align-self:center;text-align:right;white-space:nowrap} #drawer .yc b{color:var(--ink);font-size:12px}
+#drawer .pd{--a:#2A2E33;--b:var(--a);border-radius:3px;cursor:pointer;display:grid;place-items:center;position:relative;overflow:hidden;background:var(--a)}
+#drawer .pd .tri,#drawer .sw3 .tri{position:absolute;inset:0;width:100%;height:100%;display:block}
+#drawer .pd i{position:relative;z-index:1}
+#drawer .pd.one{background:var(--a)}
+#drawer .pd i{width:6px;height:6px;border-radius:50%;background:#F2876B;box-shadow:0 0 0 1.5px rgba(10,11,13,.7),0 1px 3px rgba(0,0,0,.8)}
+#drawer .pd.sp{box-shadow:inset 0 0 0 1.5px #FFFFFF}
+#drawer .pd.sel{outline:2px solid #FFFFFF;outline-offset:1px;z-index:1}
+#drawer .pd.e{background:transparent;cursor:default}
+#drawer .mdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#F2876B;box-shadow:0 0 0 1.5px rgba(10,11,13,.7)}
+#drawer .sw3{display:inline-block;position:relative;overflow:hidden;width:16px;height:12px;border-radius:3px}
+#drawer .cbot{flex:none;font:500 13px "IBM Plex Sans";border-top:1px solid var(--line);padding-top:5px}
+#drawer .cbot .site{font-weight:700;color:var(--ink)}
+#drawer .cbot .b1{display:flex;align-items:center;gap:10px;height:18px;white-space:nowrap;overflow:hidden}
+#drawer .cleg{display:inline-flex;align-items:center;gap:6px;min-width:0;overflow:hidden;color:var(--ink)}
+#drawer .cbot .cleg{flex:none}
+#drawer .cbot .mlab{margin-left:auto;flex:1 1 0;text-align:right;white-space:nowrap;color:var(--muted);font:400 10px "IBM Plex Sans";min-width:0;overflow:hidden;text-overflow:ellipsis}
+#drawer .cbot .caldet{margin:2px 0 0;text-align:left;height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#drawer .caldet .mw{color:var(--ok)}
+/* all panes fill the body; picture in the middle, changing text at the bottom */
+#drawer [data-pane]:not([hidden]){height:100%}
+#drawer #msSum,#drawer #slSum,#drawer #nxSum{display:block;overflow:hidden;text-overflow:ellipsis}
+#drawer .cbot .b1 .site,#drawer .cbot .site{font-weight:700;color:var(--ink)}
+#drawer .tsunc{color:var(--sun)} #drawer .tearc{color:var(--earth)} #drawer .okb{color:var(--go)}
+/* time row: period on the right */
+#drawer .trow .period{margin-left:auto;margin-right:0}
+#drawer .trow #span{padding:3px 6px}
+/* your mission */
+#drawer #msc{display:block;width:100%;flex:1;min-height:0;cursor:ew-resize}
+/* launch slip */
+#drawer .sl{flex:1;min-height:0;display:grid;grid-template-columns:repeat(31,minmax(0,1fr));gap:4px;align-content:center}
+#drawer .sb{display:grid;grid-template-rows:56px auto auto;gap:3px;justify-items:center;cursor:pointer;font:500 10px "IBM Plex Mono";color:var(--muted)}
+#drawer .sb .pd{width:100%;height:56px;border-radius:4px}
+#drawer .sb b{color:var(--ink);font-size:11px;white-space:nowrap} #drawer .sb small{font-size:10px;white-space:nowrap}
+#drawer .sb.sel .pd{outline:2px solid #FFFFFF;outline-offset:1px}
+#drawer .sb:hover .pd{box-shadow:inset 0 0 0 1.5px #FFFFFF}
+#drawer .sb.e{cursor:default;opacity:.5} #drawer .sb.e b{color:var(--muted)}
+/* next events */
+#drawer .nx{flex:1;min-height:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;align-content:center}
+#drawer .ev{display:grid;gap:4px;text-align:left;padding:12px 14px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);cursor:pointer;font:500 12px "IBM Plex Sans"}
+#drawer .ev:hover{border-color:var(--ink)}
+#drawer .ev .en{font:600 11px "IBM Plex Mono";letter-spacing:.04em}
+#drawer .ev b{font:600 20px "IBM Plex Sans"}
+#drawer .ev small{color:var(--muted);font-size:11px} #drawer .ev .el{color:var(--ink)}
+#drawer .ev.sun .en{color:var(--sun)} #drawer .ev.earth .en{color:var(--earth)}
+#drawer .ev.sun.up{border-top:3px solid var(--sun)} #drawer .ev.earth.up{border-top:3px solid var(--earth)} #drawer .ev.down{border-top:3px solid #3A3F45}
+#drawer .dbody{box-sizing:border-box}

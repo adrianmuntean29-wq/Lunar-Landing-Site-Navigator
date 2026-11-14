@@ -1,0 +1,60 @@
+/* scene.css: OWNER view-moon session (scene core). Style only things inside #scene. */
+#scene canvas{display:block;width:100%;height:100%}
+#scene .labels,#scene .skylabels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+#scene .zoom{position:absolute;left:12px;top:12px;display:grid;gap:4px}
+#scene .zoom button{width:30px;height:30px;font:500 16px "IBM Plex Mono";color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;cursor:pointer}
+#scene .layers{position:absolute;right:12px;top:56px;z-index:4;background:rgba(23,25,28,.88);border:1px solid var(--line);border-radius:6px;padding:8px 10px;display:grid;gap:4px;font:500 12px "IBM Plex Mono";color:var(--muted)}
+#scene .layers label{display:flex;gap:6px;align-items:center;cursor:pointer}
+#scene .psrsw{display:inline-block;width:14px;height:0;border-top:2px dashed var(--psr)}
+#scene .views{position:absolute;left:50%;top:12px;transform:translateX(-50%);display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:rgba(23,25,28,.92);z-index:3}
+#scene .views button{font:600 13px "IBM Plex Sans";color:var(--muted);background:none;border:0;padding:8px 14px;cursor:pointer}
+#scene .views button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+#scene .soon{position:absolute;inset:0;display:grid;place-items:center;font:500 13px "IBM Plex Mono";color:var(--muted);pointer-events:none}
+#scene .soon[hidden]{display:none}
+#scene .obnote{position:absolute;left:12px;bottom:12px;max-width:min(460px,calc(100% - 24px));background:rgba(23,25,28,.88);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font:500 12px/1.5 "IBM Plex Sans";color:var(--ink)}
+#scene .obnote.gnote{top:56px;bottom:auto;max-width:min(330px,calc(100% - 24px))}
+#scene .obnote .y{color:var(--sun)} #scene .obnote .n{color:var(--muted)} #scene .obnote .dim{color:var(--muted);font-size:11px}
+#scene .sitebar{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:rgba(23,25,28,.88);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--muted);z-index:3;flex-wrap:wrap;justify-content:center;width:max-content;max-width:calc(100% - 24px)}
+#scene .sitebar .btn{white-space:nowrap}
+#scene .sky{position:absolute;transform:translate(-50%,0);font:600 12px "IBM Plex Mono";white-space:nowrap;text-shadow:0 1px 3px #000}
+#scene .sky.sun{color:var(--sun)} #scene .sky.earth{color:var(--earth)} #scene .sky.card{color:#8C939B;font-weight:500}
+#scene .missw{display:inline-block;width:10px;height:10px;border:1.5px dashed #F2876B;border-radius:50%}
+#scene .layers .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+/* (i) pattern, reusable: <span class="info-wrap"><button type="button" class="info-i" aria-label="About X" aria-describedby="ID">i</button><span class="info-tip" id="ID" role="tooltip">text</span></span>
+   The tip shows on hover and keyboard focus, below the i, right-aligned (so it stays on screen at the right edge). */
+#scene .info-wrap{position:relative;display:inline-flex}
+#scene .info-i{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--muted);background:none;color:var(--muted);font:italic 700 10px/1 Georgia,serif;cursor:help;padding:0;flex:none}
+#scene .info-i:hover{border-color:var(--ink);color:var(--ink)}
+#scene .info-i:focus-visible{outline:2px solid var(--earth);outline-offset:2px}
+#scene .info-tip{position:absolute;right:-4px;top:calc(100% + 8px);z-index:5;width:300px;background:rgba(23,25,28,.96);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font:500 11.5px "IBM Plex Mono";color:var(--muted);display:none;gap:3px;box-shadow:0 4px 16px rgba(0,0,0,.5);cursor:default}
+#scene .info-i:hover + .info-tip,#scene .info-i:focus + .info-tip{display:grid}
+#scene .pin{position:absolute;transform:translate(-50%,-100%);font:600 11.5px "IBM Plex Mono";color:var(--bg);background:var(--ink);border-radius:3px;padding:2px 6px;white-space:nowrap;cursor:pointer;pointer-events:auto}
+#scene .pin.sel{background:var(--earth)}
+#scene .pin.edge{border:1px dashed var(--bg);outline:1px solid var(--ink)} #scene .pin.edge::after{display:none}
+#scene .mlab{position:absolute;transform:translate(-50%,0);font:500 10.5px "IBM Plex Mono";color:#F2876B;white-space:nowrap;text-shadow:0 1px 3px #000;pointer-events:auto;cursor:help}
+#scene .medge{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;font:500 10.5px "IBM Plex Mono";color:#F2876B;white-space:nowrap;text-shadow:0 1px 3px #000;pointer-events:auto;cursor:help}
+#scene .medge .ar{display:inline-block;font-size:15px;line-height:1}
+#scene .medge.bare .ar{font-size:18px;background:rgba(23,25,28,.8);border:1px solid rgba(242,135,107,.45);border-radius:50%;width:22px;height:22px;line-height:22px;text-align:center}
+#scene .medge .tx{background:rgba(23,25,28,.8);border:1px solid rgba(242,135,107,.45);border-radius:3px;padding:1px 5px}
+#scene .legend .msw{color:#F2876B} #scene .legend .mout{color:var(--muted)} #scene .legend .mlabel{font-size:10px;opacity:.8}
+#scene .pin::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:14px;background:var(--ink)}
+
+#scene .obbar{position:absolute;left:12px;top:56px;display:flex;align-items:center;gap:6px;background:rgba(10,12,16,.82);border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:500 11px "IBM Plex Mono";color:var(--muted);z-index:3}
+#scene .obbar[hidden]{display:none}
+#scene .obbar button{font:600 12px "IBM Plex Sans";color:var(--muted);background:none;border:1px solid transparent;border-radius:4px;padding:4px 9px;cursor:pointer}
+#scene .obbar button[aria-pressed=true]{color:#4FC3F7;border-color:rgba(79,195,247,.5);background:rgba(79,195,247,.08)}
+#scene .olab{position:absolute;transform:translate(-50%,-100%);font:600 11.5px "IBM Plex Mono";white-space:nowrap;text-shadow:0 1px 4px #000,0 0 2px #000;letter-spacing:.02em}
+#scene .olab.moon,#scene .olab.earth,#scene .olab.sun{pointer-events:auto;cursor:pointer;padding:2px 4px}
+#scene .olab.moon{color:#E8E6E0} #scene .olab.earth{color:#7CC0FF} #scene .olab.sun{color:var(--sun)}
+#scene .olab.moon:hover,#scene .olab.earth:hover,#scene .olab.sun:hover{text-decoration:underline}
+#scene .olab.apsis{color:#4FC3F7;font-weight:500;font-size:10.5px;transform:translate(-50%,-50%)}
+#scene .olab.site{color:var(--bg);background:var(--earth);border-radius:3px;padding:1px 6px;font-size:10.5px;transform:translate(8px,-50%)}
+#scene .gsite{position:absolute;width:0;height:0;pointer-events:none}
+#scene .gsite .dot{position:absolute;left:-5px;top:-5px;width:10px;height:10px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px rgba(0,0,0,.55),0 0 10px rgba(255,255,255,.6)}
+#scene .gsite .stem{position:absolute;left:0;top:0;height:1px;background:linear-gradient(90deg,rgba(255,255,255,.85),rgba(255,255,255,.35));transform-origin:0 0}
+#scene .gsite .card{position:absolute;transform:translate(-50%,-100%);pointer-events:auto;cursor:pointer;white-space:nowrap;font:600 12.5px "IBM Plex Sans";color:#F2F1EC;background:rgba(8,10,14,.82);border:1px solid rgba(255,255,255,.28);border-radius:5px;padding:4px 9px;backdrop-filter:blur(3px);box-shadow:0 2px 10px rgba(0,0,0,.45)}
+#scene .gsite.down .card{transform:translate(-50%,0)}
+#scene .gsite .card:hover{border-color:rgba(255,255,255,.7)}
+#scene .gsite.sel .dot{background:var(--earth);box-shadow:0 0 0 2px rgba(0,0,0,.55),0 0 0 6px rgba(79,195,247,.25),0 0 14px var(--earth)}
+#scene .gsite.sel .stem{background:var(--earth)}
+#scene .gsite.sel .card{border-color:var(--earth);color:#fff;background:rgba(20,60,90,.85)}

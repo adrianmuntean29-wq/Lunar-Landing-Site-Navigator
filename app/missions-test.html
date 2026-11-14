@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Missions test</title>
+<style>
+  body{font:14px/1.4 system-ui,sans-serif;margin:16px;background:#fff;color:#111}
+  table{border-collapse:collapse;margin:6px 0 18px}
+  td,th{border:1px solid #ccc;padding:3px 8px;text-align:left}
+  .in{background:#fde2e2}.co{background:#ffe9b3}.lab{color:#555;font-style:italic}
+  .ok{color:#080}.bad{color:#b00}
+</style>
+</head>
+<body>
+<h1>Missions layer test (missions chat)</h1>
+<p class="lab" id="label"></p>
+<p>Caution radius for large landers: <input id="caution" type="number" value="5" min="0" step="1" style="width:4em"> km (our assumption)
+ &nbsp; <label><input id="cn" type="checkbox" checked> show Chang'e rows</label>
+ &nbsp; Window: whole period of App.state (2027, 365 days) unless a landing day is chosen.</p>
+<h2>Hand checks</h2><div id="checks"></div>
+<div id="out"></div>
+<h2>All rows</h2><div id="rows"></div>
+<script src="js/core.js"></script>
+<script src="js/missions.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function render(){
+  const opts = {caution: +$('#caution').value, cn: $('#cn').checked, withinKm: 50};
+  $('#out').innerHTML = App.sites.map((s, i) => {
+    const sum = Missions.summary(i, opts), hits = Missions.near(i, opts);
+    return `<h2>${esc(s.name)} (${esc(s.short)}) ${s.lat.toFixed(4)}, ${s.lon.toFixed(4)} E</h2>
+      <p class="${sum.ok ? 'ok' : 'bad'}">${esc(sum.text)}</p>
+      <table><tr><th>mission</th><th>distance</th><th>keep-out (rule + position circle)</th><th>inside</th><th>coordinate</th><th>precision</th><th>why</th></tr>
+      ${hits.map(h => `<tr class="${h.coordinate ? 'co' : h.inside ? 'in' : ''}"><td>${esc(h.m.name)}${h.m.placeholder ? ' <b>[placeholder point]</b>' : ''}</td>
+        <td>${h.km.toFixed(2)} km</td><td>${h.ruleKm} + ${h.m.radius_km} = ${h.needKm.toFixed(2)} km</td><td>${h.inside ? 'yes' : ''}</td>
+        <td>${h.coordinate ? 'yes' : ''}</td><td>${esc(h.m.precision)}</td><td>${esc(h.why)}</td></tr>`).join('') || '<tr><td colspan=7>none within 50 km</td></tr>'}
+      </table>
+      <p>Day check (dayFail, day 0 = ${App.dayDate(0)}): ${JSON.stringify(Missions.dayFail(i, 0, opts))}; day 250 (${App.dayDate(250)}): ${JSON.stringify(Missions.dayFail(i, 250, opts))}</p>`;
+  }).join('');
+}
+(async function(){
+  $('#label').textContent = Missions.LABEL;
+  await App.ready; const rows = await Missions.load();
+  // two distances checked by hand (see the vault log for the arithmetic)
+  const c1 = App.sites[0], s = App.sites[1], mip2 = rows.find(r => r.id === 'mip_alt'), ce7 = rows.find(r => r.id === 'ce7');
+  const checks = [
+    ['C1 -> MIP estimate 2', Missions.distanceKm(c1.lat, c1.lon, mip2.lat, mip2.lon), 4.80],
+    ['S -> Chang\'e-7 point', Missions.distanceKm(s.lat, s.lon, ce7.lat, ce7.lon), 35.9],
+  ];
+  $('#checks').innerHTML = '<table><tr><th>pair</th><th>missions.js</th><th>by hand (flat polar)</th><th>diff</th></tr>' +
+    checks.map(([n, a, b]) => `<tr><td>${n}</td><td>${a.toFixed(2)} km</td><td>${b} km</td><td class="${Math.abs(a-b) < 0.2 ? 'ok' : 'bad'}">${(a-b).toFixed(2)} km</td></tr>`).join('') + '</table>';
+  $('#rows').innerHTML = '<table><tr><th>id</th><th>name</th><th>lat</th><th>lon E</th><th>precision</th><th>r km</th><th>date</th><th>status</th><th>Q</th><th>note</th></tr>' +
+    rows.map(r => `<tr><td>${r.id}</td><td>${esc(r.name)}</td><td>${r.lat ?? '-'}</td><td>${r.lon ?? '-'}</td><td>${r.precision}</td><td>${r.radius_km}</td><td>${esc(r.date_text)}</td><td>${r.status}</td><td>${r.quality}</td><td>${esc(r.note)}</td></tr>`).join('') + '</table>';
+  render();
+  const om = Missions.offMap(60);
+  $('#checks').insertAdjacentHTML('afterend', '<h2>Pole view (60 km)</h2><p>In view: ' + om.inView.map(m => esc(m.name)).join('; ') +
+    '</p><table><tr><th>off-map arrow</th><th>direction (east lon)</th></tr>' + om.offMap.map(g => `<tr><td>${esc(g.text)}</td><td>${g.lonE}</td></tr>`).join('') + '</table>');
+  $('#caution').oninput = render; $('#cn').onchange = render;
+})();
+</script>
+</body>
+</html>
