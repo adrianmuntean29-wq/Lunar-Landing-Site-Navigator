@@ -1,17 +1,17 @@
 """Cut the 3D view's regional terrain from the engine's cap grid.
 
 Input : data/cap_heights.bin (+ data/cap_meta.json): LOLA heights, 640 m, +/-304 km, Float32, row 0 = +y.
-Output: data/region_heights.bin: the same 640 m heights, cut to x -150.4..120.96 km, y -79.9..190.08 km
-        (the 3D map's "All four sites" view plus its shadow margin), rounded to whole metres, Int16 LE,
-        row 0 = north edge (+y), NaN filled with the mean of the valid cells around them.
-The page reads it with meta {nx: 424, ny: 422, px: 640, xmin: -150400, ymax: 190080}."""
+Output: data/region_heights.bin: the same 640 m heights, cut to the 3D map's "All sites" block (centre x 55 km,
+        y 63 km, 230 x 230 km, holding all ten sites of data/sites.json) plus 48 km of shadow margin, rounded to
+        whole metres, Int16 LE, row 0 = north edge (+y), NaN filled with the mean of the valid cells around them.
+The page reads it with meta {nx: 511, ny: 511, px: 640, xmin: -108160, ymax: 225920}."""
 import json, numpy as np, os
 here = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data')
 m = json.load(open(os.path.join(here, 'cap_meta.json')))
 z = np.fromfile(os.path.join(here, 'cap_heights.bin'), '<f4').reshape(m['ny'], m['nx'])
 px = m['pixel_m']
-c0 = int(round((-150400 - m['x_min'])/px)); r0 = int(round((m['y_max'] - 190080)/px))
-nx, ny = 424, 422
+c0 = int(round((-108160 - m['x_min'])/px)); r0 = int(round((m['y_max'] - 225920)/px))
+nx, ny = 511, 511
 cut = z[r0:r0 + ny, c0:c0 + nx].astype(np.float64)
 bad = np.isnan(cut)
 if bad.any():

@@ -88,6 +88,8 @@ h2{font-family:var(--f-display);font-weight:600;font-size:21px;line-height:1.1;l
 .pin.out .stem{opacity:.35}
 .pin.up .stem{top:-52px;height:52px}
 .pin.up .tag{top:-52px}
+.pin.up2 .stem{top:-80px;height:80px}
+.pin.up2 .tag{top:-80px}
 .pin.out .tag{background:var(--space-veil);color:var(--space-ink);box-shadow:inset 0 0 0 1px var(--space-muted)}
 .pin .tag:focus-visible{outline:2px solid var(--earth-fill);outline-offset:2px}
 .geo{font:500 11px/1 var(--f-mono);color:var(--space-muted);white-space:nowrap}
@@ -286,7 +288,7 @@ input[type=date]{font:500 13px var(--f-body);color:var(--ink);background:var(--p
         <span class="hint" id="pMastNote"></span>
       </div>
       <label class="chk"><input id="cRelay" type="checkbox"> Relay satellite available (ignore the Earth-contact limit)</label>
-      <p class="hint">Limits are example values, not NASA requirements.</p>
+      <p class="hint">Limits are example values, not NASA requirements. Earth contact 25% is the value listed in a 2024 NASA presentation (<a href="https://ntrs.nasa.gov/citations/20240009596" target="_blank" rel="noopener">Artemis HLS update</a>).</p>
       <div class="funnel" id="funnel" aria-live="polite"></div>
     </form>
     <div class="pmain">
@@ -325,7 +327,7 @@ input[type=date]{font:500 13px var(--f-body);color:var(--ink);background:var(--p
         </div>
         <div class="opts">
           <div class="seg mapsize" id="mapSize" role="group" aria-label="Map size">
-            <button type="button" data-map="sites" aria-pressed="true">All four sites</button>
+            <button type="button" data-map="sites" aria-pressed="true">All ten sites</button>
             <button type="button" data-map="pole" aria-pressed="false">Close-up of the pole</button>
           </div>
           <div class="seg" role="group" aria-label="What the map shows">
@@ -382,7 +384,7 @@ input[type=date]{font:500 13px var(--f-body);color:var(--ink);background:var(--p
   <section class="notes" aria-label="What is simulated">
     <h2>What is simulated here and what the competition version would use</h2>
     <dl>
-      <div><dt>Terrain</dt><dd>Real: NASA LOLA heights (PGDA product 90, LDEM_80S_80MPP_ADJ) averaged to 240 m by our Python engine (data/heights.bin), shown two ways: "All four sites", a 170 × 170 km map from the engine's 640 m grid (data/region_heights.bin) that holds C1, S, GR1 and MP1, and "Close-up of the pole", a 48 × 48 km map at 240 m. Shadows also use 46 km of terrain beyond each map edge. Site pins sit at the published coordinates; a site outside the map is pinned at its edge with its distance. If the heights file cannot load, the page falls back to a generated demo terrain and says so.</dd></div>
+      <div><dt>Terrain</dt><dd>Real: NASA LOLA heights (PGDA product 90, LDEM_80S_80MPP_ADJ) averaged to 240 m by our Python engine (data/heights.bin), shown two ways: "All ten sites", a 230 × 230 km map from the engine's 640 m grid (data/region_heights.bin) that holds every site in data/sites.json, and "Close-up of the pole", a 48 × 48 km map at 240 m. Shadows also use 46 km of terrain beyond each map edge. Site pins sit at the published coordinates; a site outside the map is pinned at its edge with its distance. If the heights file cannot load, the page falls back to a generated demo terrain and says so.</dd></div>
       <div><dt>Sun and Earth</dt><dd>Real: one JPL Horizons table (2026-2030, every 6 h) of the sub-solar and sub-Earth points in the Moon's mean-Earth frame. The page interpolates it and computes the Sun and Earth direction from any site, including Earth parallax. Checked against Horizons topocentric values.</dd></div>
       <div><dt>Computation</dt><dd>3D demo: each point's horizon in 64 directions out to 46 km, with the Moon's curvature. Real sites: 360-direction horizon masks from LOLA terrain, computed by our Python engine (flat horizon until they load).</dd></div>
     </dl>
@@ -424,10 +426,10 @@ function dateFromJd(jd){ return new Date((jd - 2440587.5)*86400000); }
 function startApp(){
 'use strict';
 var DEG = Math.PI/180, R_MOON = 1737.4, INV2R = 1/(2*R_MOON);
-/* Two map sizes. "sites" (default) is a 170 x 170 km block that holds all four published sites, on the engine's
+/* Two map sizes. "sites" (default) is a 230 x 230 km block that holds all ten sites of data/sites.json, on the engine's
    640 m LOLA grid; "pole" is the original 48 x 48 km close-up on the 240 m grid. The choice lives in the URL (#map=pole). */
 var MAPS = {
-  sites: {cx: -15, cz: -55, half: 85, n: 193, grid: 20, ring: 1, name: 'All four sites', size: '170 × 170 km'},
+  sites: {cx: 55, cz: -63, half: 115, n: 241, grid: 20, ring: 1, name: 'All ten sites', size: '230 × 230 km'},
   pole:  {cx: 0, cz: 0, half: 24, n: 129, grid: 4, ring: 0.25, name: 'Close-up of the pole', size: '48 × 48 km'}
 };
 var MAPKEY = /(^|[#&])map=pole(&|$)/.test(location.hash) || !REGION ? 'pole' : 'sites', MAP = MAPS[MAPKEY];
@@ -595,6 +597,13 @@ var SITE_LIST = [
   {id: 'D', name: 'Malapert massif (MP1)', lat: -85.9756, lon: 357.8876, note: 'De Rosa et al. 2012, MP1', studied: true}
 ];
 var SITEDATA = window.__siteData || null;   // {id: {masks: {"0": [...], "2": [...], "10": [...]}, err_m, effres_m, psr_km, ...}}
+/* every other site in data/sites.json (ten since the evening of 14 Nov: the best-lit point in six NASA site boxes, and the IM-2 target) */
+if (SITEDATA) Object.keys(SITEDATA).sort().forEach(function(id){
+  if (SITE_LIST.some(function(s){ return s.id === id; })) return;
+  var o = SITEDATA[id], code = (o.name.match(/\(([^)]+)\)/) || [])[1], box = /site box/.test(o.kind || ''), hist = /^historic/.test(o.kind || '');
+  SITE_LIST.push({id: id, name: o.name, lat: o.lat, lon: o.lon_e, studied: false,
+    note: box ? 'Best-lit point in NASA site box ' + code + ' (our engine, 2 m mast, 2027–2031)' : hist ? 'IM-2 Athena landing target (LROC), for comparison' : (o.source || '')});
+});
 if (SITEDATA) $('#horizonNote').textContent = 'Horizon: LOLA terrain masks';
 var sites = [];
 function maskFor(id){
@@ -659,7 +668,7 @@ function nextChange(s, t, body){
    For a landing at 00:00 UTC on day d and a mission of L days: sunlight %, Earth contact %,
    longest night (hours; ">=" when the dark spell runs past the mission window) and the Sun's height
    above the terrain horizon at touchdown. Each limit that fails is listed, in a fixed order. */
-var LIM = {len: 13, sun: 70, earth: 50, night: 48, td: 0, relay: false};
+var LIM = {len: 13, sun: 70, earth: 25, night: 48, td: 0, relay: false};
 function evalWindow(s, d){
   var h0 = d*24, h1 = h0 + LIM.len*24, H = s.hSun.length;
   if (h1 > H) return null;
@@ -848,7 +857,7 @@ function buildPins(){
 function buildGeo(){
   var rl = function(c){ return 2*R_MOON*Math.tan(c*DEG/2); };
   (MAPKEY === 'pole' ? [[0, 0, 'South Pole'], [0, rl(0.5), '89.5° S']]
-    : [[0, 0, 'South Pole'], [0.6*rl(1), -0.8*rl(1), '89° S'], [0.6*rl(2), -0.8*rl(2), '88° S'], [0.6*rl(3), -0.8*rl(3), '87° S']]).forEach(function(g){
+    : [[0, 0, 'South Pole']].concat([1, 2, 3, 4, 5].map(function(k){ return [0.8*rl(k), -0.6*rl(k), (90 - k) + '° S']; }))).forEach(function(g){
     var el = document.createElement('div'); el.className = 'mk geo';
     el.innerHTML = '<i></i><span></span>'; el.querySelector('span').textContent = g[2];
     labelsEl.appendChild(el); geoEls.push({el: el, x: g[0], z: g[1]});
@@ -872,12 +881,13 @@ function updateLabels(){
   /* tags that would overlap on screen: the pin farther back gets a taller stem */
   var shown = pinEls.filter(function(p){ return p.sp && !p.el.hidden; }).sort(function(a, b){ return b.sp[1] - a.sp[1]; }), boxes = [];
   shown.forEach(function(p){
-    var wdt = p.b.offsetWidth || 60, up = false;
-    for (var k = 0; k < 2; k++){
-      var top = p.sp[1] - (up ? 52 : 24), hit = boxes.some(function(q){ return Math.abs(q.x - p.sp[0]) < (q.w + wdt)/2 + 6 && Math.abs(q.y - top) < 24; });
-      if (!hit) break; up = true;
+    var wdt = p.b.offsetWidth || 60, lv = 0, H3 = [24, 52, 80];
+    for (; lv < 3; lv++){
+      var top = p.sp[1] - H3[lv], hit = boxes.some(function(q){ return Math.abs(q.x - p.sp[0]) < (q.w + wdt)/2 + 6 && Math.abs(q.y - top) < 24; });
+      if (!hit) break;
     }
-    p.el.classList.toggle('up', up); boxes.push({x: p.sp[0], y: p.sp[1] - (up ? 52 : 24), w: wdt});
+    lv = Math.min(lv, 2);
+    p.el.classList.toggle('up', lv === 1); p.el.classList.toggle('up2', lv === 2); boxes.push({x: p.sp[0], y: p.sp[1] - H3[lv], w: wdt});
   });
   geoEls.forEach(function(g){ place(g.el, project(g.x, hAt(g.x, g.z)*e, g.z)); });
   var su = sunAt(state.t), ea = earthAt(state.t), top = HMAXr*e + 1.2*SC, R = MAPKEY === 'pole' ? 27 : 1.35*HALF;
@@ -911,7 +921,9 @@ function qualityText(s){
   else q.push('LOLA mask' + (s.meta && s.meta.dem_near ? ', 20 m near field' : ''));
   if (s.meta && s.meta.err_m != null) q.push('height error ±' + num(s.meta.err_m, 1) + ' m');
   if (s.meta && s.meta.effres_m != null) q.push('effective resolution ' + num(s.meta.effres_m, 0) + ' m');
-  q.push(s.studied ? 'published reference' : 'no published reference');
+  if (s.meta && s.meta.psr_km != null) q.push('nearest permanent shadow ' + num(s.meta.psr_km, 1) + ' km away (LOLA model, not a map of ice)');
+  if (s.meta && s.meta.truncated) q.push((s.meta.edge_rays || 'some') + ' of 360 directions reach the edge of the terrain map, so the horizon may be low there and sunlight is an upper bound');
+  q.push(s.studied ? 'published site' : 'no published reference');
   if (s.meta && s.meta.validated === false) q.push('engine result not yet validated');
   return q.join(' · ');
 }
@@ -1170,9 +1182,9 @@ function renderHeadline(force){
 /* ---------- mission planner: controls, calendar, funnel, ranking ----------
    Everything here is computed live in the browser from the hourly series in computeSite. */
 var PRESETS = {
-  crew: {len: 6, sun: 95, earth: 50, night: 0, td: 0},
-  robotic: {len: 13, sun: 70, earth: 50, night: 48, td: 0}
-};   // example values, not NASA requirements (the page says so)
+  crew: {len: 6, sun: 95, earth: 25, night: 0, td: 0},
+  robotic: {len: 13, sun: 70, earth: 25, night: 48, td: 0}
+};   // example values, not NASA requirements (the page says so); Earth 25% = the visibility mask in a 2024 NASA presentation (NTRS 20240009596)
 var MS_PER_SPOT_YEAR = 0.7;   // engine MEASURED, single thread (vault DECISIONS item 8)
 var GLYPH = {sun: '☀', earth: '⊕', night: '☾', td: '▲'};
 var FAILTXT = {sun: 'too little sun', earth: 'too little Earth contact', night: 'night too long', td: 'Sun too low at touchdown'};
@@ -1303,11 +1315,12 @@ function renderPlanner(){
   renderFly();
 }
 /* hand a landing day over to the mission page (launch from Canada, flight, touchdown) */
-var FLYID = {A: 'C1', B: 'S', C: 'GR1', D: 'MP1'};
+/* the mission page names a site by the code in brackets (C1, S, SL2…), or by its full name when it has none */
+function flyId(s){ return s.id === 'X' ? '' : ((s.name.match(/\(([^)]+)\)/) || [])[1] || s.name); }
 function renderFly(){
   var el = $('#flybar'), s = sites[sel], res = planResults[sel] || [], d = calSelDay, picked = d >= 0;
   if (!picked){ for (var q = 0; q < res.length; q++){ if (res[q] && !res[q].fail.length){ d = q; break; } } }
-  var r = d >= 0 ? res[d] : null, fid = FLYID[s.id];
+  var r = d >= 0 ? res[d] : null, fid = flyId(s);
   var pre = $('#pPreset [aria-pressed="true"]'), type = pre && pre.getAttribute('data-v') === 'crew' ? 'crewed' : 'robotic';
   if (!r){ el.className = 'flybar fails'; el.innerHTML = '<p class="flytxt">No landing day passes these limits at ' + esc(s.name) + '. Loosen a limit or pick another site to fly a mission.</p>'; return; }
   var day = dateFromJd(state.jd0 + d).toISOString().slice(0, 10);
@@ -1315,7 +1328,7 @@ function renderFly(){
   el.className = 'flybar' + (r.fail.length ? ' fails' : '');
   var txt = '<p class="flytxt"><b>Landing ' + day + ', 00:00 UTC</b> at ' + esc(s.name) + ' · ' + type + ', ' + LIM.len + ' days · ' + status +
     '<small>' + (picked ? 'Day chosen in the calendar.' : 'First day that passes. Click any day in the calendar to change it.') + '</small></p>';
-  if (!fid){ el.innerHTML = txt + '<span class="caption">The mission page covers the four named sites.</span>'; return; }
+  if (!fid){ el.innerHTML = txt + '<span class="caption">The mission page covers the named sites, not your own site.</span>'; return; }
   var q = 'site=' + fid + '&land=' + day + '&type=' + type + '&len=' + LIM.len + '&sun=' + LIM.sun + '&earth=' + LIM.earth + '&night=' + LIM.night + '&td=' + LIM.td + '&mast=' + state.mast + '&relay=' + (LIM.relay ? 1 : 0);
   var cr = (crewResults[sel] || [])[d], crewOk = !!(cr && !cr.fail.length), P = PRESETS.crew;
   var qc = 'site=' + fid + '&land=' + day + '&type=crewed&len=' + P.len + '&sun=' + P.sun + '&earth=' + P.earth + '&night=' + P.night + '&td=' + P.td + '&mast=' + state.mast + '&relay=' + (LIM.relay ? 1 : 0);
@@ -1420,11 +1433,11 @@ requestAnimationFrame(frame);
 }
 
 /* ---------- real terrain for the 3D view: data/heights.bin from the engine (LOLA, 240 m, +/-60 km, Float32, row 0 = +y) ----------
-   and data/region_heights.bin (LOLA, 640 m, x -150..121 km, y -80..190 km, Int16 metres, row 0 = +y, pipeline/make_region_heights.py) */
+   and data/region_heights.bin (LOLA, 640 m, x -108..219 km, y -101..226 km, Int16 metres, row 0 = +y, pipeline/make_region_heights.py) */
 var LOLA = null, REGION = null;
 function b64bytes(s){ var b = atob(s.trim()), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u.buffer; }
 function loadRegion(){
-  var meta = {nx: 424, ny: 422, px: 640, xmin: -150400, ymax: 190080}, n = meta.nx*meta.ny;
+  var meta = {nx: 511, ny: 511, px: 640, xmin: -108160, ymax: 225920}, n = meta.nx*meta.ny;
   function take(ab){ if (ab.byteLength === n*2){ var s = new Int16Array(ab), h = new Float32Array(n); for (var i = 0; i < n; i++) h[i] = s[i]; REGION = {h: h, m: meta}; } }
   var el = document.getElementById('data-region');
   if (el){ try { take(b64bytes(el.textContent)); } catch (err) {} return Promise.resolve(); }
