@@ -177,5 +177,59 @@
 #panel .kindtag.hist{color:var(--mis);border-color:var(--mis)}
 #panel .ub{color:var(--ub)} #panel .sitecard .q .info-wrap{vertical-align:-3px}
 /* local tokens (theme, 14 Nov): upper-bound / approximate yellow, mission orange, "why days fail" bars */
-#panel{--ub:#E8B04A;--f-sun:#C98A2B;--f-earth:#8C6FD1;--f-dark:#6E7781}
-:root[data-theme=light] #panel{--ub:#8A5A00;--f-sun:#B07418;--f-earth:#7356C0;--f-dark:#7A828B}
+#panel{--ub:#E8B04A;--f-dark:#6E7781}
+:root[data-theme=light] #panel{--ub:#8A5A00;--f-dark:#7A828B}
+#panel .rng{display:block;font:500 12px "IBM Plex Sans";color:var(--muted);margin-top:2px} #panel .rng[hidden]{display:none} #panel .rng .info-wrap{vertical-align:-3px}
+/* Compare sites, design A (Eren 14 Nov ~20:15): numbered rows = numbered map markers; only the selected row opens.
+   Selected = base --sel (project palette). */
+#panel .lhead{margin:2px 0 10px}
+#panel .sitelist{gap:6px}
+#panel .srow{border:1px solid var(--line);border-left:3px solid var(--line);border-radius:4px;padding:7px 10px;display:grid;gap:4px;cursor:pointer;background:var(--panel)}
+#panel .srow:hover{border-color:var(--muted)}
+#panel .srow:focus-visible{outline:2px solid var(--sel);outline-offset:1px}
+#panel .srow.sel{border-color:var(--sel);border-left-color:var(--sel);background:var(--panel2);cursor:default}
+#panel .srow.out{opacity:.55}
+#panel .srow .rh{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px}
+#panel .srow .num{display:inline-grid;place-items:center;min-width:20px;height:20px;border-radius:3px;font:600 12px "IBM Plex Mono";color:var(--ink);border:1px solid var(--muted)}
+#panel .srow.sel .num{background:var(--sel);border-color:var(--sel);color:var(--bg)}
+#panel .srow .nm{font:600 14px "IBM Plex Sans";color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#panel .srow .dd{font:500 12px "IBM Plex Mono";color:var(--muted);white-space:nowrap} #panel .srow .dd b{color:var(--go)}
+#panel .srow .rs{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;padding-left:28px;font:500 12px "IBM Plex Mono";color:var(--muted)}
+#panel .srow .rs b{color:var(--ink);font-weight:600} #panel .srow .rs .kindtag{margin:0}
+#panel .srow .rs .apxk{color:var(--ub);border-color:var(--ub)}
+#panel .srow .mflag{color:var(--mis)} #panel .srow .mflag::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--mis);margin-right:5px}
+#panel .srow .rx{display:grid;gap:8px;padding:8px 0 2px 28px;border-top:1px solid var(--line);margin-top:4px;cursor:auto}
+#panel .srow .rx .q{font-size:11.5px;line-height:1.45;color:var(--muted)} #panel .srow .rx .q .info-wrap{vertical-align:-3px}
+#panel .srow .rx .gnums b{font-size:18px}
+
+/* Plan a landing, 1-second layout (view-site session, Eren 14 Nov ~21:15): one answer, one stacked bar, four sliders */
+#pMission .plHead{display:flex;align-items:center;gap:8px;padding-top:10px}
+#pMission .plHead h2{flex:0 1 auto}
+#pMission .plApx{font:500 11.5px "IBM Plex Mono";color:var(--muted);margin-top:-8px}
+#pMission .plStack{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--line);margin:8px 0 2px}
+#pMission .plStack i{display:block;height:100%;min-width:2px}
+#pMission .plLeg{display:flex;flex-wrap:wrap;gap:4px 12px;font:500 11.5px "IBM Plex Mono";color:var(--muted)}
+#pMission .plLeg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:0}
+#pMission .others{display:flex;align-items:center;gap:6px}
+#pMission .plMis{display:grid;gap:12px}
+#pMission .plRow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#pMission .plRow h3{margin:0;white-space:nowrap}
+#pMission .plRow .kind{flex:0 1 auto;gap:6px}
+#pMission .plRow .kind button{padding:6px 10px;font-size:12.5px;white-space:nowrap}
+#pMission .slr .t > span{display:inline-flex;align-items:center;gap:6px}
+#pMission .plMore[open]{display:grid;gap:12px}
+#pMission .plSub{margin:4px 0 0;font:600 12.5px "IBM Plex Sans";color:var(--ink)}
+/* Compare sites (Moon view), 1-second version (view-moon, Eren ~21:45): row = number, name, good days + bar, one ⚠; details under "More detail" */
+#pSites .srow .gbar{height:4px;margin-left:28px;background:var(--line);border-radius:2px;overflow:hidden}
+#pSites .srow .gbar i{display:block;height:100%;background:var(--go)}
+#pSites .srow .rh{grid-template-columns:auto 1fr auto auto}
+#pSites .srow .dd{font-size:12.5px} #pSites .srow .dd b{font-size:15px}
+#pSites .srow .wn{color:var(--warn);font-size:14px;line-height:1;cursor:help}
+#pSites .srow .rx{display:grid;gap:12px;margin-top:8px}
+#pSites .gnow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#pSites .gnums.g4{grid-template-columns:1fr 1fr;gap:12px 12px}
+#pSites .gnums.g4 b{font-size:24px}
+#pSites .gnums .t-sun b{color:var(--sun)} #pSites .gnums .t-earth b{color:var(--earth)} #pSites .gnums .t-night b{color:var(--ink)} #pSites .gnums .t-psr b{color:var(--psr)}
+#pSites .gfor{font:500 11.5px "IBM Plex Mono";color:var(--muted);margin-top:-6px}
+#pSites .gmore summary{font:500 12px "IBM Plex Mono";color:var(--muted);cursor:pointer}
+#pSites .gmore[open]{display:grid;gap:6px} #pSites .gmore .q{font-size:12px;color:var(--muted);line-height:1.45}

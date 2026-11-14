@@ -50,7 +50,7 @@
        MISSIONS  dot in the map's mission colour = another mission nearby (Missions.dayFail), drawn on top
      Hover any day: outlines the days your mission would be on the surface. Click: choose it. */
   // theme tokens (14 Nov): HTML/SVG cells take var() strings and follow the theme on their own; canvases read the computed value via tok()
-  const COL = {sun: 'var(--sun)', earth: 'var(--earth)', off: 'var(--cell-off)', mis: 'var(--mis)'};   // --mis (drawer.css) = scene.js MCOL in dark
+  const COL = {sun: 'var(--cell-sun)', earth: 'var(--cell-earth)', off: 'var(--cell-off)', mis: 'var(--mis)'};   // project palette (base.css, 20:20): calm fills for cells
   const tok = n => getComputedStyle(root).getPropertyValue(n).trim();
   /* split cell: an SVG diagonal (smooth edge; the old CSS gradient stair-stepped on the 28x16 px cells, Eren chose draft D 14 Nov) */
   const TRI = '<svg class="tri" viewBox="0 0 28 16" preserveAspectRatio="none" aria-hidden="true"><polygon points="0,0 28,0 0,16" fill="var(--a)"/><polygon points="28,0 28,16 0,16" fill="var(--b)"/><line x1="28" y1="0" x2="0" y2="16" stroke="var(--panel)" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg>';
@@ -113,12 +113,12 @@
     view.ms = {d: c.d, h0, HH, pw};
     let run = 0, best = 0, bestEnd = -1;
     for (let h = 0; h < HH; h++){ if (z.sun[h0 + h] < 0.5){ run++; if (run > best){ best = run; bestEnd = h; } } else run = 0; }
-    const lanes = [['Sunlight', tok('--sun'), h => z.sun[h0 + h] >= 0.5, o.sun], ['Earth contact', tok('--earth'), h => !!z.earth[h0 + h], o.earth]];
+    const lanes = [['Sunlight', [tok('--sun'), tok('--cell-sun')], h => z.sun[h0 + h] >= 0.5, o.sun], ['Earth contact', [tok('--earth'), tok('--cell-earth')], h => !!z.earth[h0 + h], o.earth]];
     x.textBaseline = 'middle';
     lanes.forEach(([name, col, on, pct], i) => { const y = MSG.t + i*(MSG.lh + MSG.gap);
       x.fillStyle = tok('--ink'); x.font = '500 12px "IBM Plex Sans"'; x.fillText(name, 0, y + MSG.lh/2 - 7);
-      x.fillStyle = col; x.font = '600 13px "IBM Plex Mono"'; x.fillText(pct.toFixed(0) + '%', 0, y + MSG.lh/2 + 8);
-      x.fillStyle = tok('--lane'); x.fillRect(MSG.l, y, pw, MSG.lh); x.fillStyle = col;
+      x.fillStyle = col[0]; x.font = '600 13px "IBM Plex Mono"'; x.fillText(pct.toFixed(0) + '%', 0, y + MSG.lh/2 + 8);
+      x.fillStyle = tok('--lane'); x.fillRect(MSG.l, y, pw, MSG.lh); x.fillStyle = col[1];   // text in --sun/--earth, lane fill in the calm cell colour
       let a = -1; for (let h = 0; h <= HH; h++){ const v = h < HH && on(h); if (v && a < 0) a = h; if (!v && a >= 0){ x.fillRect(X(a), y, Math.max(1, X(h) - X(a)), MSG.lh); a = -1; } } });
     const yB = MSG.t + 2*MSG.lh + MSG.gap;
     // day grid + dates

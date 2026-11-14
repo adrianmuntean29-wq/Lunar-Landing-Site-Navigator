@@ -6,7 +6,7 @@
    No info text here (Eren: middle screen free of info); numbers live in the right panel. */
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import {$, D2R, root, renderer, view, cams, glowTex, me2t, llv, moonTex, moonNrm, register} from './scene-core.js';
+import {$, D2R, root, renderer, view, cams, glowTex, me2t, llv, moonTex, moonNrm, register, tok} from './scene-core.js';
 
 const KM = 1/1737.4, RE = 6371*KM, RS = 695700*KM, AUKM = 149597870.7, YAX = new THREE.Vector3(0, 1, 0);
 // Earth's heliocentric ecliptic longitude phi (rad, = the Sun's longitude + 180 deg) and Sun-Earth distance (km)
@@ -31,6 +31,7 @@ function mrel(j){
   return {o: {r}, v, q};
 }
 let space, sCam, sCtl, world, eSys, sMoon, sEarth, sSun, sHalo, mMark, eMark, sTrack, sPast, eFut, ePast, stars, sL;
+let sSiteAx, siteKey = null;
 let focus = null, anim = null, anchor = new THREE.Vector3(), moonKey = null, earthKey = null, sPe = null, sAp = null, olab = {};
 const PREF = {moon: 13, earth: 700, sun: 260000}, MIND = {moon: 1.25, earth: RE*1.25, sun: RS*1.25};
 function buildSpace(){
@@ -62,12 +63,19 @@ function buildSpace(){
   const sGeo = new THREE.SphereGeometry(1, 96, 48); sGeo.computeTangents();
   sMoon = add(new THREE.Mesh(sGeo,new THREE.MeshStandardMaterial({map: moonTex(), normalMap: moonNrm(), roughness: 1, metalness: 0})), eSys);
   axis(1.7, sMoon);
+  // selected-site line (Eren 14 Nov): from the site through the Moon's centre to the far side, next to the spin axis,
+  // so the angle between them (= 90 deg - |latitude|, ~1.6-6 deg for our sites) can be seen. Points set in updateSpace.
+  sSiteAx = add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(0, 1, 0)]),
+    new THREE.LineBasicMaterial({color: tok('--earth-3d', '#64B5F6'), transparent: true, opacity: 0.9})), sMoon);
   mMark = add(glow('rgba(240,238,230,1)', 'rgba(220,220,210,0.35)', {blending: THREE.NormalBlending}), eSys);   // map markers when a body is too small to see
   eMark = add(glow('rgba(140,200,255,1)', 'rgba(90,150,255,0.35)', {blending: THREE.NormalBlending}), eSys);
-  const line = (n, op, col, parent) => { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n*3), 3));
-    const l = new THREE.Line(g, new THREE.LineBasicMaterial({color: col, transparent: true, opacity: op, depthWrite: false})); l.frustumCulled = false; parent.add(l); return l; };
-  sTrack = line(61, 0.9, '#4FC3F7', eSys); sPast = line(61, 0.28, '#4FC3F7', eSys);   // the Moon's real path around Earth, +/-15 days
-  eFut = line(366, 0.85, '#9CCC65', world); ePast = line(366, 0.28, '#9CCC65', world);   // Earth's real path around the Sun, +/-half a year
+  // paths fade along their length (per-vertex alpha, vertex 0 = the body now): ahead stays readable, the trail behind dies out fast (Eren 14 Nov)
+  const line = (n, col, a0, a1, pw, parent) => { const g = new THREE.BufferGeometry(), c = new THREE.Color(col), cl = new Float32Array(n*4);
+    for (let k = 0; k < n; k++) cl.set([c.r, c.g, c.b, a1 + (a0 - a1)*Math.pow(1 - k/(n - 1), pw)], k*4);
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n*3), 3)); g.setAttribute('color', new THREE.BufferAttribute(cl, 4));
+    const l = new THREE.Line(g, new THREE.LineBasicMaterial({vertexColors: true, transparent: true, depthWrite: false})); l.frustumCulled = false; parent.add(l); return l; };
+  sTrack = line(61, tok('--sel-3d', '#4FC3F7'), 0.95, 0.25, 1, eSys); sPast = line(61, tok('--sel-3d', '#4FC3F7'), 0.5, 0.12, 2.5, eSys);   // floor 0.12: the ring stays faintly visible under the closest/farthest marks   // the Moon's real path around Earth, +/-15 days
+  eFut = line(366, '#9CCC65', 0.85, 0.25, 1, world); ePast = line(366, '#9CCC65', 0.45, 0.08, 2.5, world);   // Earth's real path around the Sun, +/-half a year
   const mk = (cls, txt, f) => { const e = document.createElement('div'); e.className = 'olab ' + cls; e.textContent = txt; $('#olabels').appendChild(e); if (f){ e.onclick = () => focusSpace(f); e.title = 'Focus the camera on the ' + txt; } return e; };
   olab = {sun: mk('sun', 'Sun', 'sun'), earth: mk('earth', 'Earth', 'earth'), moon: mk('moon', 'Moon', 'moon'), pe: mk('apsis', '◆ closest'), ap: mk('apsis', '◆ farthest'), site: mk('site', '')};
   root.querySelectorAll('#obBar button').forEach(b => b.onclick = () => focusSpace(b.dataset.f));
@@ -104,14 +112,14 @@ function updateSpace(){
   sMoon.quaternion.copy(mr.q);   // Moon frame -> scene: north on its real fixed axis, Earth-facing side towards Earth
   // inside the tilted frame (x = March equinox direction, y = Earth's north), Greenwich faces the Greenwich sidereal angle (IAU 1982 linear term)
   sEarth.rotation.y = ((280.46061837 + 360.98564736629*(j - 2451545.0)) % 360)*D2R;
-  const mk = Math.round(j*4);
-  if (mk !== moonKey){ moonKey = mk; let lo = null, hi = null;   // the Moon's real path, redrawn every 6 h of model time
+  // the Moon's real path, redrawn every frame from the exact time, so vertex 0 sits on the Moon and the fade moves with it while playing
+  // (the old 6-hour redraw left the bright start behind the Moon at play speed)
+  if (j !== moonKey){ moonKey = j; let lo = null, hi = null;
     [[sTrack, 1], [sPast, -1]].forEach(([ln, sg]) => { const at = ln.geometry.attributes.position;
       for (let k = 0; k <= 60; k++){ const q = mrel(j + sg*k*0.25); at.setXYZ(k, q.v.x, q.v.y, q.v.z); if (!lo || q.o.r < lo.r) lo = {r: q.o.r, v: q.v}; if (!hi || q.o.r > hi.r) hi = {r: q.o.r, v: q.v}; }
       at.needsUpdate = true; });
     sPe = lo; sAp = hi; }
-  const ek = Math.round(j*4);
-  if (ek !== earthKey){ earthKey = ek;   // Earth's path: half a year ahead + half a year behind = one loop, half-day steps (chord error < 1 Moon radius)
+  if (j !== earthKey){ earthKey = j;   // Earth's path: half a year ahead + half a year behind = one loop, half-day steps (chord error < 1 Moon radius)
     [[eFut, 1], [ePast, -1]].forEach(([ln, sg]) => { const at = ln.geometry.attributes.position;
       for (let k = 0; k < 366; k++){ const v = hpos(earthHelio(j + sg*k*0.5)); at.setXYZ(k, v.x, v.y, v.z); } at.needsUpdate = true; }); }
   if (!focus) focusSpace('moon');
@@ -142,10 +150,20 @@ function updateSpace(){
   put(olab.earth, earthW.clone().add(new THREE.Vector3(0, RE + dE*0.025, 0)));
   put(olab.moon, moonW.clone().add(new THREE.Vector3(0, 1 + dM*0.025, 0)), dE < 50000 || focus === 'moon');
   put(olab.pe, eSys.localToWorld(sPe.v.clone()), near); put(olab.ap, eSys.localToWorld(sAp.v.clone()), near);
-  const s = App.sites[st.site], sp = sMoon.localToWorld(llv(s.lat, s.lon, 1.01)), facing = sp.clone().sub(moonW).dot(sCam.position.clone().sub(sp)) > 0;
-  if (olab.site.textContent !== s.short) olab.site.textContent = s.short;
+  const s = App.sites[st.site], sk = s.lat + ',' + s.lon;
+  if (sk !== siteKey){ siteKey = sk; const u = llv(s.lat, s.lon, 1.7), at = sSiteAx.geometry.attributes.position;
+    at.setXYZ(0, u.x, u.y, u.z); at.setXYZ(1, -u.x, -u.y, -u.z); at.needsUpdate = true; sSiteAx.geometry.computeBoundingSphere(); }
+  const sp = sMoon.localToWorld(llv(s.lat, s.lon, 1.01)), facing = sp.clone().sub(moonW).dot(sCam.position.clone().sub(sp)) > 0;
+  // tag = short name + the angle between the site line and the spin axis (= 90 deg - |latitude|), Eren 14 Nov
+  const stag = s.short + ' · ' + (90 - Math.abs(s.lat)).toFixed(1) + '° from the pole';
+  if (olab.site.textContent !== stag){ olab.site.textContent = stag; olab.site.title = 'Angle between the blue site line and the Moon\'s spin axis (orange) = 90° minus the site\'s latitude'; }
   put(olab.site, sp, facing && ang(1, dM) > 40);
 }
+
+// ?debug: pixel distance from each apsis marker to the nearest drawn path vertex (should be ~0)
+if (location.search.includes('debug')) window.__orbitApsis = () => { const r = renderer.domElement.getBoundingClientRect(), px = v => { const q = v.clone().project(sCam); return [(q.x*0.5 + 0.5)*r.width, (-q.y*0.5 + 0.5)*r.height]; };
+  const pts = []; [sTrack, sPast].forEach(l => { const a = l.geometry.attributes.position; for (let k = 0; k < a.count; k++) pts.push(px(eSys.localToWorld(new THREE.Vector3().fromBufferAttribute(a, k)))); });
+  return [sPe, sAp].map(s => { const p = px(eSys.localToWorld(s.v.clone())); return {p: p.map(Math.round), gap: Math.round(Math.min(...pts.map(q => Math.hypot(q[0] - p[0], q[1] - p[1]))))}; }); };
 
 register('system', {
   build: buildSpace,

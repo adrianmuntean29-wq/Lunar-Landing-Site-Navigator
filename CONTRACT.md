@@ -9,10 +9,16 @@ Data comes read-only from `app\data\` (`App.DATA = 'data/'`, since 2026-11-14 ~1
 
 | Files | Owner |
 |---|---|
-| `index.html`, `css/base.css`, `js/core.js`, `js/shell.js`, `js/missions.js`, `data/` (except `data/tiles/`), `CONTRACT.md` | COORDINATOR (local_152d34dc) |
-| `js/scene.js` (loader), `js/scene-core.js`, `js/view-orbit.js`, `js/view-moon.js`, `js/view-site.js`, `js/view-ground.js`, `css/scene.css`, `assets/` | SCENE (scene-2, local_c3ff04a8) |
-| `js/panel.js`, `css/panel.css`, `js/drawer.js`, `css/drawer.css` | PANELS (panels-2, local_744d3369) |
-| `data/tiles/` (per-site terrain tiles, display only) | ENGINE (engine-2, local_72bd04ef) |
+| `index.html`, `css/base.css`, `js/core.js`, `js/shell.js`, `js/missions.js`, `data/` (except `data/tiles/`), `CONTRACT.md`, `js/scene.js`, `js/scene-core.js`, `css/scene.css`, `assets/`, `js/drawer.js`, `css/drawer.css` | COORDINATOR ("Frontend coordinator: Peaks of Light", since 2026-11-14 ~20:50) |
+| `js/view-orbit.js` + Orbit section of `js/panel.js` / `css/panel.css` | view-orbit-3 (local_1a903ad5) |
+| `js/view-moon.js` + Moon / compare-sites section of panel | view-moon-3 (local_a8bb09bf) |
+| `js/view-site.js` + plan-a-landing section of panel | view-site-3 (local_fc309e09) |
+| `js/view-ground.js` + on-the-ground section of panel | view-ground-3 (local_b9d33eb0) |
+| `data/tiles/`, `engine-wt\` | ENGINE (engine-3, local_79a432a5) |
+| Proposals only, no app files: Tudor's zones + roughness (tudor-data, local_da0aab25); Adrian's mission.html (mission-page, local_5e8dcd3d) | via the owners above |
+
+**panel.js / panel.css are shared by the 4 view sessions:** Edit only (never Write), re-read right before every edit, touch only your view's section.
+Old owners (archived 20:40): coordinator local_152d34dc, scene-2, panels-2, engine-2.
 
 Need a change in a file you do not own (a new state field, a helper in core, a slot in index.html)? Message the
 COORDINATOR with the exact change. It lands once, for everyone. Do not work around it locally.
@@ -55,6 +61,15 @@ Checked against the engine: 0 of 1,460 landing days disagree (vault log 1440 / f
 - **Site kind** (`App.sites[i].kind`, from sites.json, engine 2026-11-14): `'published study point'` (A, B; the default if missing) | `'published study region centre'` (C, D) |
   `'best-lit point in NASA site box'` (engine search) | `'historic target (comparison)'` (IM-2). For a kind starting with "historic",
   show one line above its calendar: "Historic target, for comparison: landing here now would be inside IM-2's own keep-out." Never hide its keep-out days.
+- **Site numbers** (design A, ~20:15): a site's shown number = its `App.sites` index + 1 (1 = C1 ... 10 = IM-2); a custom spot is a star, never a number.
+  Scene markers and the panel list both use this rule, so they always match. Never number by rank.
+- **Ranges** (`App.sites[i].range`, since ~20:00, from `data/site_ranges.json`; undefined if missing): `{mast: '2', period: '2027-2031',
+  centre, best, upper, r25: {sun_pct, earth_pct, longest_night_h: {min, max}}, r50: {sun_pct, earth_pct, both_pct, longest_night_h: {min, median, max}}}`.
+  Exact engine masks at 25 points (centre + 25 m + 50 m rings). 2 m mast and 2027-2031 ONLY (not the page's mast/period), no slope check on ring points;
+  `upper` = truncated site (values are upper bounds). Custom spots have no range.
+- **Project palette** (base.css, ~20:20, DECISIONS item 18, open until Eren approves): `--sun`, `--earth`, `--mis`, `--psr`, `--sel`, `--now`,
+  `--cell-sun`, `--cell-earth` (both themes) and fixed on-3D `--sun-3d`, `--earth-3d`, `--mis-3d`, `--psr-3d`, `--sel-3d`. Areas use these;
+  area-local colour tokens only for things the palette lacks, and never a second Sun/Earth/missions colour.
 - **Theme** (`App.state.theme` = `'dark'` | `'light'`, since 2026-11-14 ~19:50): shell.js sets it from the top-bar LIGHT/DARK button (saved in
   localStorage, or `?theme=light`) and sets `<html data-theme="light">`. base.css redefines every token for light, plus `--mis` (other missions), `--tagbg`, `--tip`,
   `--shadow`. **Use tokens only, no hard-coded colours.** On key `'theme'`, redraw canvases and three.js colours that read tokens. The 3D sky may stay dark.
@@ -92,3 +107,6 @@ terrain horizon; Earth contact = any part of Earth's disc above it (geometry, no
   and one line in `vault\AI_USE.md`; new library/font/image/data -> `vault\CREDITS-PENDING.md`. Follow `vault\AGENTS.md`.
 - Test in the browser after every change: no console errors, the drawer tabs still fit (no scrolling), your area works with the others.
 - When done with a step, tell Eren in two lines what changed and how to see it.
+
+**Missions page (since 2026-11-14 ~21:40):** `mission.html` (Adrian's page, planner layout by mission-page) opens in the left slide-in `#missionPanel` iframe from the top-left `#missionBtn` (shell.js; src changes only when the URL changes; closes on button, Esc, or the page's postMessage {spn:'close-missions'}).
+(shell.js builds `mission.html?site=&land=YYYY-MM-DD&type=robotic&len=&sun=&earth=&night=&mast=&relay=`). Owner of the copy: COORDINATOR; content changes go via mission-page with Eren's OK.

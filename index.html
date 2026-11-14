@@ -15,6 +15,7 @@
 <body>
 <div class="app">
   <header class="top" id="top">
+    <button class="btn" id="missionBtn" type="button" aria-expanded="false" aria-controls="missionPanel" title="Fly a mission: the selected site and landing day, from launch to the surface">☰ MISSIONS</button>
     <span class="brand">SOUTH POLE NAVIGATOR</span>
     <!-- time, play, speed and the Sun/Earth status live in the bottom panel (Eren 2026-11-14 ~16:05) -->
     <span class="sp"></span>
@@ -30,6 +31,8 @@
     </section>
     <aside class="panel" id="panel"></aside> <!-- panel.js (right panel chat) -->
   </div>
+  <!-- Missions: Adrian's mission page in a left slide-in panel (shell.js; Eren ~21:30) -->
+  <aside id="missionPanel" aria-label="Missions" aria-hidden="true"><iframe id="missionFrame" title="Missions"></iframe></aside>
 </div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script src="js/core.js"></script>

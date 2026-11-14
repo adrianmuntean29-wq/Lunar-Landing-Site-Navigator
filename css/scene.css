@@ -2,15 +2,15 @@
 /* Theme (2026-11-14): boxed UI (layers box, view tabs, notes, camera bars) uses the page tokens from base.css, so it follows LIGHT/DARK.
    The 3D picture stays dark in both themes, so text drawn ON it (pins, mission labels, sky tags, site cards) uses these fixed --c-* tokens.
    Boxed UI uses the shared --mis (base.css); the 3D mission lines and on-picture labels keep --c-mis, because the picture stays dark. */
-#scene{--c-ink:#E8EAED;--c-bg:#111315;--c-muted:#A3AAB2;--c-line:#2A2E33;--c-sun:#F2B33D;--c-earth:#62AEF2;--c-earth2:#7CC0FF;--c-sel:#4FC3F7;--c-moon:#E8E6E0;
-  --c-mis:#F2876B;--c-misline:rgba(242,135,107,.45);--c-box:rgba(23,25,28,.8);--c-card:rgba(8,10,14,.82);--c-selcard:rgba(20,60,90,.85);--c-sel25:rgba(79,195,247,.25);
-  --c-sh:#000;--c-sh45:rgba(0,0,0,.45);--c-sh55:rgba(0,0,0,.55);--c-sh70:rgba(0,0,0,.7);
+#scene{--c-ink:#E8EAED;--c-bg:#111315;--c-muted:#A3AAB2;--c-line:#2A2E33;--c-sun:var(--sun-3d);--c-earth:var(--earth-3d);--c-earth2:var(--earth-3d);--c-sel:var(--sel-3d);--c-moon:#E8E6E0;
+  --c-mis:var(--mis-3d);--c-misline:color-mix(in srgb,var(--mis-3d) 45%,transparent);--c-box:rgba(23,25,28,.8);--c-card:rgba(8,10,14,.82);--c-selcard:rgba(20,60,90,.85);--c-sel25:color-mix(in srgb,var(--sel-3d) 25%,transparent);
+  --c-num:#3A3F46;--c-numhi:#5A616B;--c-sh:#000;--c-sh45:rgba(0,0,0,.45);--c-sh55:rgba(0,0,0,.55);--c-sh70:rgba(0,0,0,.7);
   --c-white:#fff;--c-white28:rgba(255,255,255,.28);--c-white35:rgba(255,255,255,.35);--c-white50:rgba(255,255,255,.5);--c-white70:rgba(255,255,255,.7);--c-white85:rgba(255,255,255,.85)}
 #scene canvas{display:block;width:100%;height:100%}
 #scene .labels,#scene .skylabels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 #scene .zoom{position:absolute;left:12px;top:12px;display:grid;gap:4px}
 #scene .zoom button{width:30px;height:30px;font:500 16px "IBM Plex Mono";color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;cursor:pointer}
-#scene .layers{position:absolute;right:12px;top:12px;z-index:4;background:color-mix(in srgb,var(--panel) 90%,transparent);border:1px solid var(--line);border-radius:6px;padding:8px 10px;display:grid;gap:4px;font:500 12px "IBM Plex Mono";color:var(--muted)}
+#scene .layers{position:absolute;right:12px;top:12px;z-index:4;background:color-mix(in srgb,var(--panel) 90%,transparent);border:1px solid var(--line);border-radius:6px;padding:8px 10px;display:grid;gap:4px;font:400 12.5px "IBM Plex Sans";color:var(--muted)}
 #scene.layers-low .layers{top:var(--tabs-b,56px)}   /* scene too narrow for tabs + box on one row (scene-core.js layersSpot) */
 #scene .layers label{display:flex;gap:6px;align-items:center;cursor:pointer}
 #scene .psrsw{display:inline-block;width:14px;height:0;border-top:2px dashed var(--psr)}
@@ -32,7 +32,7 @@
 /* site pins: quiet by default (dim box, light weight), the selected site is the only bright one (Eren, 2026-11-14: labels "blind the eye") */
 #scene .pin{position:absolute;transform:translate(-50%,-100%);font:500 10.5px "IBM Plex Mono";color:var(--c-muted);background:var(--c-box);border:1px solid var(--c-white28);border-radius:3px;padding:1px 5px;white-space:nowrap;cursor:pointer;pointer-events:auto}
 #scene .pin:hover{color:var(--c-ink);border-color:var(--c-white70)}
-#scene .pin.sel{background:var(--c-earth);color:var(--c-bg);border-color:var(--c-earth);font-weight:600;z-index:1}
+#scene .pin.sel{background:var(--c-sel);color:var(--c-bg);border-color:var(--c-sel);font-weight:600;z-index:1}
 #scene .pin.edge{border-style:dashed} #scene .pin.edge::after{display:none}
 #scene .mlab{position:absolute;transform:translate(-50%,0);font:500 10.5px "IBM Plex Mono";color:var(--c-mis);white-space:nowrap;text-shadow:0 1px 3px var(--c-sh);pointer-events:auto;cursor:help}
 #scene .medge{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:1px;font:500 10.5px "IBM Plex Mono";color:var(--c-mis);white-space:nowrap;text-shadow:0 1px 3px var(--c-sh);pointer-events:auto;cursor:help}
@@ -40,9 +40,10 @@
 #scene .medge.bare .ar{font-size:18px;background:var(--c-box);border:1px solid var(--c-misline);border-radius:50%;width:22px;height:22px;line-height:22px;text-align:center}
 #scene .medge .tx{background:var(--c-box);border:1px solid var(--c-misline);border-radius:3px;padding:1px 5px}
 #scene .legend .msw{color:var(--mis)} #scene .legend .mout{color:var(--muted)} #scene .legend .mlabel{font-size:10px;opacity:.8}
-#scene .pin::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:14px;background:var(--c-white35)} #scene .pin.sel::after{background:var(--c-earth)}
+#scene .pin::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:14px;background:var(--c-white35)} #scene .pin.sel::after{background:var(--c-sel)}
 
 #scene .obbar{position:absolute;left:12px;top:var(--tabs-b,56px);display:flex;align-items:center;gap:6px;background:color-mix(in srgb,var(--panel) 90%,transparent);border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:500 11px "IBM Plex Mono";color:var(--muted);z-index:3}
+#scene #obBar{top:auto;bottom:12px}   /* Orbit Focus menu just above the bottom panel (Eren ~21:10); #gBar (Moon view) keeps the top position */
 #scene .obbar[hidden]{display:none}
 #scene .obbar button{font:600 12px "IBM Plex Sans";color:var(--muted);background:none;border:1px solid transparent;border-radius:4px;padding:4px 9px;cursor:pointer}
 #scene .obbar button[aria-pressed=true]{color:var(--earth);border-color:var(--earth);background:color-mix(in srgb,var(--earth) 10%,transparent)}
@@ -50,22 +51,32 @@
 #scene .olab.moon,#scene .olab.earth,#scene .olab.sun{pointer-events:auto;cursor:pointer;padding:2px 4px}
 #scene .olab.moon{color:var(--c-moon)} #scene .olab.earth{color:var(--c-earth2)} #scene .olab.sun{color:var(--c-sun)}
 #scene .olab.moon:hover,#scene .olab.earth:hover,#scene .olab.sun:hover{text-decoration:underline}
-#scene .olab.apsis{color:var(--c-sel);font-weight:500;font-size:10.5px;transform:translate(-50%,-50%)}
+#scene .olab.apsis{color:var(--c-sel);font-weight:500;font-size:10.5px;transform:translate(-.3em,-50%)}
 #scene .olab.site{color:var(--c-bg);background:var(--c-earth);border-radius:3px;padding:1px 6px;font-size:10.5px;transform:translate(8px,-50%)}
-#scene .gsite{position:absolute;width:0;height:0;pointer-events:none}
-#scene .gsite .dot{position:absolute;left:-5px;top:-5px;width:10px;height:10px;border-radius:1px;background:var(--c-white);box-shadow:0 0 0 2px var(--c-sh70),0 0 8px var(--c-white50)}   /* square: never mistaken for a bright crater */
-#scene .gsite .stem{position:absolute;left:0;top:0;height:1px;background:linear-gradient(90deg,var(--c-white85),var(--c-white35));transform-origin:0 0}
-#scene .gsite .card{position:absolute;transform:translate(-50%,-100%);pointer-events:auto;cursor:pointer;white-space:nowrap;font:600 12.5px "IBM Plex Sans";color:var(--c-ink);background:var(--c-card);border:1px solid var(--c-white28);border-radius:5px;padding:4px 9px;backdrop-filter:blur(3px);box-shadow:0 2px 10px var(--c-sh45)}
-#scene .gsite.down .card{transform:translate(-50%,0)}
-#scene .gsite .card:hover{border-color:var(--c-white70)}
-#scene .gsite.sel .dot{background:var(--c-earth);box-shadow:0 0 0 2px var(--c-sh55),0 0 0 6px var(--c-sel25),0 0 14px var(--c-earth)}
-#scene .gsite.sel .stem{background:var(--c-earth)}
-#scene .gsite.sel .card{border-color:var(--c-earth);color:var(--c-white);background:var(--c-selcard)}
 #glabels .sky{pointer-events:auto;cursor:pointer}
 #scene .sky.edge{transform:translate(-50%,-50%);background:var(--c-box);border:1px solid var(--c-line);border-radius:4px;padding:2px 7px}   /* Moon view: Sun/Earth off screen, tag at the edge */
 /* layers box groups (Landing / Other missions / Graphics), Eren 2026-11-14 */
 #scene .layers .lyhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;padding-top:5px;border-top:1px solid var(--line);font:600 10.5px "IBM Plex Mono";letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
 #scene .layers .lyhead:first-child{margin-top:0;padding-top:0;border-top:0}
+#scene .layers .lyhead .info-tip{text-transform:none;letter-spacing:normal}   /* tips sit inside the uppercase .lyhead; keep the shared base.css tip look */
 #scene .litsw{display:inline-block;width:14px;height:10px;border-radius:2px;background:linear-gradient(90deg,#122052 50%,#FFCC4D 50%)}
 #scene .elevsw{display:inline-block;width:22px;height:10px;border-radius:2px;background:linear-gradient(90deg,#293D9E,#2E9499,#DBC74D,#FAF7F2)}
 #scene .sitesw{display:inline-block;width:14px;height:10px;border-radius:2px;background:var(--c-box);border:1px solid var(--muted)}
+/* Moon view site markers (Eren, design A): numbered circle on the site point; selected = blue; your spot = hollow ring with a star.
+   Drawn on the dark 3D picture, so fixed --c-* tokens in both themes. */
+#scene .gnum{position:absolute;transform:translate(-50%,-50%);width:18px;height:18px;padding:0;border-radius:50%;font:600 10.5px/16px "IBM Plex Mono";text-align:center;color:var(--c-ink);background:var(--c-num);border:1px solid var(--c-white35);box-shadow:0 0 0 1px var(--c-sh55);cursor:pointer;pointer-events:auto}
+#scene .gnum:hover,#scene .gnum:focus-visible{background:var(--c-numhi);border-color:var(--c-white85);outline:none}
+#scene .gnum.sel{background:var(--c-sel);color:var(--c-bg);border-color:var(--c-white85);box-shadow:0 0 0 1px var(--c-sh55),0 0 0 4px var(--c-sel25);z-index:2}
+#scene .gnum.spot{background:var(--c-box);border:2px solid var(--c-ink);font-size:10px;line-height:14px;color:var(--c-ink)}
+#scene .gnum.spot.sel{border-color:var(--c-sel);color:var(--c-sel);background:var(--c-box)}
+/* Moon view site markers (view-moon, Eren ~21:00): square on the site point, tag beside it, leader line, "N sites" box, Detail button */
+#scene .gsq{position:absolute;transform:translate(-50%,-50%);width:12px;height:12px;box-sizing:border-box;border:1.5px solid var(--c-white85);box-shadow:0 0 0 1px var(--c-sh55);pointer-events:auto;cursor:pointer}
+#scene .gsq.sel{border-color:var(--c-sel);box-shadow:0 0 0 1px var(--c-sh55),0 0 0 3px var(--c-sel25)}
+#scene .gsq.spot{border-style:dashed}
+#scene .gld{position:absolute;height:1px;background:var(--c-white50);transform-origin:0 50%;pointer-events:none}
+#scene .gld.sel{background:var(--c-sel)}
+#scene .gclus{position:absolute;box-sizing:border-box;padding:0;background:transparent;border:1.5px solid var(--c-white85);box-shadow:0 0 0 1px var(--c-sh55);pointer-events:auto;cursor:pointer}
+#scene .gclus span{position:absolute;top:100%;left:50%;transform:translate(-50%,6px);font:600 11px "IBM Plex Mono";color:var(--c-ink);background:var(--c-box);border:1px solid var(--c-line);border-radius:4px;padding:2px 7px;white-space:nowrap}
+#scene .gclus:hover,#scene .gclus:focus-visible{border-color:var(--c-sel);outline:none}
+#scene .gdet{position:absolute;transform:translate(-50%,0);font:600 10.5px "IBM Plex Mono";color:var(--c-ink);background:var(--c-box);border:1px solid var(--c-sel);border-radius:4px;padding:1px 6px;pointer-events:auto;cursor:pointer;white-space:nowrap}
+#scene .gdet:hover,#scene .gdet:focus-visible{background:var(--c-selcard);outline:none}

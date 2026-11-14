@@ -1,8 +1,8 @@
 /* drawer.css: OWNER "bottom panel" chat. Style only things inside #drawer. */
 #drawer{background:var(--panel);border-top:1px solid var(--line);
   /* local tokens (theme, 14 Nov): base.css has no mission colour or lane fill; light values under data-theme=light */
-  --cell-off:var(--line);--dim:#80878F;--lane:#23262A;--grid:rgba(17,19,21,.85);--ev-down:#3A3F45;--dot-ring:rgba(10,11,13,.7);--on-chip:#17191C;--now:#FF5CE1}
-:root[data-theme=light] #drawer{--dim:#6B727A;--lane:#E2DED6;--grid:rgba(255,255,255,.9);--ev-down:#B9B4AA;--dot-ring:rgba(255,255,255,.95);--on-chip:#FFFFFF;--now:#B5179E}
+  --cell-off:var(--line);--dim:#80878F;--lane:#23262A;--grid:rgba(17,19,21,.85);--ev-down:#3A3F45;--dot-ring:rgba(10,11,13,.7);--on-chip:#17191C}
+:root[data-theme=light] #drawer{--dim:#6B727A;--lane:#E2DED6;--grid:rgba(255,255,255,.9);--ev-down:#B9B4AA;--dot-ring:rgba(255,255,255,.95);--on-chip:#FFFFFF}
 /* time row (clock, play, speed, Sun/Earth now) */
 #drawer .trow{display:flex;align-items:center;gap:16px;height:34px;padding:0 14px;border-bottom:1px solid var(--line);font:500 12.5px "IBM Plex Mono";white-space:nowrap;overflow:hidden}
 #drawer .trow .k{color:var(--muted)} #drawer .trow b{color:var(--ink);font-weight:600}
@@ -94,6 +94,6 @@
 #drawer .hist[hidden]{display:none}
 #drawer .hasHist .yg{row-gap:1px}   /* the historic line takes ~18 px: tighter rows keep all 12 months visible */
 /* today marker: magenta bar on the clock's day + magenta month name (never the selected-day outline, which is --ink) */
-#drawer .pd.now::before{content:'';position:absolute;inset:0;border-radius:3px;box-shadow:inset 0 0 0 2px var(--now),inset 0 -5px 0 var(--now);z-index:3;pointer-events:none}   /* inner ring + bottom bar; the selected outline sits outside the cell */
-#drawer .ym.now{color:var(--now);font-weight:700}
+#drawer .pd.now::before{content:'';position:absolute;inset:0;border-radius:3px;box-shadow:inset 0 0 0 1px var(--now),inset 0 -4px 0 var(--now);z-index:3;pointer-events:none}   /* today = thin inner ring + bottom bar (base --now); selected day = thick outer box (--ink): different shapes */
+#drawer .ym.now{color:var(--now);font-weight:700;text-decoration:underline;text-underline-offset:3px}
 #drawer .nowsw{display:inline-block;width:16px;height:4px;border-radius:1px;background:var(--now);align-self:center}

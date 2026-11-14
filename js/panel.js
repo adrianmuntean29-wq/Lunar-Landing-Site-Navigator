@@ -43,50 +43,36 @@
       <details class="how"><summary>About this view</summary><p>Drag to look around, scroll to zoom.</p><p>14-day strip: one column per hour. Sun % = average share of the Sun's disc above the terrain; Earth % = share of hours with Earth in view. Dark = less than half the Sun's disc visible.</p><p>Horizon = NASA LOLA terrain mask (360 directions). Height = angle above a flat, level horizon; the terrain decides if the Sun or Earth is actually visible.</p><p>Orange pins: other missions. Teal strip under the ridge: permanently shadowed areas (LOLA model) within 20 km. Direction only: from the mast they are beyond the horizon or inside crater floors, not in view.</p></details>
     </div>
     <div class="scroll" id="pMission" hidden>
-      <div class="sitepick"><span>Landing site</span><h2 class="siteName"></h2><small class="apx" hidden></small></div>
-      <section class="blk shut"><h3>Your own spot</h3><div class="spotf"></div></section>
+      <!-- Plan a landing, 1-second layout (Eren 14 Nov ~21:15): one answer, one bar, four sliders; the rest folds or sits in (i) tips -->
+      <div class="sitepick plHead"><h2 class="siteName"></h2><span id="plInfo"></span></div>
+      <small class="apx plApx" hidden></small>
       <section class="verdict" id="verdict" aria-live="polite">
         <div class="vn"><b id="rN"></b><span id="rNs"></span></div>
-        <div class="share" aria-hidden="true"><i id="rBar"></i></div>
+        <div class="plStack" id="rStack" aria-hidden="true"></div>
+        <div class="plLeg" id="rLeg"></div>
         <p id="rFirst"></p>
-        <small id="rFor"></small>
       </section>
-      <section class="others" id="others"><b id="oHead"></b><p id="oText"></p><small id="oLabel"></small></section>
-      <section class="blk">
-        <h3>Your mission</h3>
-        <div class="kind" id="kindSeg"><button type="button" data-v="robotic" aria-pressed="true">Robotic lander<small>13 days, example limits</small></button><button type="button" data-v="crew" aria-pressed="false">Crew landing<small>6 days, example limits</small></button></div>
+      <section class="others" id="others" hidden><b id="oHead"></b><span id="oTip"></span></section>
+      <section class="plMis">
+        <div class="plRow"><h3>Your mission</h3><div class="kind" id="kindSeg"><button type="button" data-v="robotic" aria-pressed="true">Robotic · 13 d</button><button type="button" data-v="crew" aria-pressed="false">Crew · 6 d</button></div></div>
         <label class="slr"><span class="t">Mission length <b id="vLen"></b></span><input id="len" type="range" min="1" max="60"></label>
-        <label class="slr"><span class="t">Sunlight needed <b id="vSun"></b></span><input id="sun" type="range" min="0" max="100"></label>
-        <label class="slr"><span class="t">Contact with Earth <b id="vEarth"></b></span><input id="earth" type="range" min="0" max="100"></label>
+        <label class="slr"><span class="t">Sunlight <b id="vSun"></b></span><input id="sun" type="range" min="0" max="100"></label>
+        <label class="slr"><span class="t"><span>Earth contact <span id="earthTip"></span></span><b id="vEarth"></b></span><input id="earth" type="range" min="0" max="100"></label>
+        <label class="slr"><span class="t">Darkness <b id="vNight"></b></span><input id="night" type="range" min="0" max="240" step="6"></label>
+      </section>
+      <details class="how plMore"><summary id="plMoreS">More options</summary>
         <label class="chk2"><input type="checkbox" id="relay"> A relay satellite handles communication (ignore the Earth limit)</label>
-        <label class="slr"><span class="t">Longest darkness allowed <b id="vNight"></b></span><input id="night" type="range" min="0" max="240" step="6"></label>
-        <p class="note" style="margin-top:-6px">When the Sun only grazes a ridge, the longest darkness can shift by up to a day.</p>
         <div class="f2"><span>Solar panels and antenna height</span><span class="seg" id="mast"><button type="button" data-v="0">0 m</button><button type="button" data-v="2">2 m</button><button type="button" data-v="10">10 m</button></span></div>
         <div class="f2"><span>Must be near permanent shadow</span><span class="seg" id="psrf"><button type="button" data-v="0">no</button><button type="button" data-v="10">10 km</button><button type="button" data-v="5">5 km</button><button type="button" data-v="2">2 km</button></span></div>
-        <p class="note">Example values, not NASA requirements.</p>
-      </section>
-      <section class="blk">
-        <h3 id="resT">Why the other days fail</h3>
-        <div class="why" id="why"></div>
         <p class="rl" id="rPsr"></p>
-      </section>
-      <details class="how"><summary>How this is computed</summary><p>Sunlight: average share of the Sun's disc above the real terrain horizon (NASA LOLA). Darkness: the Sun's centre is below that horizon. Earth contact: any part of Earth is above it (geometry only, not a radio link). Sun and Earth positions: JPL Horizons. Each day means a landing at 00:00 UTC.</p></details>
+        <h4 class="plSub">Your own spot</h4><div class="spotf"></div>
+      </details>
+      <details class="how"><summary>How this is computed</summary><p>Sunlight: average share of the Sun's disc above the real terrain horizon (NASA LOLA). Darkness: the Sun's centre is below that horizon; when the Sun only grazes a ridge, the longest darkness can shift by up to a day. Earth contact: any part of Earth is above it (geometry only, not a radio link). Sun and Earth positions: JPL Horizons. Each day means a landing at 00:00 UTC.</p><p>The bar: each failed day is counted once, under its first reason (sunlight, then Earth, then darkness).</p><p>Limits: the Earth 25% default is the map mask used in a 2024 NASA presentation; sunlight, length and darkness are example values.</p></details>
       <details class="how"><summary>About this view</summary><p>Terrain: NASA LOLA heights (PGDA 90, Barker et al. 2023). The view centres on the selected site. Around each named site: 100 m grid, 50 × 50 km (from the 20 m map). Elsewhere: 240 m near the pole, 1.2 km out to 300 km. Your own spot has no close-up tile, so its ground is coarse. Heights ×2, and the ground curves with the Moon.</p><p>Shadows in this view are visual only; every number comes from the 360-direction horizon masks.</p></details>
     </div>
     <div class="scroll" id="pSites" hidden>
-      <div class="sitepick"><span>Selected site</span><h2 class="siteName"></h2><span class="kindtag" id="gKind"></span><small id="gLoc"></small><small class="apx" hidden></small></div>
-      <section class="blk gsite">
-        <div class="stline"><span class="ic sunc">☀</span><div><b id="gSun"></b><small id="gSunS"></small></div></div>
-        <div class="stline"><span class="ic earthc">⊕</span><div><b id="gEarth"></b><small id="gEarthS"></small></div></div>
-        <div class="gnums">
-          <div><span>Good landing days</span><b id="gOk"></b><small id="gOkS"></small></div>
-          <div><span>To permanent shadow</span><b id="gPsr"></b><small>nearest area that never sees the Sun</small></div>
-        </div>
-        <div class="gmis" id="gMis"><b id="gMisH"></b><small id="gMisL"></small></div>
-        <button class="go" type="button" id="gPlan">Plan a landing here <span aria-hidden="true">→</span></button>
-      </section>
-      <p class="rl">Drag to turn, scroll to zoom. "South pole" and "Whole Moon" (top left) move the camera.</p>
-      <div class="sec"><h3>ALL SITES · SAME LIMITS · CLICK ONE OR A MARKER ON THE MOON</h3><div id="siteList" class="sitelist"></div></div>
+      <p class="rl lhead">Click a site to compare.</p>
+      <div id="siteList" class="sitelist"></div>
       <div class="sec"><h3>YOUR OWN SPOT</h3><div class="spotf"></div></div>
       <div class="sec"><h3>DATA</h3><div class="prov" id="prov"></div></div>
       <details class="how"><summary>About this view</summary><p>3D terrain: LOLA polar heights (PGDA 90): 240 m grid within 57 km of the pole, 1.2 km grid out to 80° S (about 300 km). Heights ×2, edge eased into the globe. Shadows and fill light are visual only; all numbers come from the 360-direction horizon masks. Surface colour: NASA SVS CGI Moon Kit (made for looks, not science). Exact numbers only for the named sites; your own spot is approximate.</p></details>
@@ -100,11 +86,28 @@
   const tip = (label, text) => { const id = 'apxTip' + (tipN++); return '<span class="info-wrap"><button type="button" class="info-i" aria-label="' + label + '" aria-describedby="' + id + '">i</button><span class="info-tip left" id="' + id + '" role="tooltip">' + text + '</span></span>'; };
   // truncated horizon (coordinator 14 Nov, core site.truncated + edge_rays): missing far terrain can only raise the horizon
   const TRUNC_TXT = s => 'Part of the horizon is beyond our map: ' + s.edge_rays + ' of 360 directions reach the map edge before the terrain stops rising. Missing terrain can only hide the Sun or Earth more, so the true values can be lower, never higher.';
+  /* 50 m ranges (Eren 14 Nov ~20:00, core site.range): exact horizons at 25 points, fixed at 2 m mast and 2027-2031. Custom spots: none. */
+  const RANGE_TIP = s => 'Exact horizons at 25 points (the site, 8 at 25 m, 16 at 50 m), 2 m mast, 2027-2031. No slope check: some ring points may be too steep to land on.' +
+    (s.kind === 'best-lit point in NASA site box' ? ' This point was chosen as the best-lit one, so it sits at the top of its range.' : '') +
+    (s.range.upper ? ' Part of the horizon is beyond our map, so these are upper bounds.' : '');
+  function rangeLine(s){ const t = rangeText(s); return t ? '<span>' + t + '</span>' + (s.range.upper ? ' <span class="ub">Upper bound</span>' : '') + ' ' + tip('About this range', RANGE_TIP(s)) : ''; }
+  function rangeText(s){
+    const R = s.range; if (!R || s.custom) return '';
+    const r = Math.round, a = R.r25.sun_pct, b = R.r50.sun_pct, st = App.state;
+    const p25 = r(a.min) === r(a.max) ? r(a.max) + '%' : r(a.min) + '-' + r(a.max) + '%';
+    let t = 'Within 25 m: ' + p25 + ' sun.';
+    const lo = r(b.min) < r(a.min), hi = r(b.max) > r(a.max);
+    t += lo && hi ? ' Within 50 m: ' + r(b.min) + '-' + r(b.max) + '%.' : lo ? ' Within 50 m: as low as ' + r(b.min) + '%.' : hi ? ' Within 50 m: up to ' + r(b.max) + '%.' : ' Same within 50 m.';
+    const y0 = App.date(st.jd0).getUTCFullYear(), y1 = App.date(st.jd0 + st.days - 1).getUTCFullYear();
+    if (st.mast !== R.mast || y0 + '-' + y1 !== R.period) t += ' (at ' + R.mast + ' m, ' + R.period + ')';
+    return t;
+  }
   const truncBit = s => s.truncated ? '<span class="ub">Upper bound: sun %, Earth % and good days</span> ' + tip('About upper bound', TRUNC_TXT(s)) : '';
   function approxLines(){
     const s = App.sites[App.state.site], cus = !!s.custom, tr = !!s.truncated;
     root.querySelectorAll('.apx').forEach(el => { el.hidden = !cus && !tr; if (el.hidden) return;
       el.innerHTML = (cus ? '<span>' + s.label.charAt(0).toUpperCase() + s.label.slice(1) + '</span> ' + tip('About approximate numbers', s.why ? s.why + ' Distance to permanent shadow is not computed.' : APX_TIP) : '') + truncBit(s); });
+    const rl = rangeLine(s); root.querySelectorAll('.rng').forEach(el => { el.hidden = !rl; el.innerHTML = rl; });
     root.querySelectorAll('.sDel').forEach(b => b.hidden = !App.state.spot);
   }
   async function addSpot(f){
@@ -123,6 +126,8 @@
     pressed('#mast', st.mast); pressed('#gMastSeg', st.mast); pressed('#psrf', st.psr);
     const pre = Object.entries(App.PRESETS).find(([k, p]) => ['len', 'sun', 'earth', 'night'].every(q => p[q] === st.lim[q]));
     pressed('#kindSeg', pre ? pre[0] : '');
+    // folded options say their current values, so nothing hidden changes the answer unseen
+    $('#plMoreS').textContent = 'More options: ' + st.mast + ' m mast' + (st.lim.relay ? ', relay' : '') + (st.psr ? ', within ' + st.psr + ' km of shadow' : '') + (st.spot ? ', your spot' : '');
   }
   function now(){
     const st = App.state, s = App.sites[st.site], j = st.jd0 + st.t, a = App.next(s, j, 'sun'), b = App.next(s, j, 'earth');
@@ -149,7 +154,7 @@
     const st = App.state, ser = App.series(st.site), H = ser.sun.length, h0 = Math.max(0, Math.floor(st.t*24)), n = Math.min(14*24, H - h0);
     const cv = $('#g14'), W = cv.clientWidth || 300, ctx = cv.getContext('2d'), dpr = window.devicePixelRatio || 1;
     cv.width = W*dpr; cv.height = 44*dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, 44);
-    const bw = W/(14*24), sc = css('--sun'), ec = css('--earth'), off = css('--line');
+    const bw = W/(14*24), sc = css('--cell-sun'), ec = css('--cell-earth'), off = css('--line');
     ctx.fillStyle = off; ctx.fillRect(0, 2, W, 16); ctx.fillRect(0, 26, W, 16);
     let s = 0, e = 0;
     for (let k = 0; k < n; k++){ const v = ser.sun[h0 + k], x = k*bw; s += v; e += ser.earth[h0 + k];
@@ -179,53 +184,48 @@
     $('#oEarth').textContent = x.earthVis ? 'Earth in view' : 'Earth hidden (no direct radio contact)';
     $('#oSun').closest('.stline').classList.toggle('off', x.sunLit < 0.5); $('#oEarth').closest('.stline').classList.toggle('off', !x.earthVis);
   }
-  // Moon view: detail card for the selected site (Eren via Moon sim chat, 14 Nov ~16:15).
+  // Moon view (design A, Eren 14 Nov ~20:15): the map shows numbered markers; the expanded row of the selected site carries the live lines.
   function globeSite(){
-    const st = App.state, i = st.site, s = App.sites[i], j = st.jd0 + st.t, raw = s.raw;
-    const a = App.next(s, j, 'sun'), b = App.next(s, j, 'earth'), w = App.wins(i), ok = w.filter(o => !o.fail.length).length;
-    const poleKm = 2*1737.4*Math.tan((90 + raw.lat)/2*Math.PI/180);
-    $('#gKind').textContent = s.kind || ''; $('#gKind').classList.toggle('hist', /^historic/.test(s.kind || ''));
-    $('#gLoc').textContent = Math.abs(raw.lat).toFixed(4) + '° S, ' + raw.lon_e.toFixed(2) + '° E · ' + poleKm.toFixed(1) + ' km from the pole';
-    $('#gSun').textContent = a.now ? 'Sun up' : 'Sun down';
+    const g = $('#gSun'); if (!g) return;
+    const st = App.state, s = App.sites[st.site], j = st.jd0 + st.t, a = App.next(s, j, 'sun'), b = App.next(s, j, 'earth');
+    g.textContent = a.now ? 'Sun up' : 'Sun down';
     $('#gSunS').textContent = a.h == null ? 'no change within 60 days' : (a.now ? 'sets ' : 'rises ') + App.plainH(a.h);
     $('#gEarth').textContent = b.now ? 'Earth in view' : 'Earth hidden';
     $('#gEarthS').textContent = b.h == null ? 'no change within 60 days' : (b.now ? 'sets ' : 'rises ') + App.plainH(b.h);
-    $('#gSun').closest('.stline').classList.toggle('off', !a.now); $('#gEarth').closest('.stline').classList.toggle('off', !b.now);
-    $('#gOk').textContent = ok + ' / ' + w.length; $('#gOkS').textContent = 'with your current limits';
-    $('#gPsr').textContent = s.psr_km != null ? s.psr_km.toFixed(1) + ' km' : 'unknown';
-    const m = window.Missions && (st.missions || {}).on ? Missions.summary(s) : null;
-    $('#gMis').hidden = !m; if (m){ $('#gMis').classList.toggle('warn', !m.ok); const cut = m.text.indexOf('. '); $('#gMisH').textContent = m.ok ? 'Other missions: none too close' : (cut > 0 ? m.text.slice(0, cut + 1) : m.text); $('#gMisL').textContent = Missions.LABEL; }
+    g.closest('.stline').classList.toggle('off', !a.now); $('#gEarth').closest('.stline').classList.toggle('off', !b.now);
   }
   function live(){ const v = App.state.view; if (v === 'system') orbit(); else if (v === 'ground'){ now(); heights(); ahead(); } else if (v === 'globe') globeSite(); }
   function result(){
     const st = App.state, s = App.sites[st.site], w = App.wins(st.site), ok = w.filter(o => !o.fail.length);
     const y0 = App.date(st.jd0).getUTCFullYear(), y1 = App.date(st.jd0 + st.days - 1).getUTCFullYear();
     const yr = y0 === y1 ? y0 : y0 + '-' + y1;
-    const pre = Object.entries(App.PRESETS).find(([k, p]) => ['len', 'sun', 'earth', 'night'].every(q => p[q] === st.lim[q]));
     $('#verdict').classList.toggle('none', !ok.length);
-    $('#rN').textContent = ok.length; $('#rNs').textContent = 'of ' + w.length + ' landing days work';
-    $('#rBar').style.width = (w.length ? ok.length/w.length*100 : 0) + '%';
-    $('#rFirst').innerHTML = ok.length ? 'First good day: <b>' + App.dayDate(ok[0].d) + '</b>' : 'No day works. Try a taller mast or looser limits below.';
-    $('#rFor').textContent = (pre ? (pre[0] === 'crew' ? 'Crew landing' : 'Robotic lander') : 'Your limits') + ', ' + st.lim.len + '-day stay, ' + st.mast + ' m mast, ' + yr;
+    $('#rN').textContent = ok.length; $('#rNs').textContent = 'of ' + w.length + ' landing days in ' + yr + ' work';
+    $('#rFirst').innerHTML = ok.length ? 'First good day: <b>' + App.dayDate(ok[0].d) + '</b>' : 'No day works. Loosen a slider or open More options.';
     $('#rPsr').innerHTML = s.psr_km != null ? 'This site is <b>' + s.psr_km.toFixed(1) + ' km</b> from the nearest permanently shadowed area' + (st.psr ? (s.psr_km <= st.psr ? ', inside your ' + st.psr + ' km limit.' : ', <b>outside</b> your ' + st.psr + ' km limit.') : '.') : '';
+    // one bar: good days, then each failed day under its first reason (sunlight, Earth, darkness); same counts as the old "why" bars
     const n = [0, 0, 0]; w.forEach(o => { if (o.fail.indexOf('sun') < 0){ n[0]++; if (o.fail.indexOf('earth') < 0){ n[1]++; if (o.fail.indexOf('night') < 0) n[2]++; } } });
-    const fails = [['Not enough sunlight', w.length - n[0], 'var(--f-sun)'], [st.lim.relay ? 'Earth contact (skipped: relay)' : 'Not enough contact with Earth', n[0] - n[1], 'var(--f-earth)'], ['Darkness lasts too long', n[1] - n[2], 'var(--f-dark)']];
-    $('#why').innerHTML = '<div class="rl">Each failed day is counted once, under its first reason.</div>' + fails.map(f => '<div class="r"><span>' + f[0] + '</span><b>' + f[1] + '</b><span class="bar2"><i style="width:' + (w.length ? f[1]/w.length*100 : 0) + '%;background:' + f[2] + '"></i></span></div>').join('');
+    const segs = [['good', ok.length, 'var(--go)'], ['no sun', w.length - n[0], 'var(--sun)'], ['no Earth', n[0] - n[1], 'var(--earth)'], ['too dark', n[1] - n[2], 'var(--f-dark)']];
+    $('#rStack').innerHTML = segs.map(g => g[1] ? '<i style="flex:' + g[1] + ';background:' + g[2] + '"></i>' : '').join('');
+    $('#rLeg').innerHTML = segs.slice(1).filter(g => g[1]).map(g => '<span><i style="background:' + g[2] + '"></i>' + g[0] + ' ' + g[1] + '</span>').join('');
+    // site (i): where the point comes from, its 25/50 m range, distance to permanent shadow
+    const rt = rangeText(s);
+    $('#plInfo').innerHTML = tip('About this site', (s.custom ? 'Your own spot (' + s.label + ').' : (s.kind ? s.kind.charAt(0).toUpperCase() + s.kind.slice(1) + '.' : '')) +
+      (rt ? ' ' + rt + ' ' + RANGE_TIP(s) : '') + (s.psr_km != null ? ' ' + s.psr_km.toFixed(1) + ' km to the nearest permanently shadowed area.' : ''));
   }
   function others(){
     const box = $('#others');
     if (!window.Missions || !(App.state.missions || {}).on){ box.hidden = true; return; }
     const m = Missions.summary(App.sites[App.state.site]), cut = m.text.indexOf('. ');
-    box.hidden = false; box.classList.toggle('warn', !m.ok);
-    $('#oHead').textContent = m.ok ? 'Other missions: none too close' : (cut > 0 ? m.text.slice(0, cut + 1) : m.text);
-    $('#oText').textContent = m.ok ? '' : (cut > 0 ? m.text.slice(cut + 2) : '');
-    $('#oText').hidden = m.ok || cut < 0;
-    $('#oLabel').textContent = Missions.LABEL;
+    box.hidden = m.ok; if (m.ok) return;   // 1-second layout: the line shows only when another mission matters
+    box.classList.add('warn');
+    $('#oHead').textContent = cut > 0 ? m.text.slice(0, cut + 1) : m.text;
+    $('#oTip').innerHTML = tip('About other missions', (cut > 0 ? m.text.slice(cut + 2) + ' ' : '') + Missions.LABEL);
   }
   function siteList(){
     const st = App.state, sj = App.sitesJson;
-    const rows = App.sites.map((s, i) => { const w = App.wins(i); return {i, s, ok: w.filter(o => !o.fail.length).length, n: w.length, rs: s.raw.reference_stats.by_mast[st.mast]}; }).sort((a, b) => b.ok - a.ok);
-    // custom spot listed apart, below the named sites (coordinator 14 Nov: approximate numbers are not ranked with exact ones)
+    // design A: App.sites order, so row number = map marker number (i + 1, same rule as the scene). Custom spot keeps its number, labelled approximate.
+    const rows = App.sites.map((s, i) => { const w = App.wins(i); return {i, s, ok: w.filter(o => !o.fail.length).length, n: w.length, rs: s.raw.reference_stats.by_mast[st.mast]}; });
     /* Red team 17:54 item 5: no bare one-decimal site %. Whole %, the mast height on the label, and the 0/2/10 m spread from the same data.
        A published value that disagrees by > 5 points (C1 at 0 m: 76 vs 56) gets an (i) on why bare-surface values are fragile. */
     const P = v => Math.round(v) + '%';
@@ -236,13 +236,41 @@
       if (Math.abs(ref.diff_points) > 5){ const ok = all.find(x => x !== ref && Math.abs(x.diff_points) <= 5);
         t += ' ' + tip('Why the published value differs', 'At the bare surface, a slope too small to see on the map changes this value a lot, so one point can disagree with a paper by tens of points.' + (ok ? ' With a ' + ok.mast_m + ' m mast the paper and we agree: ' + P(ok.sun_pct) + ' vs ' + P(ok.ours_5y_sun_pct) + '.' : '')); }
       return t; };
-    const card = r => { const raw = r.s.raw, out = st.psr && raw.psr_km > st.psr, bm = raw.reference_stats.by_mast;
-      return '<div class="sitecard' + (r.i === st.site ? ' sel' : '') + (out ? ' out' : '') + '" data-i="' + r.i + '"><div class="n"><span>' + r.s.name + (r.s.kind && !r.s.custom ? ' <em class="kindtag' + (/^historic/.test(r.s.kind) ? ' hist' : '') + '">' + r.s.kind + '</em>' : '') + '</span><span class="mono">' + r.ok + ' / ' + r.n + ' days</span></div>' +
-        '<div class="nums"><div><span>SUN, ' + st.mast + ' M</span>' + P(r.rs.sun_pct) + '</div><div><span>EARTH, ' + st.mast + ' M</span>' + P(r.rs.earth_pct) + '</div><div><span>LONGEST NIGHT</span>' + r.rs.longest_night_h + ' h</div><div><span>TO PSR</span>' + (raw.psr_km != null ? raw.psr_km.toFixed(1) + ' km' : '?') + '</div></div>' +
-        '<div class="q">Sun in 2027 with a 0 / 2 / 10 m mast: ' + ['0', '2', '10'].map(m => Math.round(bm[m].sun_pct)).join(' / ') + '% ' + tip('About these percentages', SPREAD_TIP) + '</div>' +
-        '<div class="q">' + Math.abs(raw.lat).toFixed(4) + '° S, ' + raw.lon_e.toFixed(2) + '° E · ' + refBit(raw) + (r.s.custom ? ' · ' + r.s.label : '') + (r.s.truncated ? ' · ' + truncBit(r.s) : '') + (out ? ' · outside your shadow filter' : '') + '</div></div>'; };
-    const named = rows.filter(r => !r.s.custom), mine = rows.filter(r => r.s.custom);
-    $('#siteList').innerHTML = named.map(card).join('') + (mine.length ? '<div class="subh">Your spot (approximate)</div>' + mine.map(card).join('') : '');
+    const misOn = window.Missions && (st.missions || {}).on;
+    const y0 = App.date(st.jd0).getUTCFullYear();
+    const row = r => { const s = r.s, raw = s.raw, sel = r.i === st.site, out = st.psr && raw.psr_km > st.psr, bm = raw.reference_stats.by_mast;
+      const m = misOn ? Missions.summary(s) : null, hist = /^historic/.test(s.kind || '');
+      /* Eren ~21:45: "nobody should need more than 1 second". Row = number, name, good days + bar; one ⚠ only when something is off.
+         Selected row = now (Sun/Earth), 4 big numbers, mission warning, plan button; everything else under "More detail". */
+      const le = s.truncated ? '≤ ' : '', warns = [];
+      if (m && !m.ok) warns.push('another mission plans to land nearby');
+      if (s.truncated) warns.push('best case: part of the horizon is outside our map, so real numbers can only be lower');
+      if (s.custom) warns.push('your spot: ' + s.label + ', numbers approximate');
+      if (hist) warns.push('historic target, for comparison only');
+      const wn = warns.length ? '<span class="wn" title="' + warns.join('; ') + '" aria-label="Warning: ' + warns.join('; ') + '">⚠</span>' : '';
+      let h = '<div class="srow' + (sel ? ' sel' : '') + (out ? ' out' : '') + '" data-i="' + r.i + '" role="button" tabindex="0" aria-pressed="' + sel + '">' +
+        '<div class="rh"><span class="num">' + (s.custom ? '★' : r.i + 1) + '</span><span class="nm">' + s.name + '</span>' + wn + '<span class="dd"><b>' + le + r.ok + '</b> good days</span></div>' +
+        '<div class="gbar" title="' + r.ok + ' of ' + r.n + ' landing days in ' + y0 + ' work"><i style="width:' + (r.n ? r.ok/r.n*100 : 0).toFixed(1) + '%"></i></div>';
+      if (sel){ const poleKm = 2*1737.4*Math.tan((90 + raw.lat)/2*Math.PI/180), cut = m ? m.text.indexOf('. ') : -1;
+        h += '<div class="rx">' +
+          '<div class="gnow"><div class="stline"><span class="ic sunc">☀</span><div><b id="gSun"></b><small id="gSunS"></small></div></div>' +
+          '<div class="stline"><span class="ic earthc">⊕</span><div><b id="gEarth"></b><small id="gEarthS"></small></div></div></div>' +
+          '<div class="gnums g4"><div class="t-sun"><span>Sunlight</span><b>' + le + P(r.rs.sun_pct) + '</b></div><div class="t-earth"><span>Earth in view</span><b>' + le + P(r.rs.earth_pct) + '</b></div>' +
+          '<div class="t-night"><span>Longest night</span><b>' + r.rs.longest_night_h + ' h</b></div><div class="t-psr"><span>To permanent shadow</span><b>' + (s.psr_km != null ? s.psr_km.toFixed(1) + ' km' : 'unknown') + '</b>' + (out ? '<small>outside your shadow filter</small>' : '') + '</div></div>' +
+          '<div class="gfor">' + st.mast + ' m mast · ' + y0 + (s.custom ? ' · approximate' : '') + (s.truncated ? ' · best case' : '') + '</div>' +
+          (m && !m.ok ? '<div class="gmis warn"><b>⚠ ' + (cut > 0 ? m.text.slice(0, cut + 1) : m.text) + '</b></div>' : '') +
+          '<button class="go" type="button" id="gPlan">Plan a landing here <span aria-hidden="true">→</span></button>' +
+          '<details class="gmore"><summary>More detail</summary>' +
+          (s.custom ? '' : '<div class="q"><em class="kindtag' + (hist ? ' hist' : '') + '">' + (s.kind || '') + '</em></div>') +
+          '<div class="q">' + Math.abs(raw.lat).toFixed(4) + '° S, ' + raw.lon_e.toFixed(2) + '° E · ' + poleKm.toFixed(1) + ' km from the pole</div>' +
+          (s.range && !s.custom ? '<div class="q">' + rangeLine(s) + '</div>' : '') +
+          '<div class="q">Sun in ' + y0 + ' with a 0 / 2 / 10 m mast: ' + ['0', '2', '10'].map(k => Math.round(bm[k].sun_pct)).join(' / ') + '% ' + tip('About these percentages', SPREAD_TIP) + '</div>' +
+          '<div class="q">' + (s.custom ? s.label + ' ' + tip('About approximate numbers', s.why || APX_TIP) : refBit(raw)) + (s.truncated ? ' · ' + truncBit(s) : '') + '</div>' +
+          (m ? '<div class="q">' + (m.ok ? 'Other missions: none too close. ' : (cut > 0 ? m.text.slice(cut + 2) + ' ' : '')) + Missions.LABEL + '</div>' : '') +
+          '</details></div>'; }
+      return h + '</div>'; };
+    $('#siteList').innerHTML = rows.map(row).join('');
+    globeSite();
     $('#prov').innerHTML = 'Terrain masks: ' + sj.versions.dem + '; near field ' + sj.versions.dem_near + '; computed ' + sj.generated_utc + '<br>Sun/Earth: JPL Horizons DE441 table, computed ' + App.eph.generated_utc + '<br>Permanent shadow: PGDA 90 outlines, ' + App.psr.polygons.length + ' regions ≥ 1 km²<br>All numbers are precomputed by our engine; this page does not run new terrain calculations for the named sites.';
   }
   // One panel section per scene view (Eren 14 Nov): the view tabs on the Moon decide what the panel answers.
@@ -267,16 +295,19 @@
     h.onclick = flip; h.onkeydown = e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); flip(); } };
   });
   App.ready.then(() => {
+    $('#earthTip').innerHTML = tip('About the Earth limit', 'Share of the stay with Earth above the terrain (direct radio possible). The 25% default is the map mask used in a 2024 NASA presentation. Sunlight, length and darkness defaults are example values.');
     $('#kindSeg').onclick = e => { const b = e.target.closest('button'); if (b) App.set({lim: App.PRESETS[b.dataset.v]}, 'panel'); };
     ['len', 'sun', 'earth', 'night'].forEach(k => $('#' + k).oninput = e => App.set({lim: {[k]: +e.target.value}}, 'panel'));
     $('#relay').onchange = e => App.set({lim: {relay: e.target.checked}}, 'panel');
     $('#mast').onclick = e => { const b = e.target.closest('button'); if (b) App.set({mast: b.dataset.v}, 'panel'); };
     $('#psrf').onclick = e => { const b = e.target.closest('button'); if (b) App.set({psr: +b.dataset.v}, 'panel'); };
-    $('#siteList').onclick = e => { const c = e.target.closest('.sitecard'); if (c) App.set({site: +c.dataset.i, selDay: -1}, 'panel'); };
+    $('#siteList').onclick = e => { if (e.target.closest('#gPlan')){ App.set({view: 'region'}, 'panel'); return; }
+      if (e.target.closest('.rx')) return;   // clicks inside the open details (i, text) do not reselect
+      const c = e.target.closest('.srow'); if (c && +c.dataset.i !== App.state.site) App.set({site: +c.dataset.i, selDay: -1}, 'panel'); };
+    $('#siteList').onkeydown = e => { const c = e.target.closest('.srow'); if (c && e.target === c && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); App.set({site: +c.dataset.i, selDay: -1}, 'panel'); } };
     $('#gMastSeg').onclick = e => { const b = e.target.closest('button'); if (b) App.set({mast: b.dataset.v}, 'panel'); };
     root.querySelectorAll('.spotf').forEach(f => { f.querySelector('.sAdd').onclick = () => addSpot(f); f.querySelector('.sDel').onclick = () => { App.clearSpot(); f.querySelector('.sMsg').textContent = 'Removed.'; };
       f.querySelectorAll('input').forEach(i => i.onkeydown = e => { if (e.key === 'Enter') addSpot(f); }); });
-    $('#gPlan').onclick =() => App.set({view: 'region'}, 'panel');
     $('#closeP').onclick =() => App.set({panelOpen: false}, 'panel');
     App.on(render); App.on(keys => { if (keys.has('theme')) setTimeout(() => { if (App.state.view === 'ground') ahead(); }, 0); });   // canvas strip reads tokens after shell flips data-theme
     render();

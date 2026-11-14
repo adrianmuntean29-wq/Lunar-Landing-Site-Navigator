@@ -3,7 +3,7 @@
    Reads App.state; changes state only with App.set (e.g. clicking a pin selects a site). */
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import {$, R, D2R, root, renderer, meta, HGT, cams, register, view} from './scene-core.js';
+import {$, R, D2R, root, renderer, meta, HGT, cams, register, view, tok} from './scene-core.js';
 
 let scene, camera, controls, sunLight, world, psrGroup, ringGroup, mesh, stars;
 const EX = 2;   // vertical exaggeration of the terrain (curvature drop stays true)
@@ -64,11 +64,13 @@ function xzLatLon(x, z){ const X = x, Y = -z, rho = Math.hypot(X, Y);
   return {lat: -90 + 2*Math.atan(rho/(2*R))/D2R, lon: ((Math.atan2(X, Y)/D2R) + 360) % 360, km: rho}; }
 // label width from its text (no layout read: reading offsetWidth every frame forced a full-page layout per label)
 const estW = (s, cpx) => s.length*cpx + 12;
+// pin text (design A numbering, same as the Moon view + panel list): number = App.sites index + 1, custom spot = star; the selected site also shows its short name
+const pinTxt = (s, i, selI) => s.custom ? (i === selI ? '★ your spot' : '★') : (i === selI ? (i + 1) + ' ' + s.short : String(i + 1));
 function siteXZ(s){ const rho = 2*R*Math.tan((90 + s.lat)*D2R/2); return [rho*Math.sin(s.lon*D2R), -rho*Math.cos(s.lon*D2R)]; }
 
 /* ---------- other missions (missions.js): circle of radius_km = position uncertainty, styled by precision ---------- */
 let misGroup = null, misIn = [], misOut = [], misGroups = [];
-const MCOL = '#F2876B', KOMAT = new THREE.LineBasicMaterial({color: MCOL, transparent: true, opacity: 0.35});
+const MCOL = tok('--mis-3d', '#D99580'), KOMAT = new THREE.LineBasicMaterial({color: MCOL, transparent: true, opacity: 0.35});
 function missionRows(){ const ms = App.state.missions || {}; if (!window.Missions || !Missions.rows || ms.on === false) return [];
   return Missions.rows.filter(m => m.placed && (ms.cn !== false || m.group !== 'cn')); }
 function buildMissions(){
@@ -190,7 +192,27 @@ function rebuildTerrain(){
   const y = groundAt(x, z) ?? 0, q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(x/R, 1, z/R).normalize(), new THREE.Vector3(0, 1, 0));
   world.quaternion.copy(q); world.position.copy(new THREE.Vector3(x, y, z).applyQuaternion(q).negate()); world.updateMatrixWorld(true);
   centreXYZ = [x, y, z];
-  buildFocusRing(x, z); buildPsr(x, z); buildMissions(); tv++; labKey = ''; noteText();
+  buildFocusRing(x, z); buildRings(); buildPole(); buildPsr(x, z); buildMissions(); tv++; labKey = ''; noteText();
+}
+/* latitude rings every 1 deg from 89 S to 85 S (~30-152 km from the pole, so they reach the outer sites), draped on the best
+   terrain layer so hills no longer cut them; they fade with the focus fog. Labels ("88° S") are placed in updateScene(). */
+const RINGS = [89, 88, 87, 86, 85].map(lat => ({lat, rho: 2*R*Math.tan((90 - lat)*D2R/2)}));
+let ringMat = null;
+function buildRings(){
+  ringGroup.children.slice().forEach(o => { ringGroup.remove(o); o.geometry.dispose(); });
+  for (const {rho} of RINGS){ const pts = [];
+    for (let a = 0; a <= 360; a += 0.5){ const x = rho*Math.sin(a*D2R), z = -rho*Math.cos(a*D2R), y = groundAt(x, z);
+      pts.push(new THREE.Vector3(x, (y == null ? -(x*x + z*z)/(2*R) : y) + 0.3, z)); }
+    ringGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), ringMat)); }
+}
+// true south pole (90 S, map origin): a small cross on the ground + a short post; its tag is placed in updateScene()
+let poleMark = null; const POLEMAT = new THREE.LineBasicMaterial({color: '#E8ECF2'});
+function buildPole(){
+  if (poleMark){ world.remove(poleMark); poleMark.geometry.dispose(); }
+  const g = (x, z) => (groundAt(x, z) ?? -(x*x + z*z)/(2*R)) + 0.2, a = 1.6, y = g(0, 0);
+  const pos = [-a, g(-a, 0), 0, a, g(a, 0), 0, 0, g(0, -a), -a, 0, g(0, a), a, 0, y, 0, 0, y + 3, 0];
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  poleMark = new THREE.LineSegments(geo, POLEMAT); world.add(poleMark);
 }
 // focus edge: one quiet ring 59.5 km round the selected site, draped on the terrain; no text
 let focusRing = null;
@@ -233,13 +255,10 @@ function buildScene(){
   sunLight = new THREE.DirectionalLight('#FFF4E0', 2.6); sunLight.castShadow = true;   // in `world`: it moves with the site
   sunLight.shadow.mapSize.set(4096, 4096); const c = sunLight.shadow.camera; c.left = -90; c.right = 90; c.top = 90; c.bottom = -90; c.near = 1; c.far = 900;
   sunLight.shadow.bias = -0.0004; world.add(sunLight); world.add(sunLight.target);
-  const ringMat = new THREE.LineBasicMaterial({color: '#4A5058'}); ringGroup = new THREE.Group(); world.add(ringGroup);
-  // 88 S (60.6 km) dropped: it read as a double line with the old pole-centred focus ring
-  [89.5, 89, 88.5].forEach(lat => { const rho = 2*R*Math.tan((90 - lat)*D2R/2), pts = [];
-    for (let a = 0; a <= 360; a += 3){ const x = rho*Math.sin(a*D2R), z = -rho*Math.cos(a*D2R); pts.push(new THREE.Vector3(x, 1.5 - (x*x + z*z)/(2*R), z)); }
-    ringGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), ringMat)); });
+  // latitude rings: built draped on the ground in rebuildTerrain() (buildRings), once the terrain layers round the site exist
+  ringMat = focusFog(new THREE.LineBasicMaterial({color: '#6A717B'})); ringGroup = new THREE.Group(); world.add(ringGroup);
   psrGroup = new THREE.Group(); world.add(psrGroup);
-  psrMat = focusFog(new THREE.LineDashedMaterial({color: '#7FD1C7', dashSize: 0.6, gapSize: 0.4}));
+  psrMat = focusFog(new THREE.LineDashedMaterial({color: tok('--psr-3d', '#7FBDB6'), dashSize: 0.6, gapSize: 0.4}));
   $('#lyPsr').onchange = e => psrGroup.visible = e.target.checked;
   $('#lyRings').onchange = e => ringGroup.visible = e.target.checked;
   $('#lyMis').onchange = e => App.set({missions: Object.assign({}, App.state.missions, {on: e.target.checked})}, 'scene');   // shared state: panel and drawer follow
@@ -315,8 +334,8 @@ function updateScene(){
   const fitsP = (L, T, ew, eh) => !placed.some(p => Math.abs(p.L - L) < (p.w + ew)/2 + 3 && Math.abs(p.T - T) < (p.h + eh)/2 + 1);
   const mkPin = (s, i, txt, cls) => { const e = document.createElement('div'); e.className = 'pin' + (cls || '') + (i === st.site ? ' sel' : ''); e.textContent = txt;
     e.title = (s.custom ? 'Your spot (' + s.label + ')' : s.name) + ': click to select';
-    if (s.custom){ e.style.background = 'var(--c-box)'; e.style.color = i === st.site ? 'var(--c-earth)' : 'var(--c-ink)';   // --c-*: on the dark 3D picture in both themes (scene.css); custom spot = hollow pin
-      e.style.border = '1.5px solid ' + (i === st.site ? 'var(--c-earth)' : 'var(--c-muted)'); }
+    if (s.custom){ e.style.background = 'var(--c-box)'; e.style.color = i === st.site ? 'var(--c-sel)' : 'var(--c-ink)';   // --c-*: on the dark 3D picture in both themes (scene.css); custom spot = hollow pin
+      e.style.border = '1.5px solid ' + (i === st.site ? 'var(--c-sel)' : 'var(--c-muted)'); }
     e.onclick = () => App.set({site: i, selDay: -1}, 'scene'); return e; };
   const poleKm = s => Math.hypot(...siteXZ(s));
   const order = App.sites.map((s, i) => i).sort((a, b) => (b === st.site) - (a === st.site) || poleKm(App.sites[a]) - poleKm(App.sites[b]));
@@ -325,50 +344,59 @@ function updateScene(){
   for (const i of order.filter(shown)){ const s = App.sites[i], [x, z] = siteXZ(s), y = groundAt(x, z);   // sites beyond the detailed square sit on the faded outer cap
     const v = P(x, (y == null ? 0 : y) + 0.6, z).project(camera), px = (v.x*0.5 + 0.5)*w, py = (-v.y*0.5 + 0.5)*h;
     if (y == null || v.z > 1 || px < 10 || px > w - 10 || py < 70 || py > h - 10){ offFrame.push({s, i, v, px, py}); continue; }
-    const ew = estW(s.short, 7.2); let k = 0;
+    const tx = pinTxt(s, i, st.site), ew = estW(tx, 7.2); let k = 0;
     while (k < 5 && !(py - 14 - k*22 - 20 >= 40 && fitsP(px, py - 23 - k*22, ew, 18))) k++;   // never climb off the top of the frame
+    if (k === 5 && i === st.site) k = 0;   // the selected site always keeps its name tag (it is placed first, so only fixed UI can crowd it)
     if (k === 5){   // no room even 4 steps up: a small dot on the point, name in its tooltip
       if (!fitsP(px, py, 10, 10)) continue;
       const d = mkPin(s, i, ''); Object.assign(d.style, {width: '9px', height: '9px', padding: '0', borderRadius: '50%', transform: 'translate(-50%,-50%)', left: px + 'px', top: py + 'px', background: 'var(--c-muted)', border: '0'});
       d.classList.add('edge'); lab.appendChild(d); placed.push({L: px, T: py, w: 10, h: 10}); continue; }
-    const T = py - 14 - k*22, e = mkPin(s, i, s.short); e.style.left = px + 'px'; e.style.top = T + 'px'; lab.appendChild(e);
+    const T = py - 14 - k*22, e = mkPin(s, i, tx); e.style.left = px + 'px'; e.style.top = T + 'px'; lab.appendChild(e);
     if (k){ const stem = document.createElement('div');   // longer stem for a pin that climbed
-      Object.assign(stem.style, {position: 'absolute', left: px + 'px', top: (T + 14) + 'px', width: '1px', height: (k*22) + 'px', background: i === st.site ? 'var(--c-earth)' : 'var(--c-white35)', pointerEvents: 'none'}); lab.appendChild(stem); }
+      Object.assign(stem.style, {position: 'absolute', left: px + 'px', top: (T + 14) + 'px', width: '1px', height: (k*22) + 'px', background: i === st.site ? 'var(--c-sel)' : 'var(--c-white35)', pointerEvents: 'none'}); lab.appendChild(stem); }
     placed.push({L: px, T: T - 9, w: ew, h: 18}); }
   // off the frame: edge pin on the line from the frame centre toward the site, inside a margin, stacked if it would cover another
   const cx = w/2, cy = h/2, X0 = 70, X1 = w - 70, Y0 = 78, Y1 = h - 44;
-  for (const {s, i, v, px, py} of offFrame){
+  const edgeSlot = (v, px, py, ew) => {
     let dx = px - cx, dy = py - cy; if (v.z > 1){ dx = -dx; dy = -dy; }   // behind the camera: the projection flips
     const t = Math.min(dx ? ((dx > 0 ? X1 : X0) - cx)/dx : Infinity, dy ? ((dy > 0 ? Y1 : Y0) - cy)/dy : Infinity), ang = Math.atan2(dy, dx);
-    const txt = s.short + ' · ' + Math.round(poleKm(s)) + ' km', ew = estW(txt, 7.2) + 14, L0 = cx + dx*t, T0 = cy + dy*t;
+    const L0 = cx + dx*t, T0 = cy + dy*t;
     // side edges: stack up/down (then one column inward); top/bottom edges: step sideways (then one row inward)
-    const along = [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5], side = Math.abs(dx)*h > Math.abs(dy)*w, cand = [];
+    const along = [0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9, -9, 10, -10], side = Math.abs(dx)*h > Math.abs(dy)*w, cand = [];
     for (const row of [0, 1, 2]) for (const o of along) cand.push(side ? [L0 - Math.sign(dx)*row*(ew + 6), T0 + o*22] : [L0 + o*(ew*0.6 + 10), T0 - Math.sign(dy)*row*24]);
     const slot = cand
       .map(([L, T]) => [Math.max(ew/2 + 8, Math.min(w - ew/2 - 8, L)), Math.max(Y0, Math.min(Y1, T))]).find(([L, T]) => fitsP(L, T - 9, ew, 18));
-    if (!slot) continue;
-    const e = mkPin(s, i, txt, ' edge'); e.title = s.name + ', ' + Math.round(poleKm(s)) + ' km from the pole (off this view): click to select';
-    const ar = document.createElement('span'); ar.textContent = ' ➜'; ar.style.display = 'inline-block'; ar.style.transform = `rotate(${ang}rad)`; e.appendChild(ar);
-    e.style.left = slot[0] + 'px'; e.style.top = slot[1] + 'px'; lab.appendChild(e); placed.push({L: slot[0], T: slot[1] - 9, w: ew, h: 18}); }
+    return slot ? [slot[0], slot[1], ang] : null; };
+  const putEdge = (e, slot, ew) => { const ar = document.createElement('span'); ar.textContent = ' ➜'; ar.style.display = 'inline-block'; ar.style.transform = `rotate(${slot[2]}rad)`; e.appendChild(ar);
+    e.style.left = slot[0] + 'px'; e.style.top = slot[1] + 'px'; lab.appendChild(e); placed.push({L: slot[0], T: slot[1] - 9, w: ew, h: 18}); };
+  const sel = App.sites[st.site], from = sel ? (sel.custom ? 'your spot' : sel.short) : '';
+  const kmFrom = s => sel ? Missions.distanceKm(sel.lat, sel.lon, s.lat, s.lon) : poleKm(s);
+  // the true south pole (90 S): a tag over the cross on the ground, or an edge arrow when it is off the frame (placed before other edge pins)
+  { const yp = groundAt(0, 0) ?? 0, v = P(0, yp + 3.2, 0).project(camera), px = (v.x*0.5 + 0.5)*w, py = (-v.y*0.5 + 0.5)*h;
+    const e = document.createElement('div'); e.className = 'pin'; e.textContent = 'South pole'; e.style.cursor = 'default';
+    e.title = 'True south pole (90° S)' + (sel ? ', ' + Math.round(poleKm(sel)) + ' km from ' + from : '');
+    const ew = estW('South pole', 7.2);
+    if (v.z <= 1 && px >= 10 && px <= w - 10 && py >= 70 && py <= h - 10){ if (fitsP(px, py - 23, ew, 18)){ e.style.left = px + 'px'; e.style.top = (py - 14) + 'px'; lab.appendChild(e); placed.push({L: px, T: py - 23, w: ew, h: 18}); } }
+    else { const slot = edgeSlot(v, px, py, ew + 14); if (slot){ e.classList.add('edge'); putEdge(e, slot, ew + 14); } } }
+  for (const {s, i, v, px, py} of offFrame){
+    const txt = pinTxt(s, i, -1), ew = estW(txt, 7.2) + 14, slot = edgeSlot(v, px, py, ew); if (!slot) continue;
+    const e = mkPin(s, i, txt, ' edge'); e.title = (s.custom ? 'Your spot' : s.name) + ', ' + Math.round(kmFrom(s)) + ' km from ' + from + ' (off this view): click to select';
+    putEdge(e, slot, ew); }
   const fits = (L, T, ew, eh) => !placed.some(p => Math.abs(p.L - L) < (p.w + ew)/2 + 4 && Math.abs(p.T - T) < (p.h + eh)/2 + 2);
   misGroups.forEach(G => { const a = G.a.clone().applyMatrix4(W).project(camera), b = G.b.clone().applyMatrix4(W).project(camera); if (a.z > 1 || b.z > 1) return;
     const ax = (a.x*0.5 + 0.5)*w, ay = (-a.y*0.5 + 0.5)*h, bx = (b.x*0.5 + 0.5)*w, by = (-b.y*0.5 + 0.5)*h, ang = Math.atan2(by - ay, bx - ax);
-    const e = document.createElement('div'); e.className = 'medge'; e.title = G.tip;
-    e.innerHTML = `<span class="ar" style="transform:rotate(${ang}rad)">➜</span><span class="tx">${G.lines.join('<br>')}${G.more ? '<br>+' + G.more + ' more' : ''}</span>`;
-    const ew = Math.max(...G.lines.map(s => estW(s, 6.4))) + 10, eh = 18*G.lines.length + 16;
-    let L = Math.max(ew/2 + 8, Math.min(w - ew/2 - 8, bx)), T = Math.max(64, Math.min(h - 24, by));   // whole label inside the frame
-    e.style.left = L + 'px'; lab.appendChild(e);
-    const T0 = T; let ok = fits(L, T, ew, eh);
-    for (const dy of [0.6, -0.6, 1.2, -1.2, 1.8, -1.8]){ if (ok) break; T = Math.max(64, Math.min(h - 24, T0 + dy*eh)); ok = fits(L, T, ew, eh); }   // step down/up past overlapping labels
-    if (!ok){ T = T0; e.querySelector('.tx').remove(); e.classList.add('bare');   // no room: arrow only, names in the tooltip
-      let room = false;
-      for (const dx of [0, 28, -28, 56, -56, 84, -84]) if (fits(L + dx, T, 22, 22)){ e.style.left = (L + dx) + 'px'; placed.push({L: L + dx, T, w: 22, h: 22}); room = true; break; }
-      if (!room){ e.remove(); return; } }   // not even an arrow fits: drop it (names stay in the (i) legend)
-    else placed.push({L, T, w: ew, h: eh});
-    e.style.top = T + 'px'; });
+    // arrow only (declutter, Eren 14 Nov): names + distance in the tooltip and the (i) legend
+    const e = document.createElement('div'); e.className = 'medge bare'; e.title = G.tip;
+    e.innerHTML = `<span class="ar" style="transform:rotate(${ang}rad)">➜</span>`;
+    const L = Math.max(19, Math.min(w - 19, bx)), T = Math.max(64, Math.min(h - 24, by));
+    for (const dx of [0, 28, -28, 56, -56, 84, -84]) if (fits(L + dx, T, 22, 22)){ e.style.left = (L + dx) + 'px'; e.style.top = T + 'px'; lab.appendChild(e); placed.push({L: L + dx, T, w: 22, h: 22}); return; } });
   // missions that matter for the selected site (inside its keep-out) get their labels placed first
   const site = App.sites[st.site], near = new Set(!misIn.length ? [] : Missions.near(site).filter(n => n.inside).map(n => n.m.id));
   misIn.slice().sort((a, b) => near.has(b.m.id) - near.has(a.m.id)).forEach(({m, x, y, z}) => { const v = P(x, y + 0.3, z).project(camera); if (v.z > 1) return;
+    if (!near.has(m.id)){   // declutter: only missions inside the selected site's keep-out get a name; the rest = an invisible hover target on the point
+      const px = (v.x*0.5 + 0.5)*w, py = (-v.y*0.5 + 0.5)*h; if (px < 0 || px > w || py < 60 || py > h) return;
+      const d = document.createElement('div'); d.className = 'mlab'; d.title = misTip(m); if (m.source_url) d.onclick = () => window.open(m.source_url, '_blank', 'noopener');
+      Object.assign(d.style, {left: px + 'px', top: py + 'px', width: '16px', height: '16px', transform: 'translate(-50%,-50%)'}); lab.appendChild(d); return; }
     const e = document.createElement('div'); e.className = 'mlab'; e.title = misTip(m);
     e.textContent = misShort(m) + (m.precision === 'region' ? ' · region only' : '') + (m.planned ? ' · planned' : '');
     if (m.source_url) e.onclick = () => window.open(m.source_url, '_blank', 'noopener');
@@ -378,6 +406,17 @@ function updateScene(){
     const hit = tries.find(([dx, dy]) => { const L = L0 + dx, T = T0 + dy; return L - ew/2 > 0 && L + ew/2 < w && T > 60 && T + eh < h && fits(L, T + eh/2, ew, eh); });
     if (!hit) return;   // no room: no label (the circle stays; hover the (i) legend for names)
     const L = L0 + hit[0], T = T0 + hit[1]; e.style.left = L + 'px'; e.style.top = T + 'px'; lab.appendChild(e); placed.push({L, T: T + eh/2, w: ew, h: eh}); });
+  // latitude ring labels ("88° S"): one per visible ring, at its free on-screen point nearest the bottom of the frame, inside the clear (unfogged) area
+  if (ringGroup.visible) for (const {lat, rho} of RINGS){ let best = null;
+    for (let a = 0; a < 360; a += 10){ const x = rho*Math.sin(a*D2R), z = -rho*Math.cos(a*D2R), y = groundAt(x, z);
+      if (y == null || Math.hypot(x - centreXYZ[0], z - centreXYZ[2]) > FOG1 - 10) continue;
+      const v = P(x, y + 0.3, z).project(camera); if (v.z > 1) continue; const L = (v.x*0.5 + 0.5)*w, T = (-v.y*0.5 + 0.5)*h;
+      if (L < 40 || L > w - 40 || T < 80 || T > h - 30 || !fits(L, T, 40, 14)) continue; if (!best || T > best[1]) best = [L, T]; }
+    if (!best) continue;
+    const e = document.createElement('div'); e.textContent = lat + '° S'; e.title = 'Latitude ring: ' + lat + '° S, ' + rho.toFixed(0) + ' km from the pole';
+    Object.assign(e.style, {position: 'absolute', left: best[0] + 'px', top: best[1] + 'px', transform: 'translate(-50%,-50%)', font: '500 10px "IBM Plex Mono", monospace',
+      color: 'var(--c-muted)', textShadow: '0 1px 3px var(--c-sh)', whiteSpace: 'nowrap', pointerEvents: 'auto', cursor: 'default'});
+    lab.appendChild(e); placed.push({L: best[0], T: best[1], w: 40, h: 14}); }
   legendText(out);
 }
 function legendText(out){

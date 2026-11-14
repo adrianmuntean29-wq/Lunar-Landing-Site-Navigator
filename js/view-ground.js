@@ -1,9 +1,9 @@
 /* view-ground.js: Ground Level view ('ground'). OWNER: view-ground session. Registers with scene-core.js.
    Stand at the site: real Sun and Earth (true size, position, Earth phase) over the site's exact 360-bin mask horizon. */
 import * as THREE from 'three';
-import {$, D2R, renderer, view, cams, glowTex, register} from './scene-core.js';
+import {$, D2R, renderer, view, cams, glowTex, register, tok} from './scene-core.js';
 
-let markGroup = null, markKey = '', marks = [];   // other missions + permanent-shadow directions
+let groundTex = null;   // generated regolith normal map lit by the real Sun (Eren 14 Nov ~21:00; mission pins and the permanent-shadow strip removed from this view)
 let sky, skyCam, sunCore, sunGlow, earthBall, skyLight, horizonMesh, ridgeLine, sunGhost, earthGhost, look = {yaw: 0, pitch: 2, fov: 40};
 const OPEN_FOV = 16;   // opening zoom: ~27 px per degree on a 430 px pane, so a 1-3 deg gap between Sun and ridge is visible (true scale, no exaggeration)
 const DSKY = 1000;
@@ -18,14 +18,15 @@ function buildSky(){
   sky.add(new THREE.Points(sg, new THREE.PointsMaterial({color: '#8E96A0', size: 1.3, sizeAttenuation: false})));
   sunCore = new THREE.Mesh(new THREE.SphereGeometry(DSKY*Math.tan(0.2666*D2R), 32, 16), new THREE.MeshBasicMaterial({color: '#FFF7E6'})); sky.add(sunCore);
   sunGlow = new THREE.Sprite(new THREE.SpriteMaterial({map: glowTex('rgba(255,240,200,0.9)', 'rgba(255,190,90,0.35)'), depthWrite: false, transparent: true})); sunGlow.scale.set(70, 70, 1); sky.add(sunGlow);
-  earthBall = new THREE.Mesh(new THREE.SphereGeometry(DSKY*Math.tan(0.95*D2R), 48, 24), new THREE.MeshStandardMaterial({color: '#3E7CC9', roughness: 0.75, metalness: 0}));
+  earthBall = new THREE.Mesh(new THREE.SphereGeometry(DSKY*Math.tan(0.95*D2R), 48, 24), new THREE.MeshStandardMaterial({roughness: 0.8, metalness: 0,
+    map: (() => { const t = new THREE.TextureLoader().load('assets/earth_bmng_2k.jpg'); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; })()}));   // NASA Blue Marble NG (same file as Orbit)
   sky.add(earthBall); sky.add(new THREE.AmbientLight('#ffffff', 0.025));
   skyLight = new THREE.DirectionalLight('#FFFFFF', 3.2); sky.add(skyLight); sky.add(skyLight.target);
   // ghost outline = where a body sits while (part of) it is behind the terrain; drawn over the terrain, same true size as the body
   const ghost = (deg, color) => { const r = DSKY*Math.tan(deg*D2R), m = new THREE.Mesh(new THREE.RingGeometry(r*0.86, r, 64),
     new THREE.MeshBasicMaterial({color, transparent: true, opacity: 0.75, depthTest: false, depthWrite: false, side: THREE.DoubleSide}));
     m.renderOrder = 10; m.visible = false; sky.add(m); return m; };
-  sunGhost = ghost(0.2666, '#FFD27A'); earthGhost = ghost(0.95, '#6FA8E8');
+  sunGhost = ghost(0.2666, tok('--sun-3d', '#E0BC66')); earthGhost = ghost(0.95, tok('--earth-3d', '#6FA6D8'));   // project palette, on-3D variants
   const cv = renderer.domElement; let drag = null;
   cv.addEventListener('pointerdown', e => { if (view !== 'ground') return; drag = {x: e.clientX, y: e.clientY, yaw: look.yaw, pitch: look.pitch}; });
   addEventListener('pointermove', e => { if (!drag) return; const k = look.fov/cv.clientHeight; look.yaw = drag.yaw - (e.clientX - drag.x)*k; look.pitch = Math.max(-30, Math.min(60, drag.pitch + (e.clientY - drag.y)*k)); });
@@ -33,22 +34,104 @@ function buildSky(){
   cv.addEventListener('wheel', e => { if (view !== 'ground') return; e.preventDefault(); look.fov = Math.max(4, Math.min(80, look.fov*Math.exp(e.deltaY*0.001))); }, {passive: false});
   $('#lookSun').onclick = () => lookAt('sun'); $('#lookEarth').onclick = () => lookAt('earth');
 }
+/* Ground surface: a generated regolith height field (tileable 512 px: soft multi-scale bumps, ~700 small craters with raised rims, scattered
+   pebbles), turned into a normal map and LIT BY THE REAL SUN DIRECTION in the shader, so the low polar Sun brings out the relief. Looks only:
+   NOT this site's measured ground (no data exists at this scale); the horizon line itself is the engine mask. Per-pixel ground-plane mapping
+   from a 2 m eye (distance from the depression angle below the ridge), two scales mixed to hide tiling, fading to flat grey with distance. */
+const EYE_M = 2, TILE_A = 7, TILE_B = 43, FAR_M = 6000;
+function regolithTex(){
+  const N = 512, H = new Float32Array(N*N), A = new Float32Array(N*N);
+  let seed = 7; const rnd = () => (seed = (seed*16807) % 2147483647)/2147483647;
+  const octave = (P, amp, out) => { const g = new Float32Array(P*P).map(rnd), sm = t => t*t*(3 - 2*t);
+    const G = (i, j) => g[((j % P + P) % P)*P + ((i % P + P) % P)];
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++){ const fx = x/N*P, fy = y/N*P, ix = Math.floor(fx), iy = Math.floor(fy), u = sm(fx - ix), v = sm(fy - iy);
+      out[y*N + x] += amp*((G(ix, iy)*(1 - u) + G(ix + 1, iy)*u)*(1 - v) + (G(ix, iy + 1)*(1 - u) + G(ix + 1, iy + 1)*u)*v); } };
+  [[4, 9], [8, 5], [16, 3], [32, 1.6], [64, 0.8], [128, 0.45], [256, 0.25]].forEach(([P, a]) => octave(P, a, H));
+  [[4, 1], [16, 0.5], [64, 0.25]].forEach(([P, a]) => octave(P, a, A));
+  const stamp = (cx, cy, r, f) => { const R = Math.ceil(r*1.8);
+    for (let dy = -R; dy <= R; dy++) for (let dx = -R; dx <= R; dx++){ const q = Math.hypot(dx, dy)/r; if (q > 1.8) continue;
+      const i = ((Math.round(cy) + dy + N) % N)*N + ((Math.round(cx) + dx + N) % N); H[i] += f(q); } };
+  for (let k = 0; k < 700; k++){ const r = Math.min(70, 1.5*Math.pow(1 - rnd(), -1/1.4)), d = 0.22*r, rim = 0.06*r;   // power-law sizes: many small, few big
+    stamp(rnd()*N, rnd()*N, r, q => q < 1 ? d*(q*q - 1) + rim : rim*Math.exp(-(((q - 1)/0.3)**2))); }
+  for (let k = 0; k < 1500; k++){ const r = 0.6 + rnd()*1.6; stamp(rnd()*N, rnd()*N, r, q => q < 1 ? 0.9*r*Math.sqrt(1 - q*q) : 0); }   // pebbles
+  // texture channels: R,G = surface slope (normal x, y), B = albedo, A = height (0..1 over HRANGE px, slopes scaled by K)
+  const px = new Uint8Array(N*N*4), K = 1.0;
+  let amin = Infinity, amax = -Infinity, hmin = Infinity, hmax = -Infinity;
+  for (const v of A){ amin = Math.min(amin, v); amax = Math.max(amax, v); } for (const v of H){ hmin = Math.min(hmin, v); hmax = Math.max(hmax, v); }
+  const h = (i, j) => H[((j + N) % N)*N + ((i + N) % N)];
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++){
+    const gx = (h(x + 1, y) - h(x - 1, y))/2*K, gy = (h(x, y + 1) - h(x, y - 1))/2*K, l = Math.hypot(gx, gy, 1), o = (y*N + x)*4;
+    px[o] = (-gx/l*0.5 + 0.5)*255; px[o + 1] = (-gy/l*0.5 + 0.5)*255; px[o + 2] = ((A[y*N + x] - amin)/(amax - amin))*255; px[o + 3] = ((H[y*N + x] - hmin)/(hmax - hmin))*255; }
+  const t = new THREE.DataTexture(px, N, N, THREE.RGBAFormat); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.NoColorSpace;
+  t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter; t.anisotropy = renderer.capabilities.getMaxAnisotropy(); t.needsUpdate = true;
+  t.userData.hRange = (hmax - hmin)*K;   // px, same units as the 512 px tile width
+  return t;
+}
+/* Lighting (physical, with one exposure constant): brightness = albedo x cos(angle to the Sun) x cast shadow. With the polar Sun ~1 deg up,
+   flat ground is dim and only Sun-facing slopes and rims light up; bumps cast long shadows AWAY from the Sun (height-field march toward the Sun,
+   soft edge = Sun disc 0.53 deg). Beyond ~2.5 km the detail fades to an average of the same law. Sun behind the terrain at the site:
+   earthshine only. The exposure (EXP_K) is a display choice, like a camera, not a measured value. */
+const EXP_K = 0.45;   // exposure = EXP_K/(sin(Sun above terrain) + 0.1): lower Sun = longer exposure, like a camera would
+function groundMat(){
+  const f = v => v.toFixed(1), hr = groundTex.userData.hRange.toFixed(2);
+  const march = (tile, off) => '  { vec2 uv = p/' + f(tile) + off + '; float h0 = texture2D(uTex, uv).w*' + hr + ', s = 0.7, o = 1.0;\n' +
+    '    for (int i = 0; i < 22; i++){ float hs = texture2D(uTex, uv + sd*s/512.0).w*' + hr + ';\n' +
+    '      o = min(o, clamp(0.5 + (h0 + s*tanEl - hs)/(s*0.0093 + 0.25), 0.0, 1.0)); s *= 1.33; }\n' +
+    '    sh *= o; }\n';
+  return new THREE.ShaderMaterial({side: THREE.DoubleSide,
+    uniforms: {uTex: {value: groundTex}, uSun: {value: new THREE.Vector3(0, 1, 0)}, uLit: {value: 1}, uExp: {value: 4}},
+    vertexShader: 'attribute float hz; varying vec3 vDir; varying float vHz;\n' +
+      'void main(){ vDir = position; vHz = hz; gl_Position = projectionMatrix*modelViewMatrix*vec4(position, 1.0); }',
+    fragmentShader: 'uniform sampler2D uTex; uniform vec3 uSun; uniform float uLit, uExp; varying vec3 vDir; varying float vHz;\n' +
+      'void main(){\n' +
+      '  vec3 v = normalize(vDir); float el = asin(clamp(v.y, -1.0, 1.0)), dep = max(vHz - el, 1e-4);\n' +
+      '  float d = min(' + f(EYE_M) + '/tan(dep), ' + f(FAR_M) + '); vec2 p = normalize(v.xz)*d;\n' +
+      '  vec4 a = texture2D(uTex, p/' + f(TILE_A) + '), b = texture2D(uTex, p/' + f(TILE_B) + ' + 0.37);\n' +
+      '  vec2 na = a.xy*2.0 - 1.0, nb = b.xy*2.0 - 1.0;\n' +
+      '  vec3 n = normalize(vec3(na.x + 0.6*nb.x, 1.0, na.y + 0.6*nb.y));\n' +   // texture u -> world x, texture v -> world z, up = y
+      '  vec3 L = normalize(uSun); float hl = max(length(L.xz), 1e-3), tanEl = L.y/hl; vec2 sd = L.xz/hl;\n' +
+      '  float sh = 1.0;\n' + march(TILE_A, '') + march(TILE_B, ' + 0.37') +
+      '  float far = smoothstep(150.0, 2500.0, d);\n' +
+      '  float alb = mix(0.8, 1.1, mix(0.6*a.z + 0.4*b.z, 0.5, far));\n' +
+      '  float sunNear = max(dot(n, L), 0.0)*sh, sunFar = 0.5*max(L.y, 0.0) + 0.012;\n' +   // far: mean of the same law over a rough surface
+      '  float sun = mix(sunNear, sunFar, far)*uExp;\n' +
+      '  vec3 col = vec3(1.0, 0.985, 0.96)*alb*0.62*(1.0 - exp(-1.6*(uLit*sun + 0.02)));\n' +   // 0.02 = earthshine floor; soft roll-off so lit slopes do not clip to white
+      '  gl_FragColor = vec4(col, 1.0);\n' +
+      '  #include <colorspace_fragment>\n' +
+      '}'});
+}
 function buildHorizon(){
   if (horizonMesh){ sky.remove(horizonMesh); horizonMesh.geometry.dispose(); }
-  const st = App.state, m = App.mask(App.sites[st.site]), pos = [], col = [], idx = [], STEP = 0.5, n = 360/STEP;
+  if (!groundTex) groundTex = regolithTex();
+  const st = App.state, m = App.mask(App.sites[st.site]), pos = [], hzs = [], idx = [], STEP = 0.5, n = 360/STEP;
+  const DEP = [0, 0.03, 0.08, 0.15, 0.3, 0.6, 1, 1.6, 2.5, 4, 6, 9, 14, 22, 35, 55, 89], R = DEP.length;
   for (let k = 0; k <= n; k++){
-    const az = k*STEP, top = dirv(az, App.profAt(m, az)).multiplyScalar(800), bot = dirv(az, -89).multiplyScalar(800);
-    pos.push(top.x, top.y, top.z, bot.x, bot.y, bot.z); col.push(0.16, 0.155, 0.145, 0.02, 0.02, 0.02);
-    if (k < n){ const i = k*2; idx.push(i, i + 1, i + 2, i + 1, i + 3, i + 2); }
+    const az = k*STEP, hz = App.profAt(m, az);
+    for (const dep of DEP){ const p = dirv(az, Math.max(-89.5, hz - dep)).multiplyScalar(800); pos.push(p.x, p.y, p.z); hzs.push(hz*D2R); }
+    if (k < n) for (let r = 0; r < R - 1; r++){ const i = k*R + r, j = i + R; idx.push(i, i + 1, j, i + 1, j + 1, j); }
   }
-  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx);
-  horizonMesh = new THREE.Mesh(g, new THREE.MeshBasicMaterial({vertexColors: true, side: THREE.DoubleSide})); sky.add(horizonMesh);
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('hz', new THREE.Float32BufferAttribute(hzs, 1)); g.setIndex(idx);
+  horizonMesh = new THREE.Mesh(g, groundMat()); sky.add(horizonMesh);
   horizonMesh.userData.key = st.site + '/' + st.mast;
   // bright ridge line on the terrain edge (same mask values), so "above / below the terrain" reads at a glance
   if (ridgeLine){ sky.remove(ridgeLine); ridgeLine.geometry.dispose(); }
   const rp = []; for (let k = 0; k <= n; k++){ const v = dirv(k*STEP, App.profAt(m, k*STEP)).multiplyScalar(799); rp.push(v.x, v.y, v.z); }
   const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.Float32BufferAttribute(rp, 3));
   ridgeLine = new THREE.Line(rg, new THREE.LineBasicMaterial({color: '#D8D2C6'})); sky.add(ridgeLine);
+}
+/* Earth's real face: Earth's axis and rotation (GMST) turned into this site's sky. Moon-fixed axes: z = Moon pole (taken as the ecliptic
+   pole, ~1.5 deg off), equinox found from the Sun's direction and its ecliptic longitude (low-precision formula). Good to a few degrees. */
+function orientEarth(j, s){
+  const p = App.ephAt(j), la = s.lat*D2R, lo = s.lon*D2R, dot = (a, b) => a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+  const U = [Math.cos(la)*Math.cos(lo), Math.cos(la)*Math.sin(lo), Math.sin(la)], E = [-Math.sin(lo), Math.cos(lo), 0], Nn = [-Math.sin(la)*Math.cos(lo), -Math.sin(la)*Math.sin(lo), Math.cos(la)];
+  const toSky = v => new THREE.Vector3(dot(v, E), dot(v, U), -dot(v, Nn));
+  const n = j - 2451545, g = (357.528 + 0.9856003*n)*D2R, lam = (280.460 + 0.9856474*n + 1.915*Math.sin(g) + 0.020*Math.sin(2*g))*D2R;
+  const sa = Math.atan2(p.sun[1], p.sun[0]) - lam, X = [Math.cos(sa), Math.sin(sa), 0], Y = [-Math.sin(sa), Math.cos(sa), 0], eps = 23.4393*D2R;
+  const P = [Math.sin(eps)*Y[0], Math.sin(eps)*Y[1], Math.cos(eps)];   // Earth's north pole = ecliptic lon 90, lat 66.56
+  const Yq = [P[1]*X[2] - P[2]*X[1], P[2]*X[0] - P[0]*X[2], P[0]*X[1] - P[1]*X[0]];   // equatorial y = pole x equinox
+  const gm = ((280.46061837 + 360.98564736629*n) % 360)*D2R, M = [0, 1, 2].map(c => Math.cos(gm)*X[c] + Math.sin(gm)*Yq[c]);   // lon 0 on the equator
+  const vx = toSky(M).normalize(), vy = toSky(P).normalize(), vz = new THREE.Vector3().crossVectors(vx, vy);   // three.js sphere: +x = lon 0, +y = north
+  earthBall.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(vx, vy, vz));
 }
 function updateSky(){
   const st = App.state, s = App.sites[st.site], j = st.jd0 + st.t, p = App.ephAt(j), su = App.azel(s.lat, s.lon, p.sun), ea = App.azel(s.lat, s.lon, p.earth);
@@ -68,65 +151,11 @@ function updateSky(){
   place('earth', ed, 'Earth', 34, w, h, true, !x.earthVis);
   const m = App.mask(s);
   [['N', 0], ['E', 90], ['S', 180], ['W', 270]].forEach(([t, az]) => place(t, dirv(az, App.profAt(m, az) + 0.3), t, -18, w, h, false));
-  const mk = st.site + '/' + st.mast + '/' + JSON.stringify(st.missions || {}); if (mk !== markKey){ markKey = mk; buildMarks(); }
-  placeMarks(w, h, [sd, ed]);
-}
-/* ---------- where other missions and permanent shadow are: DIRECTION indicators on the horizon ----------
-   From a 2-10 m mast they are beyond the horizon or inside crater floors, so they are NOT drawn as visible; we only mark which way they lie.
-   Missions: Missions.near (same rows + on/off + Chang'e switch as Landing Site), tick on the ridge + short name and distance.
-   Permanent shadow: "permanently shadowed (LOLA model)" areas (App.psr; never call them ice, DECISIONS 11) within PSR_KM: teal strip under the ridge. */
-const MCOL = '#F2876B', PCOL = '#7FD1C7', MIS_KM = 100, PSR_KM = 20;   // colours = Landing Site legend
-const misShort = m => m.id === 'mip' ? 'Ch-1 impact est. 1' : m.id === 'mip_alt' ? 'Ch-1 impact est. 2' : m.name.replace(/ \(.*\)$/, '').replace(/ Endurance$/, '');
-function bearing(lat1, lon1, lat2, lon2){   // initial great-circle bearing, deg clockwise from north (display direction only)
-  const p1 = lat1*D2R, p2 = lat2*D2R, dl = (lon2 - lon1)*D2R;
-  return (Math.atan2(Math.sin(dl)*Math.cos(p2), Math.cos(p1)*Math.sin(p2) - Math.sin(p1)*Math.cos(p2)*Math.cos(dl))/D2R + 360) % 360; }
-function buildMarks(){
-  if (markGroup){ sky.remove(markGroup); markGroup.traverse(o => o.geometry && o.geometry.dispose()); }
-  markGroup = new THREE.Group(); sky.add(markGroup);
-  marks.forEach(k => { k.e.remove(); }); marks = [];
-  const st = App.state, s = App.sites[st.site], m = App.mask(s);
-  // missions
-  if (window.Missions && (st.missions || {}).on !== false){
-    const tick = [];
-    for (const n of Missions.near(s, {withinKm: MIS_KM})){
-      const az = bearing(s.lat, s.lon, n.m.lat, n.m.lon), el = App.profAt(m, az);
-      for (const [da, de] of [[-0.25, 0.05], [0.25, 0.05], [0, 0.75]]){ const v = dirv(az + da, el + de).multiplyScalar(796); tick.push(v.x, v.y, v.z); }   // small pin standing on the ridge
-      const e = document.createElement('div'); e.className = 'sky card'; e.style.color = MCOL; e.style.font = '500 11px "IBM Plex Mono"';
-      e.textContent = misShort(n.m) + ' · ' + (n.km < 10 ? n.km.toFixed(1) : Math.round(n.km)) + ' km' + (n.m.precision === 'region' ? ' · region' : '');
-      $('#skylabels').appendChild(e); marks.push({e, dir: dirv(az, el + 0.75), km: n.km});
-    }
-    if (tick.length){ const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(tick, 3));
-      const pin = new THREE.Mesh(g, new THREE.MeshBasicMaterial({color: MCOL, depthTest: false, side: THREE.DoubleSide})); pin.renderOrder = 6; markGroup.add(pin); }
-  }
-  // permanent shadow: nearest PSR distance per 1 deg bin (outline edges sampled every ~150 m, polar stereographic metres, conformal so bearings hold)
-  const rho = 2*1737400*Math.tan((90 + s.lat)*D2R/2), sx = rho*Math.sin(s.lon*D2R), sy = rho*Math.cos(s.lon*D2R);
-  const N = [Math.sin(s.lon*D2R), Math.cos(s.lon*D2R)], E = [Math.cos(s.lon*D2R), -Math.sin(s.lon*D2R)], near = new Float32Array(360).fill(Infinity), LIM = PSR_KM*1000;
-  const hit = (x, y) => { const dx = x - sx, dy = y - sy, d = Math.hypot(dx, dy); if (d > LIM) return;
-    const k = Math.floor((Math.atan2(dx*E[0] + dy*E[1], dx*N[0] + dy*N[1])/D2R + 360) % 360); if (d < near[k]) near[k] = d; };
-  for (const pg of App.psr.polygons) for (const ring of pg.rings){
-    if (!ring.some(([x, y]) => Math.hypot(x - sx, y - sy) < LIM + 5000)) continue;
-    for (let i = 0; i < ring.length; i++){ const [x0, y0] = ring[i], [x1, y1] = ring[(i + 1) % ring.length], n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0)/150));
-      for (let q = 0; q < n; q++) hit(x0 + (x1 - x0)*q/n, y0 + (y1 - y0)*q/n); }
-  }
-  const pos = [], col = [], idx = [], c = new THREE.Color(PCOL);
-  for (let k = 0; k < 360; k++){ if (!isFinite(near[k])) continue;
-    const al = 0.45 + 0.5*(1 - near[k]/LIM), i = pos.length/3;   // closer = stronger
-    for (const az of [k, k + 1]){ const hz = App.profAt(m, az), t = dirv(az, hz - 0.1).multiplyScalar(797), bt = dirv(az, hz - 1.1).multiplyScalar(797);
-      pos.push(t.x, t.y, t.z, bt.x, bt.y, bt.z); col.push(c.r, c.g, c.b, al, c.r, c.g, c.b, al); }
-    idx.push(i, i + 1, i + 2, i + 1, i + 3, i + 2); }
-  if (idx.length){ const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 4)); g.setIndex(idx);
-    markGroup.add(new THREE.Mesh(g, new THREE.MeshBasicMaterial({vertexColors: true, transparent: true, depthWrite: false, depthTest: false, side: THREE.DoubleSide}))); markGroup.children[markGroup.children.length - 1].renderOrder = 5; }
-}
-/* mission names above their ticks; nearest first, a label that would overlap one already placed is hidden (the tick stays) */
-function placeMarks(w, h, bodies){
-  const used = [];   // Sun and Earth (disc + name) block mission names, so names never cover a body
-  for (const d of bodies){ const q = d.clone().multiplyScalar(DSKY).project(skyCam); if (q.z <= 1) used.push({x: (q.x*0.5 + 0.5)*w, y: (-q.y*0.5 + 0.5)*h + 10, hw: 34}); }
-  for (const k of marks){
-    const q = k.dir.clone().multiplyScalar(DSKY).project(skyCam), x = (q.x*0.5 + 0.5)*w, y = (-q.y*0.5 + 0.5)*h - 14, hw = k.e.textContent.length*3.4 + 4;
-    const ok = q.z <= 1 && Math.abs(q.x) <= 1 && Math.abs(q.y) <= 1 && !used.some(u => Math.abs(u.y - y) < (u.hw === 34 ? 30 : 14) && Math.abs(u.x - x) < u.hw + hw);
-    k.e.style.display = ok ? '' : 'none'; if (!ok) continue;
-    k.e.style.left = x + 'px'; k.e.style.top = y + 'px'; used.push({x, y, hw});
-  }
+  // light direction: the real Sun azimuth, at its height ABOVE THE TERRAIN in that direction (on a ridge the ground falls away, so "Sun 1.2 deg
+  // below level" can still mean "0.4 deg above the local horizon"); earthshine only when it is behind the terrain
+  const sRel = Math.max(0.05, su.el - App.profAt(App.mask(s), su.az)), U = horizonMesh.material.uniforms;
+  U.uSun.value.copy(dirv(su.az, sRel)); U.uLit.value = x.sunLit; U.uExp.value = EXP_K/(Math.sin(sRel*D2R) + 0.1);
+  orientEarth(j, s);
 }
 /* one persistent label per key; bodies off screen get an arrow at the screen edge pointing to them */
 const LAB = {}, EDGE = 26;

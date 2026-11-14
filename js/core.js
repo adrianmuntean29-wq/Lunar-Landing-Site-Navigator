@@ -74,7 +74,7 @@ window.App = (function(){
     jd0: jd(new Date(Date.UTC(2027, 0, 1))), days: 365,      // first landing date, span
     t: 0, playing: false, speed: 1,                           // time since jd0 in days
     site: 0, mast: '2', selDay: -1, psr: 0,                   // selected site, mast height, chosen landing day, PSR filter km (0 = off)
-    lim: {len: 13, sun: 70, earth: 50, night: 48, relay: false},
+    lim: {len: 13, sun: 70, earth: 25, night: 48, relay: false},
     panelOpen: true, drawerOpen: true,
     view: 'system',   // scene view: 'system' (Orbit) | 'globe' (Moon) | 'region' (Landing Site) | 'ground' (Ground Level); scene sets it, panel follows
     // other-missions layer (missions.js): on/off, caution radius for large landers (km, OUR assumption, Eren 2026-11-14), show Chang'e rows.
@@ -85,7 +85,9 @@ window.App = (function(){
     // 'dark' | 'light' (projector). shell.js sets it and <html data-theme>; react to key 'theme' to redraw canvases / three.js colours.
     theme: document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
   };
-  const PRESETS = {robotic: {len: 13, sun: 70, earth: 50, night: 48}, crew: {len: 6, sun: 95, earth: 50, night: 0}};   // example values, not NASA's
+  // earth 25 = Earth-visibility map mask in a 2024 NASA presentation (Dwyer Cianciolo, NTRS 20240009596, VERIFIED in GOTCHAS; Eren 21:4x:
+  // "use NASA's as our own, sliders stay changeable"). Never call it a "NASA standard". len / sun / night are example values.
+  const PRESETS = {robotic: {len: 13, sun: 70, earth: 25, night: 48}, crew: {len: 6, sun: 95, earth: 25, night: 0}};
   const listeners = [];
   let sites = [], ser = [], sj = null, psr = null, eph = null, cache = {};
 
@@ -228,6 +230,16 @@ window.App = (function(){
     EPH = e; eph = {generated_utc: e.generated_utc, versions: e.versions, start: date(e.jd0), end: date(e.jd0 + (e.n - 3)*e.step_hours/24)};
     sj = s; psr = p;
     sites = s.sites.map((o, i) => ({i, id: o.id, name: o.name.replace(/ \(.*\)/, ''), short: (o.name.match(/\((.*)\)/) || [, o.name])[1], lat: o.lat, lon: o.lon_e, masks: o.masks, psr_km: o.psr_km, kind: o.kind || 'published study point', truncated: !!o.truncated, edge_rays: o.edge_rays || 0, raw: o}));
+    // 50 m ranges (engine-2, Eren 2026-11-14 ~20:00): optional file; missing = no range shown
+    try {
+      const rj = await fetch(DATA + 'site_ranges.json').then(r => r.ok ? r.json() : null);
+      if (rj) for (const o of rj.sites){
+        const s = sites.find(x => x.id === o.id); if (!s) continue;
+        const near = o.points.filter(p => p.r_m <= 25.5), mm = k => ({min: Math.min(...near.map(p => p[k])), max: Math.max(...near.map(p => p[k]))});
+        s.range = {mast: '2', period: '2027-2031', centre: o.centre, best: o.best_lit, upper: !!s.truncated,
+          r25: {sun_pct: mm('sun_pct'), earth_pct: mm('earth_pct'), longest_night_h: mm('longest_night_h')}, r50: o.range_50m};
+      }
+    } catch (err) { console.warn('site_ranges.json not loaded', err); }
     buildSeries();
     if (window.Missions && Missions.load) await Missions.load();   // missions.js is loaded right after core.js
     requestAnimationFrame(tick);

@@ -6,6 +6,8 @@
 import * as THREE from 'three';
 
 export const $ = s => document.querySelector(s);
+// project palette token from base.css (e.g. '--mis-3d': fixed colours for marks ON the dark 3D picture), read once at build
+export const tok = (name, fallback) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 export const R = App.R, D2R = App.D2R, root = $('#scene');
 root.innerHTML = `
   <div class="labels" id="labels"></div>
@@ -18,18 +20,18 @@ root.innerHTML = `
   <div class="obbar" id="gBar" role="group" aria-label="Camera" hidden><span>View</span><button type="button" data-g="pole" aria-pressed="true">South pole</button><button type="button" data-g="moon" aria-pressed="false">Whole Moon</button></div>  <div class="sitebar" id="sitebar" hidden><button type="button" class="btn" id="lookSun">Look at the Sun</button><button type="button" class="btn" id="lookEarth">Look at Earth</button></div>
   <div class="skylabels" id="skylabels" hidden></div>
   <div class="layers" id="layersBox">
-    <div class="lyhead"><span>Landing</span><span class="info-wrap"><button type="button" class="info-i" aria-label="About the landing layers" aria-describedby="lyTipLand">i</button><span class="info-tip" id="lyTipLand" role="tooltip"><span>Things that matter for the lander.</span><span><b>Landing sites</b>: name tags of the other sites. Off hides them; the selected site and your own spot always keep theirs.</span><span><b>Sunlit now</b>: ground the Sun reaches at the time on the clock turns yellow, ground in shadow turns blue. It changes as time plays; it is one moment, not a yearly average. Exact within about 90 km of the site (sun shadows switch on with it).</span><span><b>Elevation</b>: height of the ground, blue = low, yellow = high, white = highest (−6 to +7 km from the Moon's mean radius). Heights in 3D are drawn ×2.</span><span><b>Permanently shadowed</b>: areas the Sun never reaches (LOLA model).</span></span></span></div>
-    <label><input type="checkbox" id="lySites" checked> <span class="sitesw"></span> landing sites</label>
-    <label><input type="checkbox" id="lyLight"> <span class="litsw"></span> sunlit now</label>
-    <label><input type="checkbox" id="lyElev"> <span class="elevsw"></span> elevation</label>
-    <label><input type="checkbox" id="lyPsr" checked> <span class="psrsw"></span> permanently shadowed (LOLA model)</label>
+    <div class="lyhead"><span>Landing</span><span class="info-wrap"><button type="button" class="info-i" aria-label="About the landing layers" aria-describedby="lyTipLand">i</button><span class="info-tip" id="lyTipLand" role="tooltip"><span>Things that matter for the lander.</span><span><b>Landing site markers</b>: numbered tags of the other sites (same numbers as the list on the right). Off hides them; the selected site and your own spot always keep theirs.</span><span><b>Sunlight now</b>: ground the Sun reaches at the time on the clock turns yellow, ground in shadow turns blue. It changes as time plays; it is one moment, not a yearly average. Exact within about 90 km of the site (sun shadows switch on with it).</span><span><b>Elevation</b>: height of the ground, blue = low, yellow = high, white = highest (−6 to +7 km from the Moon's mean radius). Heights in 3D are drawn ×2.</span><span><b>Permanently shadowed</b>: areas the Sun never reaches (LOLA model).</span></span></span></div>
+    <label><input type="checkbox" id="lySites" checked> <span class="sitesw"></span> Landing site markers</label>
+    <label><input type="checkbox" id="lyLight"> <span class="litsw"></span> Sunlight now</label>
+    <label><input type="checkbox" id="lyElev"> <span class="elevsw"></span> Elevation</label>
+    <label><input type="checkbox" id="lyPsr" checked> <span class="psrsw"></span> Permanently shadowed areas (LOLA)</label>
     <div class="lyhead"><span>Other missions</span></div>
-    <div class="row"><label><input type="checkbox" id="lyMis" checked> <span class="missw"></span> other missions</label><span class="info-wrap"><button type="button" class="info-i" aria-label="About other missions" aria-describedby="legend">i</button><span class="info-tip legend" id="legend" role="tooltip"></span></span></div>
-    <div class="lyhead"><span>Graphics</span><span class="info-wrap"><button type="button" class="info-i" aria-label="About the graphics layers" aria-describedby="lyTipGfx">i</button><span class="info-tip" id="lyTipGfx" role="tooltip"><span>Helpers for the picture only, no data.</span><span><b>Sun shadows</b>: from the real Sun direction, within about 90 km of the site.</span><span><b>Latitude rings</b>: 89.5, 89 and 88.5° S.</span><span><b>Fog</b>: fades the ground far from the selected site so it stands out.</span><span><b>Stars</b>: decorative, not real star positions.</span></span></span></div>
-    <label><input type="checkbox" id="lyShadow" checked> sun shadows</label>
-    <label><input type="checkbox" id="lyRings" checked> latitude rings</label>
-    <label><input type="checkbox" id="lyFog" checked> fog around the landing area</label>
-    <label><input type="checkbox" id="lyStars" checked> stars</label></div>`;
+    <div class="row"><label><input type="checkbox" id="lyMis" checked> <span class="missw"></span> Other missions and keep-out zones</label><span class="info-wrap"><button type="button" class="info-i" aria-label="About other missions" aria-describedby="legend">i</button><span class="info-tip legend" id="legend" role="tooltip"></span></span></div>
+    <div class="lyhead"><span>Display</span><span class="info-wrap"><button type="button" class="info-i" aria-label="About the graphics layers" aria-describedby="lyTipGfx">i</button><span class="info-tip" id="lyTipGfx" role="tooltip"><span>Helpers for the picture only, no data.</span><span><b>Terrain shadows</b>: from the real Sun direction, within about 90 km of the site.</span><span><b>Latitude lines</b>: every 1° from 89° to 85° S (about 30 to 150 km from the pole). The cross marks the true south pole (90° S).</span><span><b>Fade distant terrain</b>: fades the ground far from the selected site so it stands out.</span><span><b>Star background</b>: decorative, not real star positions.</span></span></span></div>
+    <label><input type="checkbox" id="lyShadow" checked> Terrain shadows</label>
+    <label><input type="checkbox" id="lyRings" checked> Latitude lines</label>
+    <label><input type="checkbox" id="lyFog" checked> Fade distant terrain</label>
+    <label><input type="checkbox" id="lyStars" checked> Star background</label></div>`;
 
 // live bindings: importers always see the current value
 export let renderer = null, view = 'region', meta = null, HGT = null;   // HGT: engine heights.bin (+/-60 km, 240 m), used by Landing Site and the Moon cap
