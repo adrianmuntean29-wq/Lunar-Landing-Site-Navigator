@@ -19,15 +19,34 @@ import dem
 import horizon
 import metrics
 
+BOX = "best-lit point in NASA site box"
+BOX_SRC = ("engine search (2 m mast, 2027-2031) inside PGDA product 78 site box {box}; filters from NASA 2024 HLS presentation "
+           "(slope < 10 deg over 100 m, Earth >= 25%); vault log 2026-11-14 more-sites")
 SITES = [
     dict(id="A", name="Connecting Ridge (C1)", lat=-89.4505, lon_e=222.84, source="Glaser et al. 2018, site C1",
+         kind="published study point",
          reference=[dict(paper="Glaser et al. 2018", mast_m=0, sun_pct=76.0), dict(paper="Glaser et al. 2018", mast_m=2, sun_pct=88.0)]),
     dict(id="B", name="Shackleton rim (S)", lat=-89.7849, lon_e=203.97, source="Glaser et al. 2018, site S",
-         reference=[dict(paper="Glaser et al. 2018", mast_m=0, sun_pct=81.0)]),
-    dict(id="C", name="de Gerlache rim (GR1)", lat=-88.6952, lon_e=291.7154, source="De Rosa et al. 2012, site GR1",
+         kind="published study point", reference=[dict(paper="Glaser et al. 2018", mast_m=0, sun_pct=81.0)]),
+    dict(id="C", name="de Gerlache rim (GR1)", lat=-88.6952, lon_e=291.7154, source="De Rosa et al. 2012, region GR1 centre",
+         kind="published study region centre", reference=[]),
+    dict(id="D", name="Malapert massif (MP1)", lat=-85.9756, lon_e=357.8876, source="De Rosa et al. 2012, region MP1 centre",
+         kind="published study region centre", reference=[]),
+    # Added 2026-11-14 (Eren: "best point per box"); points found on the home server, REPORT3.md
+    dict(id="E", name="Leibnitz beta plateau (Site20v2)", lat=-85.480995, lon_e=29.566051, kind=BOX,
+         source=BOX_SRC.format(box="Site20v2 Leibnitz beta plateau"), reference=[]),
+    dict(id="F", name="de Gerlache rim 2 (SL2)", lat=-88.394084, lon_e=291.375386, kind=BOX,
+         source=BOX_SRC.format(box="SL2 de Gerlache rim"), reference=[]),
+    dict(id="G", name="Nobile rim 1 (Site06)", lat=-85.275953, lon_e=36.945850, kind=BOX,
+         source=BOX_SRC.format(box="Site06 Nobile rim 1"), reference=[]),
+    dict(id="H", name="Haworth (Haworth box)", lat=-86.372490, lon_e=336.685177, kind=BOX,
+         source=BOX_SRC.format(box="Haworth"), reference=[]),
+    dict(id="I", name="Nobile rim 2 (DM2)", lat=-84.055542, lon_e=59.248651, kind=BOX,
+         source=BOX_SRC.format(box="DM2 Nobile rim 2") + "; many rays reach the map edge, so sun % is an upper bound",
          reference=[]),
-    dict(id="D", name="Malapert massif (MP1)", lat=-85.9756, lon_e=357.8876, source="De Rosa et al. 2012, site MP1",
-         reference=[]),
+    dict(id="J", name="IM-2 Athena target", lat=-84.78, lon_e=29.13, kind="historic target (comparison)",
+         source="published IM-2 target point, LROC https://lroc.im-ldi.com/images/1401; the lander ended ~250 m away, "
+                "on its side in a crater (collectSPACE); inside IM-2's own keep-out", reference=[]),
 ]
 MASTS_M = [0, 2, 10]
 NEAR_M = 10000.0
@@ -93,7 +112,7 @@ def main(out=Path(__file__).resolve().parents[1] / "data" / "sites.json"):
             ours = stats_5y[str(r["mast_m"])]["sun_pct"]
             refs.append(dict(r, ours_5y_sun_pct=ours, diff_points=round(ours - r["sun_pct"], 1)))
         out_sites.append(dict(
-            id=s["id"], name=s["name"], lat=s["lat"], lon_e=s["lon_e"], source=s["source"],
+            id=s["id"], name=s["name"], lat=s["lat"], lon_e=s["lon_e"], source=s["source"], kind=s["kind"],
             ground_m=round(info0["h0_m"], 1),
             err_m=quality("LDEM_80S_20MPP_ADJ_ERR.TIF", s["lat"], s["lon_e"], 2),
             effres_m=quality("LDEM_80S_20MPP_ADJ_EFFRES.TIF", s["lat"], s["lon_e"], 1),
