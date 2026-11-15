@@ -51,6 +51,7 @@
         <div class="plStack" id="rStack" aria-hidden="true"></div>
         <div class="plLeg" id="rLeg"></div>
         <p id="rFirst"></p>
+        <div class="plFly" id="plFly"></div>
       </section>
       <section class="others" id="others" hidden><b id="oHead"></b><span id="oTip"></span></section>
       <section class="plMis">
@@ -198,6 +199,19 @@
     $('#gEarthS').textContent = b.h == null ? 'no change within 60 days' : (b.now ? 'sets ' : 'rises ') + App.plainH(b.h);
     g.closest('.stline').classList.toggle('off', !a.now); $('#gEarth').closest('.stline').classList.toggle('off', !b.now);
   }
+  /* Fly buttons (Eren 15 Nov ~12:05, Adrian's mission demo): same wording and crew check as drawer.js fly(); App.flyMission (shell.js)
+     uses the selected day, else the first passing day. Named sites only; hidden when no day is chosen and none passes. */
+  function plFly(){
+    const el = $('#plFly'); if (!el) return;
+    const st = App.state, s = App.sites[st.site];
+    if (!s || s.custom || !App.flyMission){ el.innerHTML = ''; return; }
+    let d = st.selDay; if (d < 0){ d = App.wins(st.site).findIndex(o => !o.fail.length); }
+    if (d < 0){ el.innerHTML = ''; return; }
+    const cw = App.wins(st.site, Object.assign({}, App.PRESETS.crew, {relay: st.lim.relay}))[d], crewOk = cw && !cw.fail.length;
+    el.innerHTML = '<small>Mission simulation, landing ' + App.dayDate(d) + (st.selDay < 0 ? ' (first good day)' : '') + '</small><div>' + (crewOk
+      ? '<button class="btn flyb" type="button" data-fly="robotic" title="Open this day on the mission page, robotic lander">Fly it robotic</button><button class="btn flyb" type="button" data-fly="crewed" title="Open this day on the mission page, crew of the crew preset (6 days, full sunlight)">Fly it with a crew</button>'
+      : '<button class="btn flyb" type="button" data-fly="robotic" title="Open this day on the mission page (a crew cannot land this day under the crew preset)">Fly this mission from Canada</button>') + '</div>';
+  }
   function live(){ const v = App.state.view; if (v === 'system') orbit(); else if (v === 'ground'){ now(); heights(); ahead(); } else if (v === 'globe') globeSite(); }
   function result(){
     const st = App.state, s = App.sites[st.site], w = App.wins(st.site), ok = w.filter(o => !o.fail.length);
@@ -206,6 +220,7 @@
     $('#verdict').classList.toggle('none', !ok.length);
     $('#rN').textContent = ok.length; $('#rNs').textContent = 'of ' + w.length + ' landing days in ' + yr + ' work';
     $('#rFirst').innerHTML = ok.length ? 'First good day: <b>' + App.dayDate(ok[0].d) + '</b>' : 'No day works. Loosen a slider or open More options.';
+    plFly();
     $('#rPsr').innerHTML = s.psr_km != null ? 'This site is <b>' + s.psr_km.toFixed(1) + ' km</b> from the nearest permanently shadowed area' + (st.psr ? (s.psr_km <= st.psr ? ', inside your ' + st.psr + ' km limit.' : ', <b>outside</b> your ' + st.psr + ' km limit.') : '.') : '';
     // one bar: good days, then each failed day under its first reason (sunlight, Earth, darkness); same counts as the old "why" bars
     const n = [0, 0, 0]; w.forEach(o => { if (o.fail.indexOf('sun') < 0){ n[0]++; if (o.fail.indexOf('earth') < 0){ n[1]++; if (o.fail.indexOf('night') < 0) n[2]++; } } });
@@ -322,6 +337,8 @@
   });
   App.ready.then(() => {
     $('#earthTip').innerHTML = tip('About the Earth limit', 'Share of the stay with Earth above the terrain (direct radio possible). The 25% default is the map mask used in a 2024 NASA presentation. Sunlight, length and darkness defaults are example values.');
+    $('#plFly').addEventListener('click', e => { const f = e.target.closest('[data-fly]'); if (f) App.flyMission(f.dataset.fly); });
+    App.on(keys => { if (keys.has('selDay')) plFly(); });   // render() skips selDay-only changes
     $('#kindSeg').onclick = e => { const b = e.target.closest('button'); if (b) App.set({lim: App.PRESETS[b.dataset.v]}, 'panel'); };
     ['len', 'sun', 'earth', 'night'].forEach(k => $('#' + k).oninput = e => App.set({lim: {[k]: +e.target.value}}, 'panel'));
     $('#relay').onchange = e => App.set({lim: {relay: e.target.checked}}, 'panel');

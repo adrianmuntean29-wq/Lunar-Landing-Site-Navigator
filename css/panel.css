@@ -238,3 +238,9 @@
 #pSites .srow .nm .ktud{margin:0 0 0 4px;vertical-align:1px;color:color-mix(in srgb,var(--zone-3d) 55%,var(--ink));border-color:color-mix(in srgb,var(--zone-3d) 55%,var(--ink))}
 #panel .psrc{margin-left:8px;align-self:center}   /* source (i) next to the view title */
 #pSites .srow .kline{display:flex;align-items:center;gap:6px;margin-left:28px;font:500 11.5px "IBM Plex Mono";color:var(--muted)} #pSites .srow .kline .info-wrap{vertical-align:0}
+#pMission .plFly{display:grid;gap:5px;margin-top:6px}
+#pMission .plFly:empty{display:none}
+#pMission .plFly small{font:500 11.5px "IBM Plex Mono";color:var(--muted)}
+#pMission .plFly div{display:flex;flex-wrap:wrap;gap:6px}
+#pMission .plFly .flyb{border-color:var(--sel);color:var(--sel);font:600 12.5px "IBM Plex Sans";padding:6px 12px}
+#pMission .plFly .flyb:hover{background:var(--sel);color:var(--bg)}
