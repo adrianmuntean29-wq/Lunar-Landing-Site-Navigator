@@ -1,4 +1,6 @@
-# South Pole Navigator
+# Aripi · South Pole Navigator
+
+*Aripi* means "wings" in Romanian.
 
 **Team Peaks of Light** · NASA Space Apps Challenge 2026 · Alba Iulia, Romania · Challenge: *Lunar Landing Site Navigator*
 

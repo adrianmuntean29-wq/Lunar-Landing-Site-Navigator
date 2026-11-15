@@ -4,7 +4,10 @@
   const $ = s => document.querySelector(s);
   function top(){
     const st = App.state;
-    $('#tMast').textContent = 'MAST ' + st.mast + ' M';
+    // site chip (Eren 15 Nov): "<short> <name> · mast N m"; Tudor's sites have short = name, a custom spot says so
+    const s = App.sites[st.site], chip = $('#siteChip');
+    if (chip && s){ const nm = s.custom ? 'Your spot (approximate)' : (s.short && s.short !== s.name ? s.short + ' ' + s.name : s.name);
+      chip.textContent = nm + ' · mast ' + st.mast + ' m'; chip.title = 'Selected: ' + nm + ', ' + st.mast + ' m mast. Click to show it in the details panel'; }
     $('#body').classList.toggle('closed', !st.panelOpen);
     const b = $('#panelBtn');
     b.textContent = st.panelOpen ? 'DETAILS ▸' : '◂ DETAILS';
@@ -14,12 +17,26 @@
   function theme(){
     const light = App.state.theme === 'light', b = $('#themeBtn');
     if (light) document.documentElement.dataset.theme = 'light'; else delete document.documentElement.dataset.theme;
-    b.textContent = light ? 'DARK' : 'LIGHT'; b.setAttribute('aria-pressed', light);
-    b.title = light ? 'Switch back to the dark theme' : 'Switch to a light theme (better on projectors)';
+    // icon button: shows the theme you switch TO (☾ in light, ☀ in dark)
+    b.textContent = light ? '☾' : '☀'; const lab = light ? 'Switch to dark theme' : 'Switch to light theme';
+    b.setAttribute('aria-label', lab); b.title = lab;
     try { localStorage.setItem('spn-theme', App.state.theme); } catch (e) {}
   }
   $('#themeBtn').onclick = () => App.set({theme: App.state.theme === 'light' ? 'dark' : 'light'}, 'shell');
-  App.on((keys, source) => { if (keys.has('panelOpen') || keys.has('mast')) top(); if (keys.has('theme')) theme(); });
+  App.on((keys, source) => { if (keys.has('panelOpen') || keys.has('mast') || keys.has('site') || keys.has('spot')) top(); if (keys.has('theme')) theme(); });
+  { const chip = $('#siteChip'); if (chip) chip.onclick = () => App.set({panelOpen: true}, 'shell'); }
+  /* data line + (i) (Eren 15 Nov): dates come from the data files themselves, never typed in */
+  function dataLine(){
+    const w = $('#dWhen'), tip = $('#dataTip'); if (!w || !tip) return;
+    const d = x => x ? new Date(x).toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC'}) : null;
+    const a = d(App.eph && App.eph.generated_utc), b = d(App.sitesJson && App.sitesJson.generated_utc);
+    w.textContent = ' · precomputed ' + (a && b && a !== b ? a.replace(/ \d{4}$/, '') + ' and ' + b : (a || b || ''));
+    tip.innerHTML = '<span><b>Precomputed data files</b> (the page reads them; nothing runs on a server):</span>' +
+      '<span><b>Sun and Earth positions</b>: data/subpoints.json, NASA JPL Horizons, 6-hour steps, 2026-2035' + (a ? ', made ' + a : '') + '.</span>' +
+      '<span><b>Horizon masks</b>: data/sites.json, from the NASA LOLA south-pole elevation model (PGDA product 90). Named sites use exact masks: 20 m terrain within 10 km, 80 m beyond' + (b ? ', made ' + b : '') + '.</span>' +
+      '<span><b>Terrain for the 3D views and your own spot</b>: data/heights.bin, data/cap_heights.bin (coarser LOLA grids; your spot is approximate).</span>' +
+      '<span><b>Permanent shadow</b>: data/psr.json (PGDA product 90). <b>Flat, smooth terrain</b>: data/zones.json (team analysis).</span>';
+  }
   // Missions button: opens Adrian's mission.html with the current site, landing day and limits (format from the mission-page session).
   // land uses slice(0,10): the full App.iso string would be read as local time. A custom spot opens the page on its defaults.
   // Missions slide-in panel: mission.html in an iframe. The src changes ONLY when the URL changes
@@ -41,12 +58,14 @@
     if (!mPanel) return;
     if (open){ const u = missionUrl(fly); if (mFrame.getAttribute('src') !== u) mFrame.setAttribute('src', u); }
     mPanel.classList.toggle('open', open); mPanel.setAttribute('aria-hidden', !open);
-    missionBtn.setAttribute('aria-expanded', open); missionBtn.classList.toggle('on', open);
-    missionBtn.textContent = open ? '✕ MISSIONS' : '☰ MISSIONS';
-    if (!open && mPanel.contains(document.activeElement)) missionBtn.focus();
+    // Planner | Missions switch (Eren 15 Nov): the active page is pressed; Missions keeps today's open/close behaviour
+    missionBtn.setAttribute('aria-expanded', open); missionBtn.setAttribute('aria-pressed', open);
+    const pl = $('#plannerBtn'); if (pl) pl.setAttribute('aria-pressed', !open);
+    if (!open && mPanel.contains(document.activeElement)) (pl || missionBtn).focus();
   }
   if (missionBtn && mPanel){
     missionBtn.onclick = () => missions(!mPanel.classList.contains('open'));
+    { const pl = $('#plannerBtn'); if (pl) pl.onclick = () => missions(false); }
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && mPanel.classList.contains('open')) missions(false); });
     window.addEventListener('message', e => { if (e.origin === location.origin && e.data && e.data.spn === 'close-missions') missions(false); });
     App.on(keys => { if (keys.has('theme') && mFrame.contentWindow) mFrame.contentWindow.postMessage({spn: 'theme', theme: App.state.theme}, location.origin); });
@@ -59,7 +78,7 @@
     };
   }
   $('#panelBtn').onclick =() => App.set({panelOpen: !App.state.panelOpen}, 'shell');
-  App.ready.then(() => { top(); theme(); });
+  App.ready.then(() => { top(); theme(); dataLine(); });
   /* loading screen (Eren 15 Nov): hide when App.ready has resolved AND view-moon.js says the Moon is ready
      (flag first: 'moon-ready' may already have fired). Hard stop after 20 s, also in CSS, so a WebGL failure never traps the page. */
   const loader = document.getElementById('loader');

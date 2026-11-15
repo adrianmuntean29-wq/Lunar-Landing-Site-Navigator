@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>South Pole Navigator</title>
+<title>Aripi · South Pole Navigator</title>
 <!-- OWNER: coordinator. The three areas fill their own container; do not add area markup here. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <script>/* theme before first paint: ?theme=light|dark, else the saved choice */try{var q=new URLSearchParams(location.search).get("theme"),t=q||localStorage.getItem("spn-theme");if(t==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
@@ -14,16 +14,16 @@
 </head>
 <body>
 <!-- loading screen (shell.js hides it when App.ready + the Moon view are ready; CSS hides it after 20 s no matter what) -->
-<div id="loader" role="status" aria-live="polite"><div class="ldbox"><div class="ldt">Preparing the Moon…</div><div class="ldbar"><i></i></div><div class="lds">Loading real terrain and Sun/Earth data</div></div></div>
+<div id="loader" role="status" aria-live="polite"><div class="ldbox"><div class="ldw">ARIPI</div><div class="ldt">Preparing the Moon…</div><div class="ldbar"><i></i></div><div class="lds">Loading real terrain and Sun/Earth data</div></div></div>
 <div class="app">
   <header class="top" id="top">
-    <button class="btn" id="missionBtn" type="button" aria-expanded="false" aria-controls="missionPanel" title="Fly a mission: the selected site and landing day, from launch to the surface">☰ MISSIONS</button>
-    <span class="brand">SOUTH POLE NAVIGATOR</span>
-    <!-- time, play, speed and the Sun/Earth status live in the bottom panel (Eren 2026-11-14 ~16:05) -->
+    <!-- top bar (Eren 15 Nov: ARIPI brand + view-orbit's three changes): brand, page switch, data line, site chip, theme icon, details -->
+    <span class="brand" aria-label="Aripi, South Pole Navigator"><b class="bw">ARIPI</b><span class="bd">SOUTH POLE NAVIGATOR</span><span class="btag">where and when to land at the lunar south pole</span></span>
+    <span class="pswitch" role="group" aria-label="Page"><button class="btn" id="plannerBtn" type="button" aria-pressed="true" title="The landing planner">Planner</button><button class="btn" id="missionBtn" type="button" aria-pressed="false" aria-expanded="false" aria-controls="missionPanel" title="Fly a mission: the selected site and landing day, from launch to the surface">Missions</button></span>
     <span class="sp"></span>
-    <span class="tag" id="tMast">MAST 2 M</span>
-    <span class="k">DRAFT · REAL LOLA + HORIZONS</span>
-    <button class="btn" id="themeBtn" type="button" aria-pressed="false" title="Switch to a light theme (better on projectors)">LIGHT</button>
+    <span class="dline"><span class="k">Data: <span class="dfull">NASA LOLA terrain + JPL Horizons</span><span class="dshort">LOLA + Horizons</span><span class="dwhen" id="dWhen"></span></span><span class="info-wrap"><button type="button" class="info-i" aria-label="About the data" aria-describedby="dataTip">i</button><span class="info-tip" id="dataTip" role="tooltip"></span></span></span>
+    <button class="tag sitechip" id="siteChip" type="button" title="Show this site in the details panel">…</button>
+    <button class="btn ticon" id="themeBtn" type="button" aria-label="Switch to light theme" title="Switch to light theme">☀</button>
     <button class="btn toggle" id="panelBtn" type="button" aria-controls="panel" aria-expanded="true">DETAILS ▸</button>
   </header>
   <div class="body" id="body">
