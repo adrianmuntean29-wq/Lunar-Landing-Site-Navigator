@@ -25,7 +25,7 @@ root.innerHTML = `
     <label><input type="checkbox" id="lyLight"> <span class="litsw"></span> Sunlight now</label>
     <label><input type="checkbox" id="lyElev"> <span class="elevsw"></span> Elevation</label>
     <label><input type="checkbox" id="lyPsr" checked> <span class="psrsw"></span> Permanently shadowed areas (LOLA)</label>
-    <label><input type="checkbox" id="lyZones" checked> <span class="zonesw"></span> Flat, smooth terrain (team analysis)</label>
+    <label><input type="checkbox" id="lyZones"> <span class="zonesw"></span> Flat, smooth terrain (team analysis)</label>
     <div class="lyhead"><span>Other missions</span></div>
     <div class="row"><label><input type="checkbox" id="lyMis" checked> <span class="missw"></span> Other missions and keep-out zones</label><span class="info-wrap"><button type="button" class="info-i" aria-label="About other missions" aria-describedby="legend">i</button><span class="info-tip legend" id="legend" role="tooltip"></span></span></div>
     <div class="lyhead"><span>Display</span><span class="info-wrap"><button type="button" class="info-i" aria-label="About the graphics layers" aria-describedby="lyTipGfx">i</button><span class="info-tip" id="lyTipGfx" role="tooltip"><span>Helpers for the picture only, no data.</span><span><b>Terrain shadows</b>: from the real Sun direction, within about 90 km of the site.</span><span><b>Latitude lines</b>: every 1° from 89° to 85° S (about 30 to 150 km from the pole). The cross marks the true south pole (90° S).</span><span><b>Fade distant terrain</b>: fades the ground far from the selected site so it stands out.</span><span><b>Star background</b>: decorative, not real star positions.</span></span></span></div>

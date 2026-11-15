@@ -83,7 +83,7 @@ window.App = (function(){
     // custom landing spot (App.addSpot): null, or {lat, lon, label, n}. A change of 'spot' means App.sites changed: rebuild per-site lists/pins.
     spot: null,
     // candidate landing zones layer (Tudor's team analysis, data/zones.json): shown or hidden
-    zones: true,
+    zones: false,   // off by default (Eren 2026-11-15: read as "good landing"; Tudor's result shows as sites 11-14)
     // 'dark' | 'light' (projector). shell.js sets it and <html data-theme>; react to key 'theme' to redraw canvases / three.js colours.
     theme: document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
   };

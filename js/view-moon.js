@@ -177,37 +177,12 @@ const ZTAG_CSS = 'position:absolute;left:0;top:0;transform:translate(-50%,-50%);
   'text-shadow:0 0 3px #000,0 0 3px #000,0 1px 2px #000;will-change:transform';
 const ZKEY_CSS = 'position:absolute;left:12px;bottom:12px;display:flex;align-items:center;gap:7px;font:500 11.5px "IBM Plex Mono";color:var(--c-ink);' +
   'background:var(--c-box);border:1px solid var(--c-line);border-radius:5px;padding:4px 9px;pointer-events:none';
+// Eren 2026-11-15 ("should we show them on the moon? ... you can't tell anything"): the flat, smooth areas are NOT drawn in the Moon view.
+// They are mostly dark (engine: at most ~51% sun) and read as "good landing" at this zoom; Tudor's result shows as sites 11-14 instead.
+// buildZones() only clears anything left from an older build, so callers stay unchanged. (Landing Site may still offer them as a layer.)
 function buildZones(){
   if (gZones){ globe.remove(gZones); gZones.traverse(o => o.geometry && o.geometry.dispose()); gZones = null; }
-  gZoneTags.forEach(t => t.el.remove()); gZoneTags = []; if (gZoneKey){ gZoneKey.remove(); gZoneKey = null; }
-  const Z = App.zones || []; if (!Z.length || App.state.zones === false) return;
-  for (const z of Z){ if (!isFinite(z.x) || !isFinite(z.y)) continue; const el = document.createElement('div'); el.style.cssText = ZTAG_CSS; el.textContent = 'flat, smooth area ' + z.id;
-    $('#glabels').appendChild(el); const rho = Math.hypot(z.x, z.y)/1000;
-    gZoneTags.push({el, id: z.id, p: surf(-90 + 2*Math.atan(rho/(2*R))/D2R, Math.atan2(z.x, z.y)/D2R)}); }
-  gZoneKey = document.createElement('div'); gZoneKey.style.cssText = ZKEY_CSS;
-  gZoneKey.innerHTML = '<span style="display:inline-block;width:14px;height:9px;border:1.5px solid var(--c-zone);border-radius:3px"></span>' + ((App.zonesJson && App.zonesJson.label) || 'Flat, smooth terrain (team analysis)');
-  $('#glabels').appendChild(gZoneKey);
-  // DRAFT styles (Eren 2026-11-15 "3 drafts of how the landing areas look"): ?zs=1 soft fill, ?zs=2 dashed outline, ?zs=3 focus on the
-  // area nearest the selected site. No flag = the current thin outline. The fills are a map overlay (drawn over the terrain, not hidden by hills).
-  const ZS = +(new URLSearchParams(location.search).get('zs') || 0), col = tok('--zone-3d', '#B49DDC');
-  const sel = App.sites[App.state.site], near = ZS === 3 && sel && App.zoneAt ? App.zoneAt(sel.lat, sel.lon) : null;
-  gZones = new THREE.Group();
-  const toV = (x, y, lift = 0.08) => { const rho = Math.hypot(x, y)/1000, lat = -90 + 2*Math.atan(rho/(2*R))/D2R, lon = Math.atan2(x, y)/D2R, v = surf(lat, lon); return v.setLength(v.length() + lift*CAPEX/R); };
-  for (const z of Z){ const focus = ZS === 3 && near && z.id === near.id;
-    const lineMat = ZS === 2 ? new THREE.LineDashedMaterial({color: col, dashSize: 0.0011, gapSize: 0.0007, transparent: true, opacity: 1})
-      : new THREE.LineBasicMaterial({color: ZS === 3 && focus ? '#E3D4FF' : col, transparent: true, opacity: ZS === 3 ? (focus ? 1 : 0.35) : 0.9});
-    const fill = ZS === 1 ? 0.22 : ZS === 3 && focus ? 0.32 : 0;
-    for (const ring of z.rings || []){ const pts = [];
-      for (let k = 0; k < ring.length; k++){ const [ax, ay] = ring[k], [bx, by] = ring[(k + 1)%ring.length], n = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay)/800));   // a point every <= 800 m: follows the ground
-        for (let t = 0; t < n; t++) pts.push(toV(ax + (bx - ax)*t/n, ay + (by - ay)*t/n)); }
-      const ln = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), lineMat); ln.renderOrder = 4; if (ZS === 2) ln.computeLineDistances(); gZones.add(ln);
-      if (fill){   // flat fill: triangulate the ring in the polar plane, lift every corner onto the ground
-        const flat = ring.map(([x, y]) => new THREE.Vector2(x, y)), tri = THREE.ShapeUtils.triangulateShape(flat, []), pos = [];
-        tri.forEach(t => t.forEach(k => { const v = toV(ring[k][0], ring[k][1], 0.3); pos.push(v.x, v.y, v.z); }));
-        const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-        const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({color: col, transparent: true, opacity: fill, depthTest: false, depthWrite: false, side: THREE.DoubleSide}));
-        m.renderOrder = 3; gZones.add(m); } } }
-  globe.add(gZones); }
+  gZoneTags.forEach(t => t.el.remove()); gZoneTags = []; if (gZoneKey){ gZoneKey.remove(); gZoneKey = null; } }
 function pickSite(i){ App.set({site: i, selDay: -1}, 'scene'); gFocus('site', i); }
 // Anchors (Eren via view-site, 2026-11-15: "it changes, doesn't look right"): every site always has a small dot at its TRUE position;
 // numbers that would overlap share a strip placed just above the group, with a thin line from each number to its own dot.
@@ -395,7 +370,7 @@ register('globe', {
   onState(keys, src){
     gDirty = true;
     if (keys.has('spot')) buildCallouts();   // App.sites changed length (custom spot added/removed): indices are stale
-    if (keys.has('zones') || (keys.has('site') && new URLSearchParams(location.search).get('zs') === '3')) buildZones();
+    if (keys.has('zones')) buildZones();
     if (keys.has('site') && src !== 'scene' && view === 'globe') gFocus('site', App.state.site);   // site picked elsewhere: glide to it
     if (keys.has('mast')) gsl.forEach(g => { g.p = null; g.boxSel = null; }); },
 });

@@ -5,7 +5,7 @@
 (function(){
   const $ = s => document.querySelector('#panel ' + s), root = document.querySelector('#panel');
   root.innerHTML = `
-    <div class="tabs" id="ptabs"><span class="vt" id="vTitle"></span><span class="info-wrap psrc"><button type="button" class="info-i" aria-label="Where the numbers in this panel come from" aria-describedby="pSrcTip">i</button><span class="info-tip" id="pSrcTip" role="tooltip"></span></span><button class="x" id="closeP" type="button" aria-label="Close panel">×</button></div>
+    <div class="tabs" id="ptabs"><span class="vt" id="vTitle"></span><span class="info-wrap psrc"><button type="button" class="info-i" aria-label="Where the numbers in this panel come from" aria-describedby="pSrcTip">i</button><span class="info-tip left" id="pSrcTip" role="tooltip" style="width:250px"></span></span><button class="x" id="closeP" type="button" aria-label="Close panel">×</button></div>
     <div class="scroll" id="pSystem" hidden>
       <section class="facts">
         <div><span>Moon phase</span><b id="oPhase"></b></div>
@@ -291,7 +291,6 @@
           '<div class="gnums g4"><div class="t-sun"><span>Sunlight</span><b>' + le + P(r.rs.sun_pct) + '</b></div><div class="t-earth"><span>Earth in view</span><b>' + le + P(r.rs.earth_pct) + '</b></div>' +
           '<div class="t-night"><span>Longest night</span><b>' + r.rs.longest_night_h + ' h</b></div><div class="t-psr"><span>To permanent shadow</span><b>' + (s.psr_km != null ? s.psr_km.toFixed(1) + ' km' : 'unknown') + '</b>' + (out ? '<small>outside your shadow filter</small>' : '') + '</div></div>' +
           '<div class="gfor">' + st.mast + ' m mast · ' + y0 + (s.custom ? ' · approximate' : '') + (s.truncated ? ' · best case' : '') + (c1(s) && st.mast === '0' ? ' ' + tip('About Connecting Ridge at ground level', C1_TIP) : '') + '</div>' +
-          zoneLine(s) +
           (m && !m.ok ? '<div class="gmis warn"><b>⚠ ' + (cut > 0 ? m.text.slice(0, cut + 1) : m.text) + '</b></div>' : '') +
           '<button class="go" type="button" id="gPlan">Plan a landing here <span aria-hidden="true">→</span></button>' +
           '<details class="gmore"><summary>More detail</summary>' +
