@@ -3060,6 +3060,106 @@ details.fold.tab-on > summary h2::after{content:''}
 })();
 </script>
 <style>
+/* Missions top cleanup (team draft, 2026-11-15 ~15:45): presentation only. Card + one compact settings row, then the tabs. */
+html.framed .top .eyebrow{display:none}
+.app{gap:14px}
+.top h1{font-size:clamp(26px,3vw,34px)}
+.top h1 .info-wrap{vertical-align:middle;margin-left:8px}
+.top .lede{display:none}
+.glance{padding:12px 16px;gap:10px 24px}
+.glance h2{font-size:22px}
+.g-from{margin:6px 0 0;font-size:12.5px;color:var(--muted);display:flex;align-items:center;flex-wrap:wrap;gap:2px}
+.g-from b{color:var(--ink);font-weight:600}
+.g-act{align-items:flex-start;gap:4px}
+.g-act button.primary{padding:11px 18px;font-size:14px}
+.g-act .g-links{display:flex;gap:4px 14px;flex-wrap:wrap;padding-left:2px}
+.g-act .g-links button{border:0;background:none;padding:4px 0;font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.g-act .g-links button:hover{color:var(--ink)}
+.setup{padding:8px 12px;gap:10px 16px}
+.adj-btn{font:500 13px/1 var(--f-body);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:4px;padding:9px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.adj-btn:hover{border-color:var(--ink)}
+.adj-btn small{color:var(--muted);font-size:12.5px}
+.adj-btn .chev{display:inline-block;transition:transform .15s}
+.adj-btn[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.adj-panel{flex-basis:100%;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding-top:10px;border-top:1px solid var(--line)}
+#landingOut{display:none}
+/* tabs first (Eren 15 Nov): the section bar is the first thing on the page */
+.app > .jump:first-child{margin-top:-14px}
+.app > .top{margin-top:10px;padding-top:14px;border-top:1px solid var(--line)}
+/* visuals first, data after: the readout chips sit under each view instead of on top of it */
+.hud.hud-below{position:static;margin-top:8px;color:var(--ink);pointer-events:auto}
+.hud.hud-below span{background:var(--panel);border:1px solid var(--line)}
+.hud.hud-below span.good{color:var(--ok)} .hud.hud-below span.bad{color:var(--warn)}
+.hud.hud-below span.crewtag{background:#2CC3B1;color:#05201C;border-color:transparent}
+@media (max-width:980px){.g-act{flex-direction:column}}
+</style>
+<script>
+/* Missions top cleanup: moves existing elements only (ids and listeners kept), so Adrian's code still finds everything. */
+(function(){
+  function $(s){ return document.querySelector(s); }
+  function tip(id, label, html, cls){
+    var w = document.createElement('span'); w.className = 'info-wrap';
+    w.innerHTML = '<button type="button" class="info-i" aria-label="' + label + '" aria-describedby="' + id + '">i</button><span class="info-tip' + (cls ? ' ' + cls : '') + '" id="' + id + '" role="tooltip"></span>';
+    w.querySelector('.info-tip').innerHTML = html; return w;
+  }
+  /* 1) header: the intro sentence goes into an (i) next to the title */
+  var lede = $('.top .lede'), h1 = $('.top h1');
+  if (lede && h1){
+    var src = lede.querySelector('.info-tip');
+    var first = lede.cloneNode(true); var old = first.querySelector('.info-wrap'); if (old) old.remove();
+    h1.appendChild(tip('tipIntro', 'About this page', '<span>' + first.innerHTML.trim() + '</span>' + (src ? src.innerHTML : ''), 'left'));
+  }
+  /* 2) the "From the landing calendar" sentence becomes one quiet line in the card; the full sentence goes in its (i) */
+  var fc = $('#fromCal'), head = $('#glance > div');
+  if (fc && head){
+    var line = document.createElement('p'); line.className = 'g-from'; line.hidden = true; head.appendChild(line);
+    var busy = false;
+    function sync(){
+      if (busy) return; busy = true;
+      var t = fc.textContent || '', m = /^From the landing calendar/.test(t) && t.match(/Launch worked back to (.+?) from /);
+      if (!fc.hidden && m){
+        line.innerHTML = 'From your landing calendar · launch worked back to <b></b>';
+        line.querySelector('b').textContent = m[1];
+        line.appendChild(tip('tipFromCal', 'About this mission', '<span></span>', 'left'));
+        line.querySelector('#tipFromCal span').textContent = t;
+        line.hidden = false; fc.style.display = 'none';
+      } else { line.hidden = true; fc.style.display = ''; }   /* errors (unknown site, no data) stay visible as before */
+      busy = false;
+    }
+    new MutationObserver(sync).observe(fc, {childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['hidden']});
+    sync();
+  }
+  /* 3) one primary action; launch and landing replays become small text links */
+  var gp = $('#gPlay'), gl = $('#gLaunch'), gd = $('#gLand');
+  if (gp && gl && gd){
+    gp.textContent = '▶ Play mission';
+    gl.textContent = 'Watch launch'; gd.textContent = 'Watch landing';
+    var links = document.createElement('div'); links.className = 'g-links'; links.appendChild(gl); links.appendChild(gd);
+    gp.parentNode.appendChild(links);
+  }
+  /* 5) tabs at the very top of the page */
+  var app = $('.app'), jump = $('#jump');
+  if (app && jump) app.insertBefore(jump, app.firstChild);
+  /* 5b) the open view comes right under the tabs; title, mission card and settings follow it (Eren 15 Nov) */
+  if (app) ['.top', '#fromCal', '#glance', '.setup'].forEach(function(sel){ var el = $(sel); if (el) app.appendChild(el); });
+  /* 6) visuals first, then data: move each readout row from on top of its view to just under it */
+  [['hud', 'vp'], ['surfHud', 'surfWrap'], ['orbHud', 'orbWrap']].forEach(function(x){
+    var h = document.getElementById(x[0]), v = document.getElementById(x[1]);
+    if (h && v && v.parentNode){ h.classList.add('hud-below'); v.parentNode.insertBefore(h, v.nextSibling); }
+  });
+  /* 4) settings: mission type stays visible, everything else folds under "Adjust mission" */
+  var setup = $('.setup'), seg = setup && setup.querySelector('.seg');
+  if (setup && seg){
+    var panel = document.createElement('div'); panel.className = 'adj-panel'; panel.id = 'adjPanel'; panel.hidden = true;
+    Array.prototype.slice.call(setup.children).forEach(function(ch){ if (ch !== seg) panel.appendChild(ch); });
+    var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'adj-btn'; btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', 'adjPanel');
+    btn.innerHTML = '<span class="chev">▸</span>Adjust mission <small>launch site, date, trip and stay, mast, relay</small>';
+    btn.addEventListener('click', function(){ var open = panel.hidden; panel.hidden = !open; btn.setAttribute('aria-expanded', open ? 'true' : 'false'); });
+    setup.appendChild(btn); setup.appendChild(panel);
+  }
+})();
+</script>
+<style>
 /* Planner hooks (not Adrian's design): only used when this page sits inside the South Pole Navigator's Missions panel */
 html.framed .top .pages{display:none}
 .spn-close{font:600 12.5px var(--f-mono);letter-spacing:.04em;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:8px 12px;cursor:pointer;white-space:nowrap;align-self:flex-start}
