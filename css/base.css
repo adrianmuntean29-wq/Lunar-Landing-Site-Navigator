@@ -2,12 +2,12 @@
    Areas style only inside their own container (#scene, #panel, #drawer) in their own css file. */
 /* PROJECT PALETTE (Eren 2026-11-14 ~20:20, "lunar mission control"; DECISIONS item 18, open until Eren approves the screenshots).
    Use these names everywhere; no hex in area css/js. --sun/--earth = text + lines; --cell-sun/--cell-earth = calm calendar fills;
-   --mis = other missions; --psr = permanent shadow; --sel = selected site; --now = today/clock marker (neutral outline).
+   --mis = other missions; --psr = permanent shadow; --zone = candidate landing zones (team analysis); --sel = selected site; --now = today/clock marker (neutral outline).
    *-3d = fixed variants for marks drawn ON the dark 3D picture (same in both themes). */
-:root{--bg:#111315;--panel:#17191C;--panel2:#1D2024;--line:#2A2E33;--ink:#E8EAED;--muted:#8C939B;--sun:#D8B25C;--earth:#5E9CD3;--go:#5E9CD3;--ok:#C9A13B;--bad:#E0A35A;--psr:#6FA9A3;--warn:#E8743B;--mis:#D08770;--sel:#4FC3F7;--now:#E6E8EB;--cell-sun:#A88443;--cell-earth:#3F6F99;--tagbg:#3A2A12;--tip:rgba(23,25,28,.96);--shadow:rgba(0,0,0,.5)}
+:root{--bg:#111315;--panel:#17191C;--panel2:#1D2024;--line:#2A2E33;--ink:#E8EAED;--muted:#8C939B;--sun:#D8B25C;--earth:#5E9CD3;--go:#5E9CD3;--ok:#C9A13B;--bad:#E0A35A;--psr:#6FA9A3;--warn:#E8743B;--mis:#D08770;--zone:#A58BCF;--sel:#4FC3F7;--now:#E6E8EB;--cell-sun:#A88443;--cell-earth:#3F6F99;--tagbg:#3A2A12;--tip:rgba(23,25,28,.96);--shadow:rgba(0,0,0,.5)}
 /* light theme for the projector (Eren 2026-11-14): same token names, darker accents for contrast on white. Set by shell.js on <html data-theme>. */
-:root[data-theme=light]{--bg:#F3F1EC;--panel:#FFFFFF;--panel2:#ECE9E3;--line:#CFCBC2;--ink:#17191C;--muted:#555C64;--sun:#8C6410;--earth:#285F94;--go:#285F94;--ok:#7D5F0C;--bad:#A65A16;--psr:#2D766F;--warn:#B8470F;--mis:#A5523C;--sel:#0A6E9C;--now:#2A2D31;--cell-sun:#D9BE7E;--cell-earth:#8FB2D3;--tagbg:#F6E6C4;--tip:rgba(255,255,255,.98);--shadow:rgba(0,0,0,.18);color-scheme:light}
-:root{color-scheme:dark;--sun-3d:#E0BC66;--earth-3d:#6FA6D8;--mis-3d:#D99580;--psr-3d:#7FBDB6;--sel-3d:#4FC3F7}
+:root[data-theme=light]{--bg:#F3F1EC;--panel:#FFFFFF;--panel2:#ECE9E3;--line:#CFCBC2;--ink:#17191C;--muted:#555C64;--sun:#8C6410;--earth:#285F94;--go:#285F94;--ok:#7D5F0C;--bad:#A65A16;--psr:#2D766F;--warn:#B8470F;--mis:#A5523C;--zone:#6A4E9E;--sel:#0A6E9C;--now:#2A2D31;--cell-sun:#D9BE7E;--cell-earth:#8FB2D3;--tagbg:#F6E6C4;--tip:rgba(255,255,255,.98);--shadow:rgba(0,0,0,.18);color-scheme:light}
+:root{color-scheme:dark;--sun-3d:#E0BC66;--earth-3d:#6FA6D8;--mis-3d:#D99580;--psr-3d:#7FBDB6;--sel-3d:#4FC3F7;--zone-3d:#B49DDC}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{height:100%}

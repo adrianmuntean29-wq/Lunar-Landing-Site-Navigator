@@ -15,6 +15,20 @@ available or OSI-licensed, with its licence listed here.
 | NASA GSFC PGDA product 90: LOLA south-pole DEM `LDEM_80S_80MPP_ADJ` and `LDEM_80S_20MPP_ADJ` (Barker et al. 2023, doi:10.3847/PSJ/acf3e1; data doi:10.60903/gsfcpgda-lola-spole) | Terrain heights, horizon masks, terrain grids and tiles, south-polar relief map | https://pgda.gsfc.nasa.gov/products/90 | NASA data; cite paper + data DOI |
 | NASA GSFC PGDA product 90: permanently shadowed regions `LPSR_80S_20MPP_ADJ` | `data/psr.json`, distance to permanent shadow | https://pgda.gsfc.nasa.gov/products/90 | NASA data; cite with the DEM |
 | NASA GSFC PGDA product 69, LOLA illumination and Earth-visibility maps (Mazarico et al.) | Validation: our sunlight and Earth-visibility percentages compared with these maps | https://pgda.gsfc.nasa.gov/products/69 | NASA data |
+| NASA GSFC PGDA product 78: High-Resolution LOLA Topography for Lunar South Pole Sites (Barker), site regions | The six boxes our engine searched for their best-lit point (sites E-I) | https://pgda.gsfc.nasa.gov/products/78 | NASA data |
+| NASA GSFC PGDA product 90: surface roughness `LDRM_80S_1000MPP_ADJ_ROUGH_100M` / `_200M` | Input to the team's candidate landing zones (`data/zones.json`) | https://pgda.gsfc.nasa.gov/products/90 | NASA data; cite with the DEM |
+| LRO NAC south-pole mosaic (1 m) and LRO WAC south-pole mosaic (100 m), served by NASA Moon Trek (WMTS tiles) | "Seen from orbit", descent and ascent cameras in `mission.html` (loaded live, not stored) | https://trek.nasa.gov/moon/ | NASA data (LRO, LROC/ASU) |
+| NASA NTRS 20250011660, Artemis candidate regions and criteria | Background for the site list | https://ntrs.nasa.gov/citations/20250011660 | NASA document |
+| NASA, LRO images of the IM-1 Odysseus lander | IM-1 landing position | https://www.nasa.gov/missions/lro/nasas-lro-images-intuitive-machines-odysseus-lander/ | NASA content |
+
+## Other data
+| Source | Used for | Link | Licence / terms |
+|---|---|---|---|
+| Open-Meteo forecast API and historical weather API (ERA5 reanalysis) | Launch-site weather in the mission view (loaded live, not stored) | https://open-meteo.com/ | Data CC BY 4.0, attribution "Weather data by Open-Meteo.com" |
+| Wikipedia, "List of artificial objects on the Moon" and "Mons Mouton" | Coordinates of past landings shown for reference | https://en.wikipedia.org/wiki/List_of_artificial_objects_on_the_Moon | CC BY-SA 4.0 (facts cited, no text copied) |
+| LROC image page of the IM-2 target | Site J (IM-2 Athena target) | https://lroc.im-ldi.com/images/1401 | LROC/ASU, NASA mission data |
+| Space Odyssey Hub, Spaceport Nova Scotia | Launch-site coordinates | https://spaceodysseyhub.com/compare/spaceports/spaceport-nova-scotia | Facts cited |
+| Candidate landing zones (`data/zones.json`) | Team analysis by Tudor in ArcGIS from LOLA slope and hillshade, PGDA 90 roughness and permanently shadowed regions; drawn as "Candidate zones (team analysis)", not NASA regions | this repository | MIT (our work) |
 
 ## Images and textures
 | File | Source | Credit |
@@ -35,9 +49,12 @@ No music, sound effects, voice or AI-generated images.
 - Mazarico, E. et al. (2011). Illumination conditions of the lunar polar regions using LOLA topography. *Icarus* 211. Horizon method.
 - Barker, M. K. et al. (2023). LOLA south-pole DEM (PGDA product 90). *Planetary Science Journal*, doi:10.3847/PSJ/acf3e1.
 - Dwyer Cianciolo, A. (2024). "Artemis Human Landing System Update", NASA presentation, NTRS 20240009596.
-  Reference values next to the sliders ("as listed in a NASA presentation (2024)").
+  The Earth-contact default (25%), quoted as listed there ("as listed in a NASA presentation (2024)").
 - NASA (2011). Recommendations to Space-Faring Entities: How to Protect and Preserve the Historic and Scientific Value of
   U.S. Government Lunar Artifacts, Rev A. Keep-out distances 2.0 km / 0.5 km (non-binding).
+- Meeus, J. (1998). *Astronomical Algorithms*, 2nd ed., Willmann-Bell. Moon and Sun positions for the mission view's 3D scene
+  and launch times (checked against JPL Horizons).
+- IAU sidereal time formula (Greenwich mean sidereal time) for the launch-site rotation.
 - Other-missions positions (`data/missions.csv`): each row cites its source in the file (LROC image pages, agency releases,
   USGS Gazetteer of Planetary Nomenclature, published papers).
 
@@ -45,7 +62,7 @@ No music, sound effects, voice or AI-generated images.
 | Package | Version | Licence | Where |
 |---|---|---|---|
 | three.js | 0.160.0 (jsDelivr CDN) | MIT | 3D views (page) |
-| IBM Plex Sans, IBM Plex Mono (Google Fonts) | | SIL Open Font License 1.1 | page |
+| IBM Plex Sans, IBM Plex Mono (Google Fonts) | | SIL Open Font License 1.1 | pages |
 | NumPy | 2.4.2 | BSD-3-Clause (with bundled MIT/0BSD/Zlib/CC0 parts) | engine |
 | SciPy | 1.17.1 | BSD-3-Clause | engine |
 | rasterio | 1.5.2 | BSD-3-Clause | engine (DEM reading) |

@@ -82,6 +82,8 @@ window.App = (function(){
     missions: {on: true, caution: 5, cn: true},
     // custom landing spot (App.addSpot): null, or {lat, lon, label, n}. A change of 'spot' means App.sites changed: rebuild per-site lists/pins.
     spot: null,
+    // candidate landing zones layer (Tudor's team analysis, data/zones.json): shown or hidden
+    zones: true,
     // 'dark' | 'light' (projector). shell.js sets it and <html data-theme>; react to key 'theme' to redraw canvases / three.js colours.
     theme: document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
   };
@@ -89,7 +91,7 @@ window.App = (function(){
   // "use NASA's as our own, sliders stay changeable"). Never call it a "NASA standard". len / sun / night are example values.
   const PRESETS = {robotic: {len: 13, sun: 70, earth: 25, night: 48}, crew: {len: 6, sun: 95, earth: 25, night: 0}};
   const listeners = [];
-  let sites = [], ser = [], sj = null, psr = null, eph = null, cache = {};
+  let sites = [], ser = [], sj = null, psr = null, eph = null, cache = {}, zones = [], zonesJson = null;
 
   function seriesOf(site){
     const H = (state.days + 61)*24;   // +61 days: missions may end after the period (porkchop goes to 60 days)
@@ -204,6 +206,31 @@ window.App = (function(){
     const p = ephAt(j), su = azel(site.lat, site.lon, p.sun), ea = azel(site.lat, site.lon, p.earth);
     return {sunLit: sunFraction(su.el, profAt(m, su.az)), earthVis: ea.el - profAt(m, ea.az) + 0.95 > 0};
   }
+  /* ---------- candidate landing zones (Tudor, team analysis; data/zones.json written by the engine) ----------
+     App.zoneAt(lat, lonE) -> {id, name, inside, km} for the zone containing the point (km 0), else the nearest by edge
+     distance (km, polar stereographic metres, same projection as llXY). null when there are no zones. */
+  function segDist(px, py, ax, ay, bx, by){
+    const dx = bx - ax, dy = by - ay, L = dx*dx + dy*dy, t = L ? Math.max(0, Math.min(1, ((px - ax)*dx + (py - ay)*dy)/L)) : 0;
+    return Math.hypot(px - ax - t*dx, py - ay - t*dy);
+  }
+  function zoneAt(lat, lon){
+    if (!zones.length) return null;
+    const [x, y] = llXY(+lat, ((+lon % 360) + 360) % 360);
+    let best = null;
+    for (const z of zones){
+      let inside = false, d = Infinity;
+      for (const ring of z.rings) for (let a = 0, b = ring.length - 1; a < ring.length; b = a++){
+        const [ax, ay] = ring[a], [bx, by] = ring[b];
+        if ((ay > y) !== (by > y) && x < (bx - ax)*(y - ay)/(by - ay) + ax) inside = !inside;   // even-odd: holes work too
+        const s = segDist(x, y, ax, ay, bx, by); if (s < d) d = s;
+      }
+      const km = inside ? 0 : d/1000;
+      if (!best || km < best.km) best = {id: z.id, name: z.name, inside, km};
+      if (inside) break;
+    }
+    return best;
+  }
+
   /* remove the custom spot (selects site 0 if it was selected) */
   function clearSpot(){
     if (!sites.some(s => s.custom)) return;
@@ -240,6 +267,16 @@ window.App = (function(){
           r25: {sun_pct: mm('sun_pct'), earth_pct: mm('earth_pct'), longest_night_h: mm('longest_night_h')}, r50: o.range_50m};
       }
     } catch (err) { console.warn('site_ranges.json not loaded', err); }
+    // candidate zones (optional file; missing = App.zones stays [], no error). Checks the file's x/y against our projection once.
+    try {
+      const zr = await fetch(DATA + 'zones.json');
+      if (zr.ok){
+        zonesJson = await zr.json(); zones = zonesJson.zones || [];
+        const z = zones.find(q => isFinite(q.lat) && isFinite(q.x));
+        if (z){ const [x, y] = llXY(z.lat, z.lon_e), off = Math.hypot(x - z.x, y - z.y)/1000;
+          if (off > 1) console.warn('zones.json: x/y differ from the page projection by ' + off.toFixed(1) + ' km (zone ' + z.id + ')'); }
+      }
+    } catch (err) { zones = []; zonesJson = null; }
     buildSeries();
     if (window.Missions && Missions.load) await Missions.load();   // missions.js is loaded right after core.js
     requestAnimationFrame(tick);
@@ -249,6 +286,7 @@ window.App = (function(){
     // constants + data
     R, D2R, DATA, PRESETS, ready,
     get state(){ return state; }, get sites(){ return sites; }, get sitesJson(){ return sj; }, get psr(){ return psr; }, get eph(){ return eph; },
+    get zones(){ return zones; }, get zonesJson(){ return zonesJson; }, zoneAt,
     // maths (read-only use)
     ephAt, azel, jd, date, profAt, sunFraction, mask, stateAt, next, moonInfo,
     series: i => ser[i], wins, winsLong,

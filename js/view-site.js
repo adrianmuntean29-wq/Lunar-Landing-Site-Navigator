@@ -192,7 +192,28 @@ function rebuildTerrain(){
   const y = groundAt(x, z) ?? 0, q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(x/R, 1, z/R).normalize(), new THREE.Vector3(0, 1, 0));
   world.quaternion.copy(q); world.position.copy(new THREE.Vector3(x, y, z).applyQuaternion(q).negate()); world.updateMatrixWorld(true);
   centreXYZ = [x, y, z];
-  buildFocusRing(x, z); buildRings(); buildPole(); buildPsr(x, z); buildMissions(); tv++; labKey = ''; noteText();
+  buildFocusRing(x, z); buildRings(); buildPole(); buildPsr(x, z); buildZones(); buildMissions(); tv++; labKey = ''; noteText();
+}
+/* candidate zones (Tudor's team analysis in ArcGIS, via engine-3 data/zones.json; Eren approved 14 Nov): outlines draped on the best
+   terrain layer, lifted like the PSR lines. Display only, not NASA regions. Shown while App.state.zones !== false (key 'zones'). */
+let zoneGroup = null, zoneData = null, zoneMat = null;
+async function loadZones(){
+  try { await App.ready; if (App.zones){ zoneData = App.zones; buildZones(); return; }   // core already loaded them: no second request
+    const r = await fetch(App.DATA + 'zones.json'); if (!r.ok) return; zoneData = await r.json(); buildZones(); }
+  catch (e){ console.warn('view-site: zones not loaded', e); }   // missing file: no zones, everything else works
+}
+function buildZones(){
+  if (!zoneGroup) return;
+  zoneGroup.children.slice().forEach(o => { zoneGroup.remove(o); o.geometry.dispose(); });
+  const zs = zoneData && (zoneData.zones || zoneData); if (!Array.isArray(zs)) return;
+  const pos = [];
+  for (const zn of zs) for (const ring of zn.rings || []){ let prev = null;
+    for (const [X, Y] of ring){ const x = X/1000, z = -Y/1000, L = layerAt(x, z); if (!L){ prev = null; continue; }
+      const p = [x, sampleL(L, x, z) + 0.15 + L.px*0.12, z]; if (prev) pos.push(...prev, ...p); prev = p; } }
+  if (!pos.length) return;
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  zoneGroup.add(new THREE.LineSegments(g, zoneMat));
+  zoneGroup.visible = App.state.zones !== false;
 }
 /* latitude rings every 1 deg from 89 S to 85 S (~30-152 km from the pole, so they reach the outer sites), draped on the best
    terrain layer so hills no longer cut them; they fade with the focus fog. Labels ("88° S") are placed in updateScene(). */
@@ -260,6 +281,9 @@ function buildScene(){
   psrGroup = new THREE.Group(); world.add(psrGroup);
   psrMat = focusFog(new THREE.LineDashedMaterial({color: tok('--psr-3d', '#7FBDB6'), dashSize: 0.6, gapSize: 0.4}));
   $('#lyPsr').onchange = e => psrGroup.visible = e.target.checked;
+  zoneMat = new THREE.LineBasicMaterial({color: tok('--zone-3d', '#B59CF0'), transparent: true, opacity: 0.9});
+  zoneGroup = new THREE.Group(); world.add(zoneGroup); loadZones();
+  { const zb = $('#lyZones'); if (zb){ zb.checked = App.state.zones !== false; zb.onchange = e => App.set({zones: e.target.checked}, 'scene'); } }   // switch markup: scene-core.js (coordinator)
   $('#lyRings').onchange = e => ringGroup.visible = e.target.checked;
   $('#lyMis').onchange = e => App.set({missions: Object.assign({}, App.state.missions, {on: e.target.checked})}, 'scene');   // shared state: panel and drawer follow
   const shadows = on => { renderer.shadowMap.enabled = on; world.traverse(o => { if (o.isMesh) o.material.needsUpdate = true; }); };
@@ -417,6 +441,16 @@ function updateScene(){
     Object.assign(e.style, {position: 'absolute', left: best[0] + 'px', top: best[1] + 'px', transform: 'translate(-50%,-50%)', font: '500 10px "IBM Plex Mono", monospace',
       color: 'var(--c-muted)', textShadow: '0 1px 3px var(--c-sh)', whiteSpace: 'nowrap', pointerEvents: 'auto', cursor: 'default'});
     lab.appendChild(e); placed.push({L: best[0], T: best[1], w: 40, h: 14}); }
+  // candidate zones: one tag only, on the zone nearest the selected site (declutter; the panel line names it too)
+  const zs = zoneData && (zoneData.zones || zoneData), za = st.zones !== false && Array.isArray(zs) && typeof App.zoneAt === 'function' && site ? App.zoneAt(site.lat, site.lon) : null;
+  const zn = za && zs.find(q => q.id === za.id);
+  if (zn && zn.x != null){ const x = zn.x/1000, z = -zn.y/1000, y = groundAt(x, z);
+    if (y != null){ const v = P(x, y + 0.3, z).project(camera), L = (v.x*0.5 + 0.5)*w, T = (-v.y*0.5 + 0.5)*h, txt = zn.name + ' · team analysis', ew = estW(txt, 6.4);
+      if (v.z <= 1 && L > ew/2 && L < w - ew/2 && T > 70 && T < h - 20 && fits(L, T, ew, 15)){ const e = document.createElement('div'); e.textContent = txt;
+        e.title = 'Candidate zone (team analysis by Tudor in ArcGIS). Not a NASA region.' + (za.inside ? ' The selected site is inside it.' : ' ' + za.km.toFixed(1) + ' km from the selected site.');
+        Object.assign(e.style, {position: 'absolute', left: L + 'px', top: T + 'px', transform: 'translate(-50%,-50%)', font: '500 10.5px "IBM Plex Mono", monospace',
+          color: 'var(--c-zone, #B49DDC)', textShadow: '0 1px 3px var(--c-sh)', whiteSpace: 'nowrap', pointerEvents: 'auto', cursor: 'help'});
+        lab.appendChild(e); placed.push({L, T, w: ew, h: 15}); } } }
   legendText(out);
 }
 function legendText(out){
@@ -437,6 +471,7 @@ register('region', {
   show(on){ $('#layersBox').hidden = !on; $('#labels').hidden = !on; root.querySelector('.zoom').hidden = !on; controls.enabled = on; if (on && terrDirty) rebuildTerrain(); if (note){ note.hidden = !on; noteText(); } },
   frame(){ if (terrDirty) rebuildTerrain(); controls.update(); updateScene(); renderer.render(scene, camera); },
   onState(keys){ if (keys.has('missions')){ buildMissions(); $('#lyMis').checked = (App.state.missions || {}).on !== false; }
+    if (keys.has('zones')){ labKey = ''; if (zoneGroup) zoneGroup.visible = App.state.zones !== false; const zb = $('#lyZones'); if (zb) zb.checked = App.state.zones !== false; }
     if (keys.has('spot') || keys.has('sites')){ labKey = ''; buildMissions(); }   // App.sites changed length: pins rebuild on the next frame
     if (keys.has('site') || keys.has('spot') || keys.has('sites')) kick(); },   // re-centre now if this view is on (no wait for a frame)
   ready(){ $('#lyMis').checked = (App.state.missions || {}).on !== false; buildMissions(); },

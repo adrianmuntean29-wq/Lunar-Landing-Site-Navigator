@@ -46,6 +46,7 @@
       <!-- Plan a landing, 1-second layout (Eren 14 Nov ~21:15): one answer, one bar, four sliders; the rest folds or sits in (i) tips -->
       <div class="sitepick plHead"><h2 class="siteName"></h2><span id="plInfo"></span></div>
       <small class="apx plApx" hidden></small>
+      <small class="plZone" id="plZone" hidden></small>
       <section class="verdict" id="verdict" aria-live="polite">
         <div class="vn"><b id="rN"></b><span id="rNs"></span></div>
         <div class="plStack" id="rStack" aria-hidden="true"></div>
@@ -83,6 +84,10 @@
   const APX_TIP = 'Horizon from coarse terrain grids, not the exact masks of the named sites. It misses nearby bumps, so sun and Earth % can be far off. Distance to permanent shadow is not computed.';
   let tipN = 0;
   root.querySelectorAll('.spotf').forEach(f => { f.innerHTML = '<div class="addspot"><label>Latitude<br><input class="sLat" type="number" step="0.01" value="-89.2" aria-label="Latitude, degrees (negative = south)"></label><label>Longitude E<br><input class="sLon" type="number" step="0.1" value="120" aria-label="East longitude, degrees"></label><button class="btn sAdd" type="button">Add</button><button class="btn sDel" type="button" hidden>Remove</button></div><p class="note sMsg">Any spot within 290 km of the pole. Its horizon is approximate.</p>'; });
+  // candidate zones (Tudor's team analysis, Eren approved ~21:55): one line for the selected site in Compare sites. Never "NASA zones", never "ice".
+  const zoneTip = () => ((App.zonesJson && App.zonesJson.label) || 'Candidate zones (team analysis)') + ': made by Tudor in ArcGIS (LOLA slope and hillshade, PGDA 90 roughness, permanently shadowed regions). Not NASA regions.';
+  const zoneLine = s => { const z = App.zoneAt && App.state.zones !== false ? App.zoneAt(s.lat, s.lon) : null; if (!z) return '';
+    return '<div class="gzone">' + (z.inside ? 'Inside candidate zone ' + z.id : z.km.toFixed(1) + ' km from candidate zone ' + z.id) + ' ' + tip('About candidate zones', zoneTip()) + '</div>'; };
   const tip = (label, text) => { const id = 'apxTip' + (tipN++); return '<span class="info-wrap"><button type="button" class="info-i" aria-label="' + label + '" aria-describedby="' + id + '">i</button><span class="info-tip left" id="' + id + '" role="tooltip">' + text + '</span></span>'; };
   // truncated horizon (coordinator 14 Nov, core site.truncated + edge_rays): missing far terrain can only raise the horizon
   const TRUNC_TXT = s => 'Part of the horizon is beyond our map: ' + s.edge_rays + ' of 360 directions reach the map edge before the terrain stops rising. Missing terrain can only hide the Sun or Earth more, so the true values can be lower, never higher.';
@@ -212,6 +217,11 @@
     const rt = rangeText(s);
     $('#plInfo').innerHTML = tip('About this site', (s.custom ? 'Your own spot (' + s.label + ').' : (s.kind ? s.kind.charAt(0).toUpperCase() + s.kind.slice(1) + '.' : '')) +
       (rt ? ' ' + rt + ' ' + RANGE_TIP(s) : '') + (s.psr_km != null ? ' ' + s.psr_km.toFixed(1) + ' km to the nearest permanently shadowed area.' : ''));
+    // candidate zones (Tudor's team analysis; App.zoneAt from core.js once data/zones.json lands): one line + (i). Never "NASA" regions, never "ice".
+    const zEl = $('#plZone'), za = typeof App.zoneAt === 'function' && st.zones !== false ? App.zoneAt(s.lat, s.lon) : null;
+    zEl.hidden = !za; if (za){ const zn = za.zone || za, nm = zn.name || ('candidate zone ' + zn.id), km = za.km ?? za.dist_km ?? za.distance_km;
+      zEl.innerHTML = '<span>' + (za.inside ? 'Inside ' + nm : (km != null ? km.toFixed(1) + ' km from ' : 'Nearest: ') + nm) + '</span> ' +
+        tip('About candidate zones', 'Candidate zones: team analysis by Tudor in ArcGIS (LOLA slope and hillshade, PGDA 90 roughness, permanently shadowed regions). Not NASA regions.'); }
   }
   function others(){
     const box = $('#others');
@@ -244,12 +254,11 @@
          Selected row = now (Sun/Earth), 4 big numbers, mission warning, plan button; everything else under "More detail". */
       const le = s.truncated ? '≤ ' : '', warns = [];
       if (m && !m.ok) warns.push('another mission plans to land nearby');
-      if (s.truncated) warns.push('best case: part of the horizon is outside our map, so real numbers can only be lower');
-      if (s.custom) warns.push('your spot: ' + s.label + ', numbers approximate');
-      if (hist) warns.push('historic target, for comparison only');
+      if (hist) warns.push('historic target, for comparison only');   // ⚠ only for things a planner must act on; "best case" is the ≤ sign, your spot is the ★
       const wn = warns.length ? '<span class="wn" title="' + warns.join('; ') + '" aria-label="Warning: ' + warns.join('; ') + '">⚠</span>' : '';
+      const ddTip = s.truncated ? ' title="Best case: part of the horizon is outside our map, so the real number can only be lower"' : s.custom ? ' title="Your spot: ' + s.label + ', approximate"' : '';
       let h = '<div class="srow' + (sel ? ' sel' : '') + (out ? ' out' : '') + '" data-i="' + r.i + '" role="button" tabindex="0" aria-pressed="' + sel + '">' +
-        '<div class="rh"><span class="num">' + (s.custom ? '★' : r.i + 1) + '</span><span class="nm">' + s.name + '</span>' + wn + '<span class="dd"><b>' + le + r.ok + '</b> good days</span></div>' +
+        '<div class="rh"><span class="num">' + (s.custom ? '★' : r.i + 1) + '</span><span class="nm">' + s.name + '</span>' + wn + '<span class="dd"' + ddTip + '><b>' + (s.custom ? '~ ' : le) + r.ok + '</b> good days</span></div>' +
         '<div class="gbar" title="' + r.ok + ' of ' + r.n + ' landing days in ' + y0 + ' work"><i style="width:' + (r.n ? r.ok/r.n*100 : 0).toFixed(1) + '%"></i></div>';
       if (sel){ const poleKm = 2*1737.4*Math.tan((90 + raw.lat)/2*Math.PI/180), cut = m ? m.text.indexOf('. ') : -1;
         h += '<div class="rx">' +
@@ -258,6 +267,7 @@
           '<div class="gnums g4"><div class="t-sun"><span>Sunlight</span><b>' + le + P(r.rs.sun_pct) + '</b></div><div class="t-earth"><span>Earth in view</span><b>' + le + P(r.rs.earth_pct) + '</b></div>' +
           '<div class="t-night"><span>Longest night</span><b>' + r.rs.longest_night_h + ' h</b></div><div class="t-psr"><span>To permanent shadow</span><b>' + (s.psr_km != null ? s.psr_km.toFixed(1) + ' km' : 'unknown') + '</b>' + (out ? '<small>outside your shadow filter</small>' : '') + '</div></div>' +
           '<div class="gfor">' + st.mast + ' m mast · ' + y0 + (s.custom ? ' · approximate' : '') + (s.truncated ? ' · best case' : '') + '</div>' +
+          zoneLine(s) +
           (m && !m.ok ? '<div class="gmis warn"><b>⚠ ' + (cut > 0 ? m.text.slice(0, cut + 1) : m.text) + '</b></div>' : '') +
           '<button class="go" type="button" id="gPlan">Plan a landing here <span aria-hidden="true">→</span></button>' +
           '<details class="gmore"><summary>More detail</summary>' +

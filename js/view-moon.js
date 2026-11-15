@@ -69,7 +69,7 @@ async function buildOuter(){   // 3D terrain ring 57 km -> 80.3 S, so the real s
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vLoc;\nuniform sampler2D polarNrm;')
       .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>' + POLAR_GLSL).replace('#include <lights_fragment_begin>', LIGHTS_EDGE); };
   gOut = buildTerrain(OMETA, OHGT, rho => rho >= RIN && rho <= ROUT, outTaper, mat);
-  capColored = false; gsl.forEach(g => { g.p = null; g.boxSel = null; });   // recolour both meshes; markers beyond the fine cap move onto the new ground
+  capColored = false; gsl.forEach(g => { g.p = null; g.boxSel = null; }); buildZones();   // recolour both meshes; markers beyond the fine cap move onto the new ground
 }
 function colorCap(){   // sample the NASA colour map at each terrain vertex (sRGB -> linear)
   const img = moonTex().image, cv = document.createElement('canvas'); cv.width = img.width; cv.height = img.height;
@@ -102,8 +102,9 @@ function buildGlobe(){
   globe.add(new THREE.Points(sg, new THREE.PointsMaterial({color: '#8E96A0', size: 1.2, sizeAttenuation: false})));
   buildSunEarth();
   buildCap(); buildOuter().catch(e => console.error('Moon view: outer terrain failed to load', e));
-  buildCallouts();
+  buildCallouts(); buildZones();
   root.querySelectorAll('#gBar button').forEach(b => b.onclick = () => gFocus(b.dataset.g));
+  Object.assign($('#gBar').style, {top: 'auto', bottom: '12px', left: '50%', transform: 'translateX(-50%)'});   // Eren ~22:05: View bar bottom centre (inline: own element; coordinator may move it to scene.css)
   gFocus('pole', null, true);
 }
 // Sun (disc + glow) and Earth (NASA Blue Marble, lit by the real Sun direction: correct phase; Earth's spin is not modelled here)
@@ -140,6 +141,19 @@ function boxLine(s){   // 1 km box in polar stereographic metres around the site
       const lat = -90 + 2*Math.atan(rho/(2*R))/D2R, lon = Math.atan2(x, y)/D2R, v = surf(lat, lon); pts.push(v.setLength(v.length() + 0.06*CAPEX/R)); } }
   const ln = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color: tok('--sel-3d', '#4FC3F7')}));
   ln.renderOrder = 2; globe.add(ln); return ln; }
+// candidate landing zones (Tudor's team analysis, Eren approved ~21:55; data/zones.json via App.zones): thin outlines draped on the
+// terrain in --zone-3d, no fill. Hidden when App.state.zones === false. Rebuilt on key 'zones' and once the outer terrain has loaded.
+let gZones = null;
+function buildZones(){
+  if (gZones){ globe.remove(gZones); gZones.traverse(o => o.geometry && o.geometry.dispose()); gZones = null; }
+  const Z = App.zones || []; if (!Z.length || App.state.zones === false) return;
+  gZones = new THREE.Group(); const mat = new THREE.LineBasicMaterial({color: tok('--zone-3d', '#B49DDC'), transparent: true, opacity: 0.9});
+  const toV = (x, y) => { const rho = Math.hypot(x, y)/1000, lat = -90 + 2*Math.atan(rho/(2*R))/D2R, lon = Math.atan2(x, y)/D2R, v = surf(lat, lon); return v.setLength(v.length() + 0.08*CAPEX/R); };
+  for (const z of Z) for (const ring of z.rings || []){ const pts = [];
+    for (let k = 0; k < ring.length; k++){ const [ax, ay] = ring[k], [bx, by] = ring[(k + 1)%ring.length], n = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay)/800));   // a point every <= 800 m: follows the ground
+      for (let t = 0; t < n; t++) pts.push(toV(ax + (bx - ax)*t/n, ay + (by - ay)*t/n)); }
+    const ln = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), mat); ln.renderOrder = 1; gZones.add(ln); }
+  globe.add(gZones); }
 function pickSite(i){ App.set({site: i, selDay: -1}, 'scene'); gFocus('site', i); }
 function buildCallouts(){
   gsl.forEach(g => { if (g.box){ globe.remove(g.box); g.box.geometry.dispose(); } });
@@ -247,10 +261,10 @@ function updateGlobe(){
     used.add(key); members.forEach(i => gPrev.set(i, key));
     const cx = gs.reduce((a, g) => a + g.x, 0)/gs.length, cy = gs.reduce((a, g) => a + g.y, 0)/gs.length;
     S(v.el, 'display', ''); S(v.el, 'transform', `translate3d(${(cx - v.w/2).toFixed(1)}px,${(cy - MK/2).toFixed(1)}px,0)`);
-    if (members.includes(st.site)) det = {x: cx + v.w/2 + 6, y: cy}; });
+    if (members.includes(st.site)) det = {x: cx, y: cy + MK/2 + 5}; });   // under the marker: side-by-side neighbours never sit there
   gPins.forEach((v, key) => { if (!used.has(key)) S(v.el, 'display', 'none'); });
   S(gDet, 'display', det ? '' : 'none');
-  if (det){ S(gDet, 'left', det.x.toFixed(1) + 'px'); S(gDet, 'top', det.y.toFixed(1) + 'px'); S(gDet, 'transform', 'translate(0, -50%)'); }
+  if (det){ S(gDet, 'left', det.x.toFixed(1) + 'px'); S(gDet, 'top', det.y.toFixed(1) + 'px'); S(gDet, 'transform', 'translate(-50%, 0)'); }
 }
 
 // draw only when something changed (Eren ~21:20: page laggy). Redraw when: the camera moved (drag, damping, glide), app state changed,
@@ -267,6 +281,7 @@ register('globe', {
   onState(keys, src){
     gDirty = true;
     if (keys.has('spot')) buildCallouts();   // App.sites changed length (custom spot added/removed): indices are stale
+    if (keys.has('zones')) buildZones();
     if (keys.has('site') && src !== 'scene' && view === 'globe') gFocus('site', App.state.site);   // site picked elsewhere: glide to it
     if (keys.has('mast')) gsl.forEach(g => { g.p = null; g.boxSel = null; }); },
 });
