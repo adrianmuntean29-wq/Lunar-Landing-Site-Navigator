@@ -56,7 +56,7 @@
       </section>
       <section class="others" id="others" hidden><b id="oHead"></b><span id="oTip"></span></section>
       <section class="plMis">
-        <div class="plRow"><h3>Your mission</h3><div class="kind" id="kindSeg"><button type="button" data-v="robotic" aria-pressed="true">Robotic · 13 d</button><button type="button" data-v="crew" aria-pressed="false">Crew · 6 d</button></div></div>
+        <div class="plRow"><h3>Your mission</h3><div class="kind" id="kindSeg"><span class="kc"><button type="button" data-v="robotic" aria-pressed="true">Robotic</button><span class="info-wrap"><button type="button" class="info-i" aria-label="About robotic missions" aria-describedby="kTipRob">i</button><span class="info-tip" id="kTipRob" role="tooltip"><span><b>Robotic</b>: a lander or rover for one lunar day, 13 days by default.</span><span>Needs: sunlight at least 70% of the mission, Earth in view at least 25% (direct radio), and no darkness longer than 48 h (batteries and heaters can bridge a short night).</span><span>Difference: a robot can sit out up to 48 h of night; a crew cannot.</span><span>Earth 25% = the map mask in a 2024 NASA presentation; 13 d, 70% and 48 h are our example values.</span></span></span></span><span class="kc"><button type="button" data-v="crew" aria-pressed="false">Crew</button><span class="info-wrap"><button type="button" class="info-i" aria-label="About crewed missions" aria-describedby="kTipCrew">i</button><span class="info-tip " id="kTipCrew" role="tooltip"><span><b>Crew</b>: a crewed stay of about 6 days on the surface by default.</span><span>Needs: sunlight at least 95%, Earth in view at least 25%, and no darkness at all during the stay.</span><span>Why: the 2024 NASA presentation lists a landing site lit for the whole surface stay and direct-to-Earth contact for Artemis III.</span><span>Earth 25% and "lit for the stay" are from that presentation; 6 d and 95% are our example values.</span></span></span></span></div></div>
         <label class="slr"><span class="t">Mission length <b id="vLen"></b></span><input id="len" type="range" min="1" max="60"></label>
         <label class="slr"><span class="t">Sunlight <b id="vSun"></b></span><input id="sun" type="range" min="0" max="100"></label>
         <label class="slr"><span class="t"><span>Earth contact <span id="earthTip"></span></span><b id="vEarth"></b></span><input id="earth" type="range" min="0" max="100"></label>
@@ -124,7 +124,7 @@
     catch (e){ msg.classList.add('err'); msg.textContent = e.message; }
     finally { btn.disabled = false; }
   }
-  const pressed = (sel, v) => root.querySelectorAll(sel + ' button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === String(v)));
+  const pressed = (sel, v) => root.querySelectorAll(sel + ' button[data-v]').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === String(v)));
   function sliders(){
     const st = App.state;
     [['len', 'vLen', v => v + ' days'], ['sun', 'vSun', v => 'at least ' + v + '%'], ['earth', 'vEarth', v => st.lim.relay ? 'not needed (relay)' : 'at least ' + v + '%'], ['night', 'vNight', v => v == 0 ? 'none' : 'up to ' + v + ' h']].forEach(([id, out, f]) => {
@@ -338,7 +338,7 @@
     $('#earthTip').innerHTML = tip('About the Earth limit', 'Share of the stay with Earth above the terrain (direct radio possible). The 25% default is the map mask used in a 2024 NASA presentation. Sunlight, length and darkness defaults are example values.');
     $('#plFly').addEventListener('click', e => { const f = e.target.closest('[data-fly]'); if (f) App.flyMission(f.dataset.fly); });
     App.on(keys => { if (keys.has('selDay')) plFly(); });   // render() skips selDay-only changes
-    $('#kindSeg').onclick = e => { const b = e.target.closest('button'); if (b) App.set({lim: App.PRESETS[b.dataset.v], kind: b.dataset.v}, 'panel'); };
+    $('#kindSeg').onclick = e => { const b = e.target.closest('button[data-v]'); if (b) App.set({lim: App.PRESETS[b.dataset.v], kind: b.dataset.v}, 'panel'); };
     ['len', 'sun', 'earth', 'night'].forEach(k => $('#' + k).oninput = e => App.set({lim: {[k]: +e.target.value}}, 'panel'));
     $('#relay').onchange = e => App.set({lim: {relay: e.target.checked}}, 'panel');
     $('#mast').onclick = e => { const b = e.target.closest('button'); if (b) App.set({mast: b.dataset.v}, 'panel'); };

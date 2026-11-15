@@ -9,10 +9,10 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <script>/* theme before first paint: ?theme=light|dark, else the saved choice */try{var q=new URLSearchParams(location.search).get("theme"),t=q||localStorage.getItem("spn-theme");if(t==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
 <style>/* phone card visibility lives in the page itself, so a stale cached base.css can never show it on a desktop */#narrow{display:none}@media (max-width:860px){#narrow{display:grid}}</style>
-<link rel="stylesheet" href="css/base.css?v=20261115f">
-<link rel="stylesheet" href="css/scene.css?v=20261115f">
-<link rel="stylesheet" href="css/panel.css?v=20261115f">
-<link rel="stylesheet" href="css/drawer.css?v=20261115f">
+<link rel="stylesheet" href="css/base.css?v=20261115g">
+<link rel="stylesheet" href="css/scene.css?v=20261115g">
+<link rel="stylesheet" href="css/panel.css?v=20261115g">
+<link rel="stylesheet" href="css/drawer.css?v=20261115g">
 </head>
 <body>
 <!-- loading screen (shell.js hides it when App.ready + the Moon view are ready; CSS hides it after 20 s no matter what) -->
@@ -22,7 +22,7 @@
 <div class="app">
   <header class="top" id="top">
     <!-- top bar (Eren 15 Nov: ARIPI brand + view-orbit's three changes): brand, page switch, data line, site chip, theme icon, details -->
-    <span class="brand"><img class="blogo" src="favicon.svg?v=20261115f" width="22" height="22" alt="Aripi logo (AI-generated)"><b class="bw" aria-label="Aripi">ARIPI</b><span class="bd">SOUTH POLE NAVIGATOR</span><span class="info-wrap btagi"><button type="button" class="info-i" aria-label="What this tool is for" aria-describedby="tagTip">i</button><span class="info-tip left" id="tagTip" role="tooltip"><span>Where and when to land at the lunar south pole.</span></span></span></span>
+    <span class="brand"><img class="blogo" src="favicon.svg?v=20261115g" width="22" height="22" alt="Aripi logo (AI-generated)"><b class="bw" aria-label="Aripi">ARIPI</b><span class="bd">SOUTH POLE NAVIGATOR</span><span class="info-wrap btagi"><button type="button" class="info-i" aria-label="What this tool is for" aria-describedby="tagTip">i</button><span class="info-tip left" id="tagTip" role="tooltip"><span>Where and when to land at the lunar south pole.</span></span></span></span>
     <span class="pswitch" role="group" aria-label="Page"><button class="btn" id="plannerBtn" type="button" aria-pressed="true" title="The landing planner">Planner</button><button class="btn" id="missionBtn" type="button" aria-pressed="false" aria-expanded="false" aria-controls="missionPanel" title="Fly a mission: the selected site and landing day, from launch to the surface">Missions</button></span>
     <span class="sp"></span>
     <span class="dline"><span class="k">Data: <span class="dfull">NASA LOLA terrain + JPL Horizons</span><span class="dshort">LOLA + Horizons</span><span class="dwhen" id="dWhen"></span></span><span class="info-wrap"><button type="button" class="info-i" aria-label="About the data" aria-describedby="dataTip">i</button><span class="info-tip" id="dataTip" role="tooltip"></span></span></span>
@@ -41,11 +41,11 @@
   <aside id="missionPanel" aria-label="Missions" aria-hidden="true"><iframe id="missionFrame" title="Missions"></iframe></aside>
 </div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
-<script src="js/core.js?v=20261115f"></script>
-<script src="js/missions.js?v=20261115f"></script>   <!-- missions chat; App.ready waits for Missions.load() -->
-<script src="js/shell.js?v=20261115f"></script>
-<script src="js/panel.js?v=20261115f"></script>
-<script src="js/drawer.js?v=20261115f"></script>
-<script type="module" src="js/scene.js?v=20261115f"></script>
+<script src="js/core.js?v=20261115g"></script>
+<script src="js/missions.js?v=20261115g"></script>   <!-- missions chat; App.ready waits for Missions.load() -->
+<script src="js/shell.js?v=20261115g"></script>
+<script src="js/panel.js?v=20261115g"></script>
+<script src="js/drawer.js?v=20261115g"></script>
+<script type="module" src="js/scene.js?v=20261115g"></script>
 </body>
 </html>
