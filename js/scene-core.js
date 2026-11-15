@@ -55,12 +55,13 @@ export function register(name, hooks){ views[name] = hooks; }
 function size(){ if (!renderer) return; const w = root.clientWidth, h = root.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false);
   cams.forEach(c => { c.aspect = w/h; c.updateProjectionMatrix(); }); layersSpot(); }
 // layers box fold (Eren 15 Nov, v2 after "this does not look right"): open = header row "LAYERS · Hide ›", folded = one "‹ Layers" pill; state kept in localStorage 'spn-layers-folded'
-function setFold(f){ const box = $('#layersBox'), b = $('#lyFold'); if (!box || !b) return;
+function setFold(f, save = true){ const box = $('#layersBox'), b = $('#lyFold'); if (!box || !b) return;
   box.classList.toggle('folded', f); b.setAttribute('aria-expanded', !f); b.textContent = f ? '‹ Layers' : 'Hide ›';
   const lab = f ? 'Show layers' : 'Hide layers'; b.setAttribute('aria-label', lab); b.title = lab;
-  try { localStorage.setItem('spn-layers-folded', f ? '1' : '0'); } catch (e) {} }
+  if (save) try { localStorage.setItem('spn-layers-folded', f ? '1' : '0'); } catch (e) {} }
 { const b = $('#lyFold'); if (b){ b.onclick = () => setFold(!$('#layersBox').classList.contains('folded'));
-  let f = false; try { f = localStorage.getItem('spn-layers-folded') === '1'; } catch (e) {} if (f) setFold(true); } }
+  let f = matchMedia('(max-width: 860px)').matches;   // phones: start folded so the map stays visible, unless the user chose otherwise
+  try { const v = localStorage.getItem('spn-layers-folded'); if (v === '1') f = true; else if (v === '0') f = false; } catch (e) {} if (f) setFold(true, false); } }   // boot: restore without saving, so the phone default never sticks on desktop
 // layers box: top-right corner; drops below the view tabs only when the scene is too narrow for both on one row
 let boxW = 310;
 function layersSpot(){ const box = $('#layersBox'), tabs = root.querySelector('.views'); if (box.offsetWidth) boxW = box.offsetWidth;
@@ -83,7 +84,7 @@ export async function boot(){
   await App.ready;
   meta = await (await fetch(App.DATA + 'terrain_meta.json')).json();
   HGT = new Float32Array(await (await fetch(App.DATA + 'heights.bin')).arrayBuffer());
-  renderer = new THREE.WebGLRenderer({antialias: true}); renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer = new THREE.WebGLRenderer({antialias: true}); renderer.setPixelRatio(Math.min(devicePixelRatio, matchMedia('(max-width: 860px)').matches ? 1.5 : 2));   // phones: cap at 1.5 (Eren 15 Nov), desktop unchanged
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; root.prepend(renderer.domElement);
   for (const n of ORDER) if (views[n] && views[n].build) views[n].build();
   new ResizeObserver(size).observe(root); size();

@@ -160,6 +160,9 @@ function updateSpace(){
   const stag = 'Selected: ' + s.short + ' · ' + (90 - Math.abs(s.lat)).toFixed(1) + '° from the pole';
   if (olab.site.textContent !== stag){ olab.site.textContent = stag; olab.site.title = 'Angle between the blue site line and the Moon\'s spin axis (orange) = 90° minus the site\'s latitude'; }
   put(olab.site, sp, facing && ang(1, dM) > 40);
+  // keep the tag inside the scene on narrow screens (coordinator, phone layout): clamp its left edge to [8, width - tagWidth - 8]
+  if (olab.site.style.display !== 'none'){ const tw = olab.site.offsetWidth, x = parseFloat(olab.site.style.left) + 8;
+    olab.site.style.transform = 'translate(0,-50%)'; olab.site.style.left = Math.max(8, Math.min(x, w - tw - 8)) + 'px'; }
   // line-end tags: south end of the spin axis + site end of the site line. Hidden when the Moon is small or the end is behind the disc.
   // The two ends are only 0.2-6 deg apart, so the tag of the end further left on screen goes left, the other goes right (never overlap).
   const pEnd = sMoon.localToWorld(new THREE.Vector3(0, -1.7, 0)), sEnd = sMoon.localToWorld(llv(s.lat, s.lon, 1.7)), mq = moonW.clone().project(sCam);

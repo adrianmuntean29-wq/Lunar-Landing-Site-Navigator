@@ -281,8 +281,8 @@
       const wn = warns.length ? '<span class="wn" title="' + warns.join('; ') + '" aria-label="Warning: ' + warns.join('; ') + '">⚠</span>' : '';
       const ddTip = s.truncated ? ' title="Best case: part of the horizon is outside our map, so the real number can only be lower"' : s.custom ? ' title="Your spot: ' + s.label + ', approximate"' : '';
       let h = '<div class="srow' + (sel ? ' sel' : '') + (out ? ' out' : '') + '" data-i="' + r.i + '" role="button" tabindex="0" aria-pressed="' + sel + '">' +
-        '<div class="rh"><span class="num">' + (s.custom ? '★' : r.i + 1) + '</span><span class="nm">' + s.name + (ks && s.name.indexOf(ks[0]) < 0 ? ' <em class="kindtag ktud">' + ks[0] + '</em>' : '') + '</span>' + wn + '<span class="dd"' + ddTip + '><b>' + (s.custom ? '~ ' : le) + r.ok + '</b> good days</span></div>' +
-        (ks ? '<div class="kline">' + tip('About ' + ks[0], ks[1]) + '<span>' + (ks[0] === 'POL proposed site' ? 'our pick' : 'our analysis') + '</span></div>' : '') +
+        '<div class="rh"><span class="num">' + (s.custom ? '★' : r.i + 1) + '</span><span class="nm">' + s.name + '' + '</span>' + wn + '<span class="dd"' + ddTip + '><b>' + (s.custom ? '~ ' : le) + r.ok + '</b> good days</span></div>' +
+        (ks ? '<div class="kline">' + tip('About ' + ks[0], ks[1]) + '<em class="kindtag ktud">' + ks[0] + '</em></div>' : '') +
         '<div class="gbar" title="' + r.ok + ' of ' + r.n + ' landing days in ' + y0 + ' work"><i style="width:' + (r.n ? r.ok/r.n*100 : 0).toFixed(1) + '%"></i></div>';
       if (sel){ const poleKm = 2*1737.4*Math.tan((90 + raw.lat)/2*Math.PI/180), cut = m ? m.text.indexOf('. ') : -1;
         h += '<div class="rx">' +
