@@ -158,3 +158,7 @@ studies, and the browser against an independently written Python engine.
 ## Team
 
 Peaks of Light (5 members), NASA Space Apps Challenge 2026, Alba Iulia.
+
+- **Mission page (`mission.html`):** Adrian Muntean ([@adrianmuntean29-wq](https://github.com/adrianmuntean29-wq)). Launch dates
+  from Spaceport Nova Scotia with weather, Δv and mass, the flight in 3D, the launch, landing and liftoff replays, the crew on
+  the surface, and the site seen from orbit on LRO images.
