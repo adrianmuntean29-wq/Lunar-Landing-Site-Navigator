@@ -35,3 +35,16 @@ small slopes near the site).
 
 ## Data
 LOLA LDEM_80S_80MPP_ADJ / 20MPP_ADJ, PGDA product 90 (Barker et al. 2023, doi:10.3847/PSJ/acf3e1). JPL Horizons API.
+
+## Validation (does the page show real numbers?)
+Two scripts in `validation/` load the page in headless Chromium (Playwright), served from this repo, and check it
+against independent sources. Run from `pipeline/` after `pip install playwright && python -m playwright install chromium`.
+
+| Test | Script | Result (2026-11-15) |
+|---|---|---|
+| Page vs Python engine: same calendar? 10 sites x masts 0/2/10 m, 2027, page default limits | `python validation/page_vs_engine.py` | 10,589 of 10,590 landing days agree; hourly sunlight within 0.002 of the Sun's disc |
+| Page vs NASA JPL Horizons (live API, observer on the Moon at the site), 4 sites x 5 dates | `python validation/page_vs_horizons.py` | Sun within 0.0003 deg, Earth within 0.006 deg (the Sun's disc is 0.53 deg wide) |
+
+The one disagreeing day is site C (GR1), 2 m mast, landing 2027-11-17: Earth is up 25.0% of the mission on the page and
+24.7% in the engine (78 vs 77 of 312 hours), right on the 25% limit. One hour where Earth's edge grazes the horizon decides it.
+Results are written next to the scripts (`page_vs_engine.json`, `page_vs_horizons.json`).

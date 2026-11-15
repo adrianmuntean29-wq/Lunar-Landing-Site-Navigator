@@ -1,0 +1,342 @@
+{
+ "limits": {
+  "len": 13,
+  "sun": 70,
+  "earth": 25,
+  "night": 48,
+  "relay": false
+ },
+ "console_errors": 0,
+ "rows": [
+  {
+   "mast": "0",
+   "id": "A",
+   "page_good": 113,
+   "engine_good": 113,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020933357992599655,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "0",
+   "id": "B",
+   "page_good": 174,
+   "engine_good": 174,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020391881108028365,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "0",
+   "id": "C",
+   "page_good": 19,
+   "engine_good": 19,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020226132114886664,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "0",
+   "id": "D",
+   "page_good": 39,
+   "engine_good": 39,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.001946627870447748,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "0",
+   "id": "E",
+   "page_good": 64,
+   "engine_good": 64,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020710940802414757,
+   "earth_hours_differ": 1,
+   "hours": 9072
+  },
+  {
+   "mast": "0",
+   "id": "F",
+   "page_good": 80,
+   "engine_good": 80,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.002057654799492603,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "0",
+   "id": "G",
+   "page_good": 100,
+   "engine_good": 100,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020185424347357594,
+   "earth_hours_differ": 1,
+   "hours": 9072
+  },
+  {
+   "mast": "0",
+   "id": "H",
+   "page_good": 39,
+   "engine_good": 39,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020152991266760845,
+   "earth_hours_differ": 1,
+   "hours": 9072
+  },
+  {
+   "mast": "0",
+   "id": "I",
+   "page_good": 63,
+   "engine_good": 63,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.001982040373202487,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "0",
+   "id": "J",
+   "page_good": 50,
+   "engine_good": 50,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020171948362547876,
+   "earth_hours_differ": 1,
+   "hours": 9072
+  },
+  {
+   "mast": "2",
+   "id": "A",
+   "page_good": 203,
+   "engine_good": 203,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020933357992599655,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "2",
+   "id": "B",
+   "page_good": 202,
+   "engine_good": 202,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.002025984400394698,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "2",
+   "id": "C",
+   "page_good": 52,
+   "engine_good": 51,
+   "days": 353,
+   "disagree": 1,
+   "max_sun_diff": 0.0020411736077806664,
+   "earth_hours_differ": 1,
+   "hours": 9072
+  },
+  {
+   "mast": "2",
+   "id": "D",
+   "page_good": 163,
+   "engine_good": 163,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.002045175642349628,
+   "earth_hours_differ": 1,
+   "hours": 9072
+  },
+  {
+   "mast": "2",
+   "id": "E",
+   "page_good": 175,
+   "engine_good": 175,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020014259737510254,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "2",
+   "id": "F",
+   "page_good": 128,
+   "engine_good": 128,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020202403357891807,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "2",
+   "id": "G",
+   "page_good": 138,
+   "engine_good": 138,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0019969556640361263,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "2",
+   "id": "H",
+   "page_good": 103,
+   "engine_good": 103,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020097474305947327,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "2",
+   "id": "I",
+   "page_good": 80,
+   "engine_good": 80,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020371827751948235,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "2",
+   "id": "J",
+   "page_good": 53,
+   "engine_good": 53,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.002000843576670297,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "10",
+   "id": "A",
+   "page_good": 259,
+   "engine_good": 259,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020999422635938902,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "10",
+   "id": "B",
+   "page_good": 219,
+   "engine_good": 219,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.002005707111505717,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "10",
+   "id": "C",
+   "page_good": 137,
+   "engine_good": 137,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.002034655195436108,
+   "earth_hours_differ": 1,
+   "hours": 9072
+  },
+  {
+   "mast": "10",
+   "id": "D",
+   "page_good": 199,
+   "engine_good": 199,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020510173685686084,
+   "earth_hours_differ": 2,
+   "hours": 9072
+  },
+  {
+   "mast": "10",
+   "id": "E",
+   "page_good": 181,
+   "engine_good": 181,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.002034683964409423,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "10",
+   "id": "F",
+   "page_good": 129,
+   "engine_good": 129,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020068798715243696,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "10",
+   "id": "G",
+   "page_good": 154,
+   "engine_good": 154,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0019997715417205963,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "10",
+   "id": "H",
+   "page_good": 169,
+   "engine_good": 169,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020103005749202985,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "10",
+   "id": "I",
+   "page_good": 81,
+   "engine_good": 81,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.0020685049221440543,
+   "earth_hours_differ": 0,
+   "hours": 9072
+  },
+  {
+   "mast": "10",
+   "id": "J",
+   "page_good": 55,
+   "engine_good": 55,
+   "days": 353,
+   "disagree": 0,
+   "max_sun_diff": 0.001995200032597899,
+   "earth_hours_differ": 2,
+   "hours": 9072
+  }
+ ]
+}
