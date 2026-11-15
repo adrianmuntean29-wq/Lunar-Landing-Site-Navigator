@@ -110,3 +110,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "IBM Plex San
   #narrow .btn{justify-self:start;text-decoration:none;padding:8px 12px}
   .app,#loader,#missionPanel{display:none !important}
 }
+/* top bar logo + tagline in an (i) (Eren 15 Nov ~15:10): logo left of ARIPI, vertically centred; tagline only in the tip */
+#top .brand{align-items:center}
+#top .brand .blogo{width:22px;height:22px;display:block;flex:none;border-radius:5px}
+#top .brand .btagi{align-self:center;letter-spacing:0}
+#top .brand .btagi .info-tip{width:240px}
