@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Aripi favicon: the Moon with sunlight grazing its south-pole limb (gold crescent), Earth near the horizon (blue). Our own drawing. -->
+  <rect width="64" height="64" rx="14" fill="#111315"/>
+  <circle cx="30" cy="32" r="21" fill="#E0BC66"/>
+  <circle cx="27" cy="27" r="20" fill="#5B6168"/>
+  <circle cx="51" cy="12" r="5.5" fill="#5E9CD3"/>
+</svg>

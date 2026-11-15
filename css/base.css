@@ -98,3 +98,15 @@ body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "IBM Plex San
 @media (max-width:1700px){#top .brand .btag{display:none}}
 @media (max-width:1400px){#top .dwhen{display:none}}
 @media (max-width:1180px){#top .dfull{display:none} #top .dshort{display:inline} #top .sitechip{max-width:190px}}
+/* narrow-screen card (Eren 15 Nov): under 860 px show one card, hide the tool (it needs a computer screen) */
+#narrow{display:none}
+@media (max-width:860px){
+  #narrow{display:grid;place-items:center;min-height:100vh;padding:24px 16px;box-sizing:border-box;background:var(--bg);color:var(--ink)}
+  #narrow .nbox{max-width:420px;display:grid;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px 20px}
+  #narrow .nbrand{font:700 13px "IBM Plex Sans";letter-spacing:.3em;color:var(--muted)}
+  #narrow h1{margin:0;font:600 20px/1.3 "IBM Plex Sans"}
+  #narrow p{margin:0;font:400 15px/1.5 "IBM Plex Sans";color:var(--muted)}
+  #narrow .nlink{font:500 12px "IBM Plex Mono";color:var(--ink);word-break:break-all}
+  #narrow .btn{justify-self:start;text-decoration:none;padding:8px 12px}
+  .app,#loader,#missionPanel{display:none !important}
+}

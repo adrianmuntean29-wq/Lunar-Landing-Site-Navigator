@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aripi · South Pole Navigator</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <!-- OWNER: coordinator. The three areas fill their own container; do not add area markup here. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <script>/* theme before first paint: ?theme=light|dark, else the saved choice */try{var q=new URLSearchParams(location.search).get("theme"),t=q||localStorage.getItem("spn-theme");if(t==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
@@ -14,6 +15,8 @@
 </head>
 <body>
 <!-- loading screen (shell.js hides it when App.ready + the Moon view are ready; CSS hides it after 20 s no matter what) -->
+<!-- narrow screens (< 860 px, Eren 15 Nov): one clean card instead of a squashed layout -->
+<div id="narrow"><div class="nbox"><div class="nbrand">ARIPI</div><h1>South Pole Navigator is built for a computer screen.</h1><p>Open this link on a laptop for the full tool.</p><p class="nlink">erenhocoklu.github.io/Peaks-of-Light-Lunar-Landing-Site-Navigator</p><a class="btn" href="https://github.com/erenhocoklu/Peaks-of-Light-Lunar-Landing-Site-Navigator">See the code and README on GitHub</a></div></div>
 <div id="loader" role="status" aria-live="polite"><div class="ldbox"><div class="ldw">ARIPI</div><div class="ldt">Preparing the Moon…</div><div class="ldbar"><i></i></div><div class="lds">Loading real terrain and Sun/Earth data</div></div></div>
 <div class="app">
   <header class="top" id="top">

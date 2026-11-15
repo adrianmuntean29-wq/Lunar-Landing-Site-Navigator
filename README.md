@@ -51,6 +51,8 @@ checks the Sun and the Earth against the **real terrain horizon** computed from 
 
 ## How to use it
 
+Best in a desktop browser, 1200 px or wider.
+
 1. Open https://erenhocoklu.github.io/Peaks-of-Light-Lunar-Landing-Site-Navigator/ (no login, works in a desktop browser).
 2. Pick a site, or press **Compare sites**.
 3. Choose the first landing date and the time span.
