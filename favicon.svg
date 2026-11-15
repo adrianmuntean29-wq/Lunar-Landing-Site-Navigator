@@ -1,5 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Aripi favicon: the Moon with sunlight grazing its south-pole limb (gold crescent), Earth near the horizon (blue). Our own drawing. -->
+  <title>Aripi logo, drawn as SVG code by Claude (Anthropic), AI-generated</title>
+  <!-- AI-generated (NASA Space Apps SI rule): written as SVG code by Claude (Anthropic) on 2026-11-15. No NASA elements.
+       The Moon with sunlight grazing its south-pole limb (gold crescent), Earth near the horizon (blue). -->
   <rect width="64" height="64" rx="14" fill="#111315"/>
   <circle cx="30" cy="32" r="21" fill="#E0BC66"/>
   <circle cx="27" cy="27" r="20" fill="#5B6168"/>

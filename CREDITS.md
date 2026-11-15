@@ -38,8 +38,9 @@ available or OSI-licensed, with its licence listed here.
 | `assets/moon_normal_4k.jpg` (baked by us) | Derived from CGI Moon Kit `ldem_16_uint.tif` (LOLA elevation), https://svs.gsfc.nasa.gov/4720 | NASA's Scientific Visualization Studio; LOLA team, NASA GSFC |
 | `assets/moon_normal_s80_2k.jpg`, `assets/site_detail_normal.jpg`, `assets/site_outer_heights.bin` (baked by us) | Derived from PGDA product 90 `LDEM_80S_80MPP_ADJ` | As the DEM row above |
 | `assets/earth_bmng_2k.jpg` (resized by us) | NASA Earth Observatory, Blue Marble Next Generation with topography and bathymetry, December 2004 | NASA Earth Observatory (Reto Stöckli, NASA GSFC) |
+| `favicon.svg` (tab icon and loading-screen logo) | Logo: SVG written by Claude (Anthropic), AI-generated; no NASA elements. Marked "Logo drawn by AI (Claude)" on the loading screen and in the file's title. | Our project (MIT) |
 
-No music, sound effects, voice or AI-generated images.
+No music, sound effects or voice. The only AI-generated image is the logo above.
 
 ## Papers and documents
 - Gläser, P. et al. (2018). Illumination conditions at the lunar poles: implications for future exploration. *Planetary and Space
