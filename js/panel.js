@@ -5,7 +5,8 @@
 (function(){
   const $ = s => document.querySelector('#panel ' + s), root = document.querySelector('#panel');
   root.innerHTML = `
-    <div class="tabs" id="ptabs"><span class="vt" id="vTitle"></span><span class="info-wrap psrc"><button type="button" class="info-i" aria-label="Where the numbers in this panel come from" aria-describedby="pSrcTip">i</button><span class="info-tip left" id="pSrcTip" role="tooltip" style="width:250px"></span></span><button class="x" id="closeP" type="button" aria-label="Close panel">×</button></div>
+    <div class="tabs" id="ptabs"><span class="vt" id="vTitle"></span><span class="info-wrap psrc"><button type="button" class="info-i" aria-label="Where the numbers in this panel come from" aria-describedby="pSrcTip">i</button><span class="info-tip left" id="pSrcTip" role="tooltip" style="width:250px"></span></span></div><!-- no × here (Eren 15 Nov): the top-bar DETAILS button hides/shows the panel -->
+
     <div class="scroll" id="pSystem" hidden>
       <section class="facts">
         <div><span>Moon phase</span><b id="oPhase"></b></div>
@@ -350,7 +351,6 @@
     $('#gMastSeg').onclick = e => { const b = e.target.closest('button'); if (b) App.set({mast: b.dataset.v}, 'panel'); };
     root.querySelectorAll('.spotf').forEach(f => { f.querySelector('.sAdd').onclick = () => addSpot(f); f.querySelector('.sDel').onclick = () => { App.clearSpot(); f.querySelector('.sMsg').textContent = 'Removed.'; };
       f.querySelectorAll('input').forEach(i => i.onkeydown = e => { if (e.key === 'Enter') addSpot(f); }); });
-    $('#closeP').onclick =() => App.set({panelOpen: false}, 'panel');
     App.on(render); App.on(keys => { if (keys.has('theme')) setTimeout(() => { if (App.state.view === 'ground') ahead(); }, 0); });   // canvas strip reads tokens after shell flips data-theme
     render();
   });

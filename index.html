@@ -9,10 +9,10 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <script>/* theme before first paint: ?theme=light|dark, else the saved choice */try{var q=new URLSearchParams(location.search).get("theme"),t=q||localStorage.getItem("spn-theme");if(t==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
 <style>/* phone card visibility lives in the page itself, so a stale cached base.css can never show it on a desktop */#narrow{display:none}@media (max-width:860px){#narrow{display:grid}}</style>
-<link rel="stylesheet" href="css/base.css?v=20261115c">
-<link rel="stylesheet" href="css/scene.css?v=20261115c">
-<link rel="stylesheet" href="css/panel.css?v=20261115c">
-<link rel="stylesheet" href="css/drawer.css?v=20261115c">
+<link rel="stylesheet" href="css/base.css?v=20261115d">
+<link rel="stylesheet" href="css/scene.css?v=20261115d">
+<link rel="stylesheet" href="css/panel.css?v=20261115d">
+<link rel="stylesheet" href="css/drawer.css?v=20261115d">
 </head>
 <body>
 <!-- loading screen (shell.js hides it when App.ready + the Moon view are ready; CSS hides it after 20 s no matter what) -->
@@ -41,11 +41,11 @@
   <aside id="missionPanel" aria-label="Missions" aria-hidden="true"><iframe id="missionFrame" title="Missions"></iframe></aside>
 </div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
-<script src="js/core.js?v=20261115c"></script>
-<script src="js/missions.js?v=20261115c"></script>   <!-- missions chat; App.ready waits for Missions.load() -->
-<script src="js/shell.js?v=20261115c"></script>
-<script src="js/panel.js?v=20261115c"></script>
-<script src="js/drawer.js?v=20261115c"></script>
-<script type="module" src="js/scene.js?v=20261115c"></script>
+<script src="js/core.js?v=20261115d"></script>
+<script src="js/missions.js?v=20261115d"></script>   <!-- missions chat; App.ready waits for Missions.load() -->
+<script src="js/shell.js?v=20261115d"></script>
+<script src="js/panel.js?v=20261115d"></script>
+<script src="js/drawer.js?v=20261115d"></script>
+<script type="module" src="js/scene.js?v=20261115d"></script>
 </body>
 </html>
