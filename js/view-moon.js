@@ -132,7 +132,7 @@ const PIN_CSS = 'position:absolute;left:0;top:0;display:flex;gap:1px;pointer-eve
   'box-shadow:0 0 0 2px rgba(0,0,0,.8),0 2px 10px rgba(0,0,0,.65);will-change:transform;z-index:1';
 const numCss = (sel, spot) => `min-width:${MK}px;height:${MK}px;padding:0 4px;box-sizing:border-box;border:0;margin:0;font:700 14px/${MK}px "IBM Plex Mono";` +
   `text-align:center;cursor:pointer;color:#111315;background:${sel ? 'var(--c-sel)' : '#F2F1EC'};` + (spot ? 'outline:2px dashed #111315;outline-offset:-5px;' : '');
-let gClus = null, gDet = null, gPins = new Map(), gPrev = new Map();   // gPins: group key -> {el, w}; gPrev: site index -> last group key
+let gClus = null, gStem = null, gPins = new Map(), gPrev = new Map();   // gPins: group key -> {el, w}; gPrev: site index -> last group key
 function boxLine(s){   // 1 km box in polar stereographic metres around the site, draped on the terrain (lifted ~60 m before exaggeration)
   const r0 = rhoOf(s.lat), x0 = r0*Math.sin(s.lon*D2R), y0 = r0*Math.cos(s.lon*D2R), h = BOX_KM/2, pts = [], N = 8;
   const C = [[-h, -h], [h, -h], [h, h], [-h, h]];
@@ -143,10 +143,23 @@ function boxLine(s){   // 1 km box in polar stereographic metres around the site
   ln.renderOrder = 2; globe.add(ln); return ln; }
 // Tudor's zones, label "Flat, smooth terrain (team analysis)" since 2026-11-15 (was "candidate zones"; data/zones.json via App.zones): thin outlines draped on the
 // terrain in --zone-3d, no fill. Hidden when App.state.zones === false. Rebuilt on key 'zones' and once the outer terrain has loaded.
-let gZones = null;
+// Labels (Eren 2026-11-15 "add labels"): a small purple "Area N" tag at each zone's centre (N = the id the panel line uses) and one key
+// line bottom-left with the file's own label. Tags hide at whole-Moon zoom and when the zones layer is off.
+let gZones = null, gZoneTags = [], gZoneKey = null;
+const ZTAG_CSS = 'position:absolute;left:0;top:0;transform:translate(-50%,-50%);font:600 11px "IBM Plex Mono";color:var(--c-zone);white-space:nowrap;pointer-events:none;' +
+  'text-shadow:0 0 3px #000,0 0 3px #000,0 1px 2px #000;will-change:transform';
+const ZKEY_CSS = 'position:absolute;left:12px;bottom:12px;display:flex;align-items:center;gap:7px;font:500 11.5px "IBM Plex Mono";color:var(--c-ink);' +
+  'background:var(--c-box);border:1px solid var(--c-line);border-radius:5px;padding:4px 9px;pointer-events:none';
 function buildZones(){
   if (gZones){ globe.remove(gZones); gZones.traverse(o => o.geometry && o.geometry.dispose()); gZones = null; }
+  gZoneTags.forEach(t => t.el.remove()); gZoneTags = []; if (gZoneKey){ gZoneKey.remove(); gZoneKey = null; }
   const Z = App.zones || []; if (!Z.length || App.state.zones === false) return;
+  for (const z of Z){ if (!isFinite(z.x) || !isFinite(z.y)) continue; const el = document.createElement('div'); el.style.cssText = ZTAG_CSS; el.textContent = 'Area ' + z.id;
+    $('#glabels').appendChild(el); const rho = Math.hypot(z.x, z.y)/1000;
+    gZoneTags.push({el, p: surf(-90 + 2*Math.atan(rho/(2*R))/D2R, Math.atan2(z.x, z.y)/D2R)}); }
+  gZoneKey = document.createElement('div'); gZoneKey.style.cssText = ZKEY_CSS;
+  gZoneKey.innerHTML = '<span style="display:inline-block;width:14px;height:9px;border:1.5px solid var(--c-zone);border-radius:3px"></span>' + ((App.zonesJson && App.zonesJson.label) || 'Flat, smooth terrain (team analysis)');
+  $('#glabels').appendChild(gZoneKey);
   gZones = new THREE.Group(); const mat = new THREE.LineBasicMaterial({color: tok('--zone-3d', '#B49DDC'), transparent: true, opacity: 0.9});
   const toV = (x, y) => { const rho = Math.hypot(x, y)/1000, lat = -90 + 2*Math.atan(rho/(2*R))/D2R, lon = Math.atan2(x, y)/D2R, v = surf(lat, lon); return v.setLength(v.length() + 0.08*CAPEX/R); };
   for (const z of Z) for (const ring of z.rings || []){ const pts = [];
@@ -155,17 +168,22 @@ function buildZones(){
     const ln = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), mat); ln.renderOrder = 1; gZones.add(ln); }
   globe.add(gZones); }
 function pickSite(i){ App.set({site: i, selDay: -1}, 'scene'); gFocus('site', i); }
+// Anchors (Eren via view-site, 2026-11-15: "it changes, doesn't look right"): every site always has a small dot at its TRUE position;
+// numbers that would overlap share a strip placed just above the group, with a thin line from each number to its own dot.
+// Whole-Moon zoom: one "N sites ›" tag on a short stem to the cluster centre. No "Detail" button (the panel's Plan button opens Landing Site).
+const DOT_CSS = 'position:absolute;left:0;top:0;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;box-shadow:0 0 0 1.5px #111315;pointer-events:none;will-change:transform';
+const LD_CSS = 'position:absolute;left:0;top:0;height:1.5px;margin-top:-0.75px;transform-origin:0 50%;pointer-events:none;will-change:transform';
+const CTAG_CSS = 'position:absolute;left:0;top:0;font:600 12.5px "IBM Plex Mono";color:var(--c-ink);background:var(--c-box);border:1px solid var(--c-white50);border-radius:5px;' +
+  'padding:4px 10px;cursor:pointer;pointer-events:auto;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.6);z-index:1';
 function buildCallouts(){
-  gsl.forEach(g => { if (g.box){ globe.remove(g.box); g.box.geometry.dispose(); } });
+  gsl.forEach(g => { if (g.box){ globe.remove(g.box); g.box.geometry.dispose(); } if (g.dot) g.dot.remove(); if (g.ld) g.ld.remove(); });
   gPins.forEach(v => v.el.remove()); gPins.clear(); gPrev.clear();
-  gsl = App.sites.map(() => ({p: null, box: null, boxSel: null}));
-  if (!gClus){ gClus = document.createElement('button'); gClus.type = 'button'; gClus.className = 'gclus';
-    gClus.title = 'All landing sites are inside this box near the south pole: click to fly there';
-    gClus.onclick = () => gFocus('pole'); $('#glabels').appendChild(gClus); }
-  gClus.innerHTML = '<span>' + App.sites.length + ' sites</span>';
-  if (!gDet){ gDet = document.createElement('button'); gDet.type = 'button'; gDet.className = 'gdet'; gDet.textContent = 'Detail ›';
-    gDet.title = 'Open the Landing Site view: 100 m terrain around this site (the Moon view uses a 240 m grid)';
-    gDet.onclick = () => App.set({view: 'region'}, 'moon'); $('#glabels').appendChild(gDet); }
+  gsl = App.sites.map(() => { const dot = document.createElement('div'), ld = document.createElement('div');
+    dot.style.cssText = DOT_CSS; ld.style.cssText = LD_CSS; $('#glabels').append(ld, dot); return {p: null, box: null, boxSel: null, dot, ld}; });
+  if (!gStem){ gStem = document.createElement('div'); gStem.style.cssText = LD_CSS + ';background:var(--c-white70)'; $('#glabels').appendChild(gStem); }
+  if (!gClus){ gClus = document.createElement('button'); gClus.type = 'button'; gClus.style.cssText = CTAG_CSS;
+    gClus.title = 'All landing sites are near the south pole: click to fly there'; gClus.onclick = () => gFocus('pole'); $('#glabels').appendChild(gClus); }
+  gClus.textContent = App.sites.length + ' sites ›';
 }
 function pinFor(key, members, sel){   // one marker element per group; rebuilt only when its members or the selection inside it change
   const id = key + '|' + (members.includes(sel) ? sel : -1); let v = gPins.get(key);
@@ -181,7 +199,8 @@ function pinFor(key, members, sel){   // one marker element per group; rebuilt o
 function gFocus(kind, i, now){
   const st = App.state, sunD = me2t(App.ephAt(st.jd0 + st.t).sun).normalize();
   let tgt, pos, minD, maxD, minP = 0;
-  if (kind === 'moon'){ tgt = new THREE.Vector3(); pos = llv(-45, 0, 3.2); minD = 1.15; maxD = 8; }
+  if (kind === 'moon'){ tgt = new THREE.Vector3(); pos = llv(-62, 0, 3.2);   // from further south (was -45): the pole and its "N sites" tag sit clear of the bottom View bar
+    minD = 1.15; maxD = 8; }
   else if (kind === 'sun' || kind === 'earth'){   // look past the Moon toward the body: it shows beside the Moon (~9 deg clear of the limb), at its true size
     const p = App.ephAt(st.jd0 + st.t), d = me2t(kind === 'sun' ? p.sun : p.earth).normalize(), side = new THREE.Vector3(0, 1, 0).cross(d).normalize();
     tgt = new THREE.Vector3(); pos = d.clone().multiplyScalar(-6).addScaledVector(side, 2.0).addScaledVector(new THREE.Vector3(0, -1, 0), 0.6); minD = 1.15; maxD = 8; }   // a little from the south: the pole sites stay in view
@@ -248,23 +267,34 @@ function updateGlobe(){
       g.box.visible = Math.hypot((c2.x - c0.x)*w, (c2.y - c0.y)*h)/2/Math.SQRT2 > MK + 6; } });   // only once the real box is bigger than the marker
   let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; vis.forEach(g => { x0 = Math.min(x0, g.x); x1 = Math.max(x1, g.x); y0 = Math.min(y0, g.y); y1 = Math.max(y1, g.y); });
   const clus = vis.length > 1 && Math.max(x1 - x0, y1 - y0) < 70;   // whole-Moon zoom
-  S(gClus, 'display', clus ? '' : 'none');
-  if (clus){ const P = 14; S(gClus, 'left', (x0 - P) + 'px'); S(gClus, 'top', (y0 - P) + 'px'); S(gClus, 'width', (x1 - x0 + 2*P) + 'px'); S(gClus, 'height', (y1 - y0 + 2*P) + 'px'); }
+  const at = (el, x, y, extra = '') => S(el, 'transform', `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)` + extra);
+  const line = (el, ax, ay, bx, by) => { const L = Math.hypot(bx - ax, by - ay); S(el, 'width', L.toFixed(1) + 'px'); at(el, ax, ay, ` rotate(${Math.atan2(by - ay, bx - ax).toFixed(3)}rad)`); };
+  // whole Moon: one tag on a stem, nothing else
+  S(gClus, 'display', clus ? '' : 'none'); S(gStem, 'display', clus ? '' : 'none');
+  if (clus){ const cx = (x0 + x1)/2, cy = (y0 + y1)/2, ty = cy - 46; line(gStem, cx, cy, cx, ty + 12); at(gClus, cx, ty, ' translate(-50%,-50%)'); }
+  gZoneTags.forEach(t => { const q = t.p.clone().project(gCam), on = !clus && gCam.position.distanceTo(gCtl.target) < 0.2 && gCam.position.clone().sub(t.p).dot(t.p) > 0 && q.z <= 1 && Math.abs(q.x) <= 0.97 && Math.abs(q.y) <= 0.97;
+    S(t.el, 'display', on ? '' : 'none'); if (on) S(t.el, 'transform', `translate3d(${((q.x*0.5 + 0.5)*w).toFixed(1)}px,${((-q.y*0.5 + 0.5)*h).toFixed(1)}px,0) translate(-50%,-50%)`); });
+  if (gZoneKey) S(gZoneKey, 'display', clus ? 'none' : '');
+  // dots: every visible site, true position (hidden at whole-Moon zoom)
+  gsl.forEach(g => { const on = !clus && vis.includes(g); S(g.dot, 'display', on ? '' : 'none'); S(g.ld, 'display', 'none');
+    if (on){ S(g.dot, 'background', g.i === st.site ? 'var(--c-sel)' : '#F2F1EC'); at(g.dot, g.x, g.y); } });
   // union-find over close pairs; KEEP (looser) for pairs that were together last frame: no flicker at the threshold
   const par = vis.map((_, k) => k), find = k => par[k] === k ? k : (par[k] = find(par[k]));
   if (!clus) for (let a = 0; a < vis.length; a++) for (let b = a + 1; b < vis.length; b++){ const A = vis[a], B = vis[b];
     const lim = gPrev.get(A.i) && gPrev.get(A.i) === gPrev.get(B.i) ? KEEP : JOIN;
     if (Math.hypot(A.x - B.x, A.y - B.y) < lim) par[find(a)] = find(b); }
   const groups = new Map(); if (!clus) vis.forEach((g, k) => { const r = find(k); if (!groups.has(r)) groups.set(r, []); groups.get(r).push(g); });
-  const used = new Set(); gPrev.clear(); let det = null;
-  groups.forEach(gs => { const members = gs.map(g => g.i).sort((a, b) => a - b), key = members.join(','), v = pinFor(key, members, st.site);
-    used.add(key); members.forEach(i => gPrev.set(i, key));
-    const cx = gs.reduce((a, g) => a + g.x, 0)/gs.length, cy = gs.reduce((a, g) => a + g.y, 0)/gs.length;
-    S(v.el, 'display', ''); S(v.el, 'transform', `translate3d(${(cx - v.w/2).toFixed(1)}px,${(cy - MK/2).toFixed(1)}px,0)`);
-    if (members.includes(st.site)) det = {x: cx, y: cy + MK/2 + 5}; });   // under the marker: side-by-side neighbours never sit there
+  const used = new Set(); gPrev.clear();
+  groups.forEach(gs => { gs.sort((a, b) => a.i - b.i); const members = gs.map(g => g.i), key = members.join(','), v = pinFor(key, members, st.site);
+    used.add(key); members.forEach(i => gPrev.set(i, key)); S(v.el, 'display', '');
+    if (gs.length === 1){ const g = gs[0]; at(v.el, g.x - MK/2, g.y - MK/2); return; }   // single site: the marker sits on its point
+    // strip just above the group (below it near the top edge); a line from each number to its own dot
+    const cx = gs.reduce((a, g) => a + g.x, 0)/gs.length, top = Math.min(...gs.map(g => g.y)), bot = Math.max(...gs.map(g => g.y));
+    const up = top - 22 - MK > 48, sy = up ? top - 22 - MK : bot + 22, left = cx - v.w/2;
+    at(v.el, left, sy);
+    gs.forEach((g, k) => { const bx = left + k*(MK + 1) + MK/2, by = up ? sy + MK : sy;
+      S(g.ld, 'display', ''); S(g.ld, 'background', g.i === st.site ? 'var(--c-sel)' : 'rgba(242,241,236,.55)'); line(g.ld, bx, by, g.x, g.y); }); });
   gPins.forEach((v, key) => { if (!used.has(key)) S(v.el, 'display', 'none'); });
-  S(gDet, 'display', det ? '' : 'none');
-  if (det){ S(gDet, 'left', det.x.toFixed(1) + 'px'); S(gDet, 'top', det.y.toFixed(1) + 'px'); S(gDet, 'transform', 'translate(-50%, 0)'); }
 }
 
 // draw only when something changed (Eren ~21:20: page laggy). Redraw when: the camera moved (drag, damping, glide), app state changed,

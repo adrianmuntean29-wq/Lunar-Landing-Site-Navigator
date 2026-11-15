@@ -105,3 +105,8 @@
 #drawer .pd.now::before{content:'';position:absolute;inset:0;border-radius:3px;box-shadow:inset 0 0 0 1px var(--now),inset 0 -4px 0 var(--now);z-index:3;pointer-events:none}   /* today = thin inner ring + bottom bar (base --now); selected day = thick outer box (--ink): different shapes */
 #drawer .ym.now{color:var(--now);font-weight:700;text-decoration:underline;text-underline-offset:3px}
 #drawer .nowsw{display:inline-block;width:16px;height:4px;border-radius:1px;background:var(--now);align-self:center}
+/* "Fly it" buttons in the calendar footer (Eren 15 Nov): small, inside the 18 px row, so the drawer never scrolls */
+#drawer .cbot .fly{display:inline-flex;gap:6px;flex:none}
+#drawer .cbot .flyb{height:18px;padding:0 8px;font:500 11px "IBM Plex Sans";line-height:16px;border-color:var(--sel);color:var(--sel)}
+#drawer .cbot .flyb:hover{background:var(--sel);color:var(--bg)}
+#drawer .cbot .b1 .cleg{flex:0 1 auto;min-width:0;overflow:hidden}   /* narrow: the legend gives way, the Fly it buttons stay */

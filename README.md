@@ -41,7 +41,8 @@ checks the Sun and the Earth against the **real terrain horizon** computed from 
 - **Flat, smooth terrain (team analysis):** 11 areas a teammate drew in ArcGIS from LOLA slope and hillshade, PGDA 90
   roughness and permanent shadow, with the distance from each site to the nearest zone. They are flat and smooth, but our
   engine finds most of them poorly lit (the best point reaches about 51% sunlight), which shows why terrain alone is not enough.
-- **Missions (fly it):** the top-left ☰ MISSIONS button opens the mission view for the selected site and day: launch dates
+- **Missions (fly it), the mission page by Adrian:** pick a day in the calendar and press **Fly it robotic** or **Fly it with a crew**
+  (or the top-left ☰ MISSIONS button) to open the mission view for that site and day; the launch and flight play by themselves: launch dates
   from Spaceport Nova Scotia (Canada), the flight to the Moon (simplified model), touchdown, the sky above the site during
   the stay, and launch weather (Open-Meteo).
 

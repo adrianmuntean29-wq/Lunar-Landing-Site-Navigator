@@ -13,7 +13,7 @@
     <div class="tabs dtabs" role="tablist" id="dtabs"><button role="tab" data-d="price" aria-selected="true">CALENDAR</button><button role="tab" data-d="ms" aria-selected="false">YOUR MISSION</button><button role="tab" data-d="slip" aria-selected="false">LAUNCH SLIP</button><button role="tab" data-d="nx" aria-selected="false">NEXT EVENTS</button><span class="ctl" data-for="price"><span class="seg" id="cMode"><button type="button" data-c="all">ALL</button><button type="button" data-c="sun">SUN</button><button type="button" data-c="earth">EARTH</button><button type="button" data-c="mis">MISSIONS</button></span></span><span class="sp"></span><span class="ctl" data-for="price"><span class="yp"><button class="pnav" data-n="-12" aria-label="Earlier year">‹</button><b id="ylab"></b><button class="pnav" data-n="12" aria-label="Later year">›</button></span></span>
       <button class="btn" id="hide" type="button">HIDE</button></div>
     <div class="dbody" id="dbody">
-      <div data-pane="price"><div class="cal" id="pcal"><p class="hist" id="hist" hidden></p><div class="yg" id="yg"></div><div class="cbot"><div class="b1"><b class="site" data-site></b><span class="cleg" id="cleg"></span><small class="mlab" id="mlab"></small></div><p class="caldet" data-det>Point at a day to see your mission on the calendar; click to choose it.</p></div></div></div>
+      <div data-pane="price"><div class="cal" id="pcal"><p class="hist" id="hist" hidden></p><div class="yg" id="yg"></div><div class="cbot"><div class="b1"><b class="site" data-site></b><span class="cleg" id="cleg"></span><span class="fly" id="fly"></span><small class="mlab" id="mlab"></small></div><p class="caldet" data-det>Point at a day to see your mission on the calendar; click to choose it.</p></div></div></div>
       <div data-pane="ms" hidden><div class="cal"><canvas id="msc"></canvas><div class="cbot"><div class="b1" id="msSum"></div><p class="caldet" id="msDet">Drag across the lanes to move the clock through your mission.</p></div></div></div>
       <div data-pane="slip" hidden><div class="cal"><div class="sl" id="slip"></div><div class="cbot"><div class="b1" id="slSum"></div><p class="caldet" id="slDet">Point at a box to see that landing day; click to choose it.</p></div></div></div>
       <div data-pane="nx" hidden><div class="cal"><div class="nx" id="nx"></div><div class="cbot"><div class="b1" id="nxSum"></div><p class="caldet">Counted from the clock above (hourly steps, real terrain horizon). Press PLAY to watch them count down; click a card to jump there.</p></div></div></div>
@@ -74,6 +74,16 @@
     if (on.earth) return [eOk, '--a:' + (eOk ? COL.earth : COL.off), ' one'];
     return [false, '--a:' + COL.off, ' one'];
   }
+  /* "Fly it" (Adrian's mission page, Eren 15 Nov): shown once a day is chosen, named sites only. Crew button only when the
+     crew preset (App.PRESETS.crew, same relay) passes on that day; otherwise one robotic button worded like Adrian's page. */
+  function fly(){
+    const st = S(), s = App.sites[st.site], el = $('#fly'); if (!el) return;
+    if (st.selDay < 0 || !s || s.custom || !App.flyMission){ el.innerHTML = ''; return; }
+    const cw = App.wins(st.site, Object.assign({}, App.PRESETS.crew, {relay: st.lim.relay}))[st.selDay], crewOk = cw && !cw.fail.length;
+    el.innerHTML = crewOk
+      ? '<button class="btn flyb" type="button" data-fly="robotic" title="Open this day on the mission page, robotic lander">Fly it robotic</button><button class="btn flyb" type="button" data-fly="crewed" title="Open this day on the mission page, crew of the crew preset (6 days, full sunlight)">Fly it with a crew</button>'
+      : '<button class="btn flyb" type="button" data-fly="robotic" title="Open this day on the mission page (a crew cannot land this day under the crew preset)">Fly this mission from Canada</button>';
+  }
   function priceCal(){
     const st = S(), w = App.wins(st.site), d0 = App.date(st.jd0), months = Math.ceil(st.days/30.44), onlyMis = view.on.mis && !view.on.sun && !view.on.earth;
     view.pcM = Math.max(0, Math.min(Math.max(0, months - 12), view.pcM)); view.anyM = false;
@@ -95,6 +105,7 @@
     const allOn = view.on.sun && view.on.earth && view.on.mis; root.querySelectorAll('#cMode button').forEach(b => b.setAttribute('aria-pressed', b.dataset.c === 'all' ? allOn : !!view.on[b.dataset.c]));
     $('#cleg').innerHTML = legend();
     $('#mlab').textContent = $('#mlab').title = view.anyM && window.Missions ? Missions.LABEL : '';
+    fly();
   }
   function spanAt(d){ root.querySelectorAll('#yg .sp').forEach(x => x.classList.remove('sp')); if (d == null) return;
     for (let k = d; k < d + S().lim.len; k++){ const x = root.querySelector('#yg .pd[data-d="' + k + '"]'); if (x) x.classList.add('sp'); } }
@@ -246,7 +257,8 @@
     $('#pPrev').onclick = () => shiftStart(-1); $('#pNext').onclick = () => shiftStart(1);
     $('#hide').onclick = () => App.set({drawerOpen: !S().drawerOpen}, 'drawer');
     // calendar
-    $('#pcal').addEventListener('click', e => { const c = e.target.closest('.pd[data-d]'); if (c) pick(+c.dataset.d); });
+    $('#pcal').addEventListener('click', e => { const f = e.target.closest('[data-fly]'); if (f){ App.flyMission(f.dataset.fly); return; }
+      const c = e.target.closest('.pd[data-d]'); if (c) pick(+c.dataset.d); });
     $('#pcal').addEventListener('mouseover', e => { const c = e.target.closest('.pd[data-d]'); if (!c) return; const d = +c.dataset.d, len = S().lim.len; spanAt(d);
       root.querySelector('[data-pane=price] [data-det]').innerHTML = sentence(App.wins(S().site)[d]) + ' · on the surface ' + len + ' days, until ' + App.dayDate(d + len - 1) + mText(S().site, d); });
     $('#pcal').addEventListener('mouseleave', () => spanAt(null));
