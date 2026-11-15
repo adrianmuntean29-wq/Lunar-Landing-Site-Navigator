@@ -13,6 +13,8 @@
 <link rel="stylesheet" href="css/drawer.css">
 </head>
 <body>
+<!-- loading screen (shell.js hides it when App.ready + the Moon view are ready; CSS hides it after 20 s no matter what) -->
+<div id="loader" role="status" aria-live="polite"><div class="ldbox"><div class="ldt">Preparing the Moon…</div><div class="ldbar"><i></i></div><div class="lds">Loading real terrain and Sun/Earth data</div></div></div>
 <div class="app">
   <header class="top" id="top">
     <button class="btn" id="missionBtn" type="button" aria-expanded="false" aria-controls="missionPanel" title="Fly a mission: the selected site and landing day, from launch to the surface">☰ MISSIONS</button>

@@ -108,8 +108,15 @@ function buildGlobe(){
   const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.BufferAttribute(a, 3));
   globe.add(new THREE.Points(sg, new THREE.PointsMaterial({color: '#8E96A0', size: 1.2, sizeAttenuation: false})));
   buildSunEarth();
-  buildCap(); buildOuter().catch(e => console.error('Moon view: outer terrain failed to load', e));
-  buildCallouts(); buildZones();
+  buildCap();
+  // Loading screen hook (Eren 2026-11-15 "add loading screen"): once the outer terrain and the Moon textures are in, colour the cap and
+  // compile the shaders up front, then set window.__moonReady and fire 'moon-ready' on document. The coordinator's loading screen waits for it.
+  const texReady = t => new Promise(res => { const ok = () => t.image && t.image.complete && t.image.width; if (ok()) return res(); const id = setInterval(() => { if (ok()){ clearInterval(id); res(); } }, 100); });
+  buildOuter().catch(e => console.error('Moon view: outer terrain failed to load', e))
+    .then(() => Promise.all([texReady(moonTex()), texReady(moonNrm())]))
+    .then(() => { if (!capColored) colorCap(); try { renderer.compile(globe, gCam); } catch (e) {} })
+    .finally(moonReady);
+  buildCallouts(); buildZones(); buildPole();
   root.querySelectorAll('#gBar button').forEach(b => b.onclick = () => gFocus(b.dataset.g));
   Object.assign($('#gBar').style, {top: 'auto', bottom: '12px', left: '50%', transform: 'translateX(-50%)'});   // Eren ~22:05: View bar bottom centre (inline: own element; coordinator may move it to scene.css)
   gFocus('pole', null, true);
@@ -140,6 +147,18 @@ const PIN_CSS = 'position:absolute;left:0;top:0;display:flex;gap:1px;pointer-eve
 const numCss = (sel, spot) => `min-width:${MK}px;height:${MK}px;padding:0 4px;box-sizing:border-box;border:0;margin:0;font:700 14px/${MK}px "IBM Plex Mono";` +
   `text-align:center;cursor:pointer;color:#111315;background:${sel ? 'var(--c-sel)' : '#F2F1EC'};` + (spot ? 'outline:2px dashed #111315;outline-offset:-5px;' : '');
 const SRC_SITE = 'Sun and Earth positions: NASA JPL Horizons. Terrain horizon: NASA LOLA (PGDA 90, Barker et al. 2023).', SRC_SPOT = 'Your own spot: coarse terrain, approximate.';
+// South pole (Eren 2026-11-15: "add the south pole ... as a straight line coming out of it"): the Moon's spin axis as a straight line
+// standing up out of the pole point (~20 km tall, a marker, not to scale), with a "South pole" tag at its top. Tag hidden at whole-Moon zoom.
+const POLE_LEN = 0.012;   // ~20 km: the line and its tag stay on screen at pole zoom
+let gPole = null, gPoleTag = null, gPoleTop = null;
+function buildPole(){
+  const base = surf(-90, 0); gPoleTop = base.clone().setLength(base.length() + POLE_LEN);
+  gPole = new THREE.Line(new THREE.BufferGeometry().setFromPoints([base, gPoleTop]), new THREE.LineBasicMaterial({color: '#E8EAED', transparent: true, opacity: 0.9}));
+  gPole.renderOrder = 3; globe.add(gPole);
+  gPoleTag = document.createElement('div'); gPoleTag.textContent = 'South pole';
+  gPoleTag.title = 'The Moon\'s south pole (90 deg S). The line is the Moon\'s spin axis.';
+  gPoleTag.style.cssText = 'position:absolute;left:0;top:0;font:600 11.5px "IBM Plex Mono";color:var(--c-ink);background:var(--c-box);border:1px solid var(--c-white50);border-radius:4px;padding:2px 7px;white-space:nowrap;pointer-events:auto;cursor:help;will-change:transform';
+  $('#glabels').appendChild(gPoleTag); }
 let gClus = null, gStem = null, gPins = new Map(), gPrev = new Map();   // gPins: group key -> {el, w}; gPrev: site index -> last group key
 function boxLine(s){   // 1 km box in polar stereographic metres around the site, draped on the terrain (lifted ~60 m before exaggeration)
   const r0 = rhoOf(s.lat), x0 = r0*Math.sin(s.lon*D2R), y0 = r0*Math.cos(s.lon*D2R), h = BOX_KM/2, pts = [], N = 8;
@@ -293,6 +312,8 @@ function updateGlobe(){
   gZoneTags.forEach(t => { const q = t.p.clone().project(gCam), on = !clus && gCam.position.distanceTo(gCtl.target) < 0.2 && gCam.position.clone().sub(t.p).dot(t.p) > 0 && q.z <= 1 && Math.abs(q.x) <= 0.97 && Math.abs(q.y) <= 0.97;
     S(t.el, 'display', on ? '' : 'none'); if (on) S(t.el, 'transform', `translate3d(${((q.x*0.5 + 0.5)*w).toFixed(1)}px,${((-q.y*0.5 + 0.5)*h).toFixed(1)}px,0) translate(-50%,-50%)`); });
   if (gZoneKey) S(gZoneKey, 'display', clus ? 'none' : '');
+  if (gPoleTag){ const q = gPoleTop.clone().project(gCam), on = !clus && q.z <= 1 && Math.abs(q.x) <= 0.97 && Math.abs(q.y) <= 0.97;
+    S(gPoleTag, 'display', on ? '' : 'none'); if (on) S(gPoleTag, 'transform', `translate3d(${((q.x*0.5 + 0.5)*w).toFixed(1)}px,${((-q.y*0.5 + 0.5)*h).toFixed(1)}px,0) translate(-50%,-100%) translateY(-4px)`); }
   // dots: every visible site, true position (hidden at whole-Moon zoom)
   gsl.forEach(g => { const on = !clus && vis.includes(g); S(g.dot, 'display', on ? '' : 'none'); S(g.ld, 'display', 'none');
     if (on){ S(g.dot, 'background', g.i === st.site ? 'var(--c-sel)' : '#F2F1EC'); at(g.dot, g.x, g.y); } });
@@ -326,8 +347,12 @@ function updateGlobe(){
 let gDirty = true, gLastDraw = 0, gSize = '', gHot = 0, gSaved = null;
 let gDraws = 0;
 function drawGlobe(){ updateGlobe(); renderer.render(globe, gCam); gDirty = false; gLastDraw = performance.now(); gDraws++; }
+// loading-screen flag: set once (terrain + textures + shaders ready, a failed build, or no WebGL at all). Build runs at boot for every
+// opening view, so the flag does not depend on the Moon view being shown.
+function moonReady(){ if (window.__moonReady) return; window.__moonReady = true; document.dispatchEvent(new CustomEvent('moon-ready')); }
+try { const c = document.createElement('canvas'); if (!(c.getContext('webgl2') || c.getContext('webgl'))) moonReady(); } catch (e){ moonReady(); }   // no WebGL: release at once
 register('globe', {
-  build: buildGlobe,
+  build(){ try { buildGlobe(); } catch (e){ console.error('Moon view: build failed', e); moonReady(); } },   // a failed build must not hold the loading screen
   show(on){ $('#glabels').hidden = !on; $('#gBar').hidden = !on; gCtl.enabled = on; gDirty = true;
     // shared renderer: while the Moon view is on, shadows update only on demand (see updateGlobe) and use the standard PCF filter
     // (was PCFSoft: per-pixel cost); both restored for the other views when it hides

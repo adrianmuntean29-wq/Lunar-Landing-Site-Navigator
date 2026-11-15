@@ -81,3 +81,9 @@
 #scene .gclus:hover,#scene .gclus:focus-visible{border-color:var(--c-sel);outline:none}
 #scene .gdet{position:absolute;transform:translate(-50%,0);font:600 10.5px "IBM Plex Mono";color:var(--c-ink);background:var(--c-box);border:1px solid var(--c-sel);border-radius:4px;padding:1px 6px;pointer-events:auto;cursor:pointer;white-space:nowrap}
 #scene .gdet:hover,#scene .gdet:focus-visible{background:var(--c-selcard);outline:none}
+/* layers box fold tab (Eren 15 Nov, view-site spec) */
+#scene .layers .lyfold{position:absolute;left:-22px;top:8px;width:22px;height:34px;border:1px solid var(--line);border-right:0;border-radius:6px 0 0 6px;background:color-mix(in srgb,var(--panel) 90%,transparent);color:var(--muted);cursor:pointer;font:600 14px "IBM Plex Mono";padding:0}
+#scene .layers .lyfold:hover,#scene .layers .lyfold:focus-visible{color:var(--ink)}
+#scene .layers .lyfold:focus-visible{outline:2px solid var(--earth);outline-offset:1px}
+#scene .layers.folded{padding:0;border:0;background:none;width:0;height:42px;overflow:visible}
+#scene .layers.folded > :not(.lyfold){display:none}

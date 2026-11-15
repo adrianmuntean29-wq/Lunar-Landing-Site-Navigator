@@ -19,7 +19,7 @@ root.innerHTML = `
   <div class="labels" id="glabels" hidden></div>
   <div class="obbar" id="gBar" role="group" aria-label="Camera" hidden><span>View</span><button type="button" data-g="pole" aria-pressed="true">South pole</button><button type="button" data-g="moon" aria-pressed="false">Whole Moon</button></div>  <div class="sitebar" id="sitebar" hidden><button type="button" class="btn" id="lookSun">Look at the Sun</button><button type="button" class="btn" id="lookEarth">Look at Earth</button></div>
   <div class="skylabels" id="skylabels" hidden></div>
-  <div class="layers" id="layersBox">
+  <div class="layers" id="layersBox"><button type="button" class="lyfold" id="lyFold" aria-expanded="true" aria-controls="layersBox" aria-label="Hide layers" title="Hide layers">›</button>
     <div class="lyhead"><span>Landing</span><span class="info-wrap"><button type="button" class="info-i" aria-label="About the landing layers" aria-describedby="lyTipLand">i</button><span class="info-tip" id="lyTipLand" role="tooltip"><span>Things that matter for the lander.</span><span><b>Landing site markers</b>: numbered tags of the other sites (same numbers as the list on the right). Off hides them; the selected site and your own spot always keep theirs.</span><span><b>Sunlight now</b>: ground the Sun reaches at the time on the clock turns yellow, ground in shadow turns blue. It changes as time plays; it is one moment, not a yearly average. Exact within about 90 km of the site (sun shadows switch on with it).</span><span><b>Elevation</b>: height of the ground, blue = low, yellow = high, white = highest (−6 to +7 km from the Moon's mean radius). Heights in 3D are drawn ×2.</span><span><b>Permanently shadowed</b>: areas the Sun never reaches (LOLA model).</span><span><b>Flat, smooth terrain</b>: team analysis by Tudor (ArcGIS: LOLA slope and hillshade, PGDA 90 roughness, permanent shadow). Most of it is dark most of the time. Not NASA regions.</span></span></span></div>
     <label><input type="checkbox" id="lySites" checked> <span class="sitesw"></span> Landing site markers</label>
     <label><input type="checkbox" id="lyLight"> <span class="litsw"></span> Sunlight now</label>
@@ -54,6 +54,13 @@ export function register(name, hooks){ views[name] = hooks; }
 
 function size(){ if (!renderer) return; const w = root.clientWidth, h = root.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false);
   cams.forEach(c => { c.aspect = w/h; c.updateProjectionMatrix(); }); layersSpot(); }
+// layers box fold tab (Eren 15 Nov, via view-site): arrow on the box's left side; state kept in localStorage 'spn-layers-folded'
+function setFold(f){ const box = $('#layersBox'), b = $('#lyFold'); if (!box || !b) return;
+  box.classList.toggle('folded', f); b.setAttribute('aria-expanded', !f); b.textContent = f ? '‹' : '›';
+  const lab = f ? 'Show layers' : 'Hide layers'; b.setAttribute('aria-label', lab); b.title = lab;
+  try { localStorage.setItem('spn-layers-folded', f ? '1' : '0'); } catch (e) {} }
+{ const b = $('#lyFold'); if (b){ b.onclick = () => setFold(!$('#layersBox').classList.contains('folded'));
+  let f = false; try { f = localStorage.getItem('spn-layers-folded') === '1'; } catch (e) {} if (f) setFold(true); } }
 // layers box: top-right corner; drops below the view tabs only when the scene is too narrow for both on one row
 let boxW = 310;
 function layersSpot(){ const box = $('#layersBox'), tabs = root.querySelector('.views'); if (box.offsetWidth) boxW = box.offsetWidth;

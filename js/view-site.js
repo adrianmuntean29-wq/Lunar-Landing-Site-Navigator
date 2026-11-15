@@ -309,7 +309,8 @@ function buildScene(){
   // note box (bottom left, never mid-screen): spot status, errors, and "outside the detailed map" for the selected site
   note = document.createElement('div'); note.id = 'siteNote'; note.setAttribute('role', 'status');
   Object.assign(note.style, {position: 'absolute', left: '12px', bottom: '12px', maxWidth: '360px', font: '12px/1.4 "IBM Plex Sans", sans-serif',
-    color: 'var(--ink)', background: 'color-mix(in srgb, var(--panel) 90%, transparent)', border: '1px solid var(--line)', borderRadius: '4px', padding: '6px 9px', pointerEvents: 'none', zIndex: 3});
+    color: 'var(--ink)', background: 'color-mix(in srgb, var(--panel) 90%, transparent)', border: '1px solid var(--line)', borderRadius: '4px', padding: '6px 9px', pointerEvents: 'auto', zIndex: 3, display: 'flex', alignItems: 'center', gap: '8px'});
+  note.innerHTML = '<span class="nt"></span><span class="info-wrap"><button type="button" class="info-i" aria-label="About this 3D ground" aria-describedby="siteNoteTip">i</button><span class="info-tip left up" id="siteNoteTip" role="tooltip"></span></span>';
   note.hidden = true; root.appendChild(note);
   // double-click the ground = test a custom landing spot there (single clicks and drags still orbit)
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
@@ -329,11 +330,13 @@ function noteText(){
   // honest terrain label: which grid the 3D ground under the selected site comes from (the picture only; numbers come from core.js)
   const s = App.sites[App.state.site], [x, z] = s ? siteXZ(s) : [0, 0], L = s && layerAt(x, z);
   const res = !L ? null : L.res >= 1000 ? (L.res/1000).toFixed(1) + ' km' : Math.round(L.res) + ' m';
-  let t = flash;
-  if (!t && s) t = (s.custom ? 'Your spot' : s.short) + ': 3D ground from ' + (res ? res + ' NASA LOLA terrain (PGDA 90)' : 'terrain (loading)') + ', a picture only. '
-    + (s.custom ? 'Its numbers are ' + s.label + '.' : 'Its numbers use its full terrain horizon.') + ' Double-click the ground to test any spot.';
-  if (!t) t = 'Double-click the ground to test any spot.';
-  if (note.textContent !== t) note.textContent = t;
+  // visible: one short action line (Eren 15 Nov); the terrain detail lives in the (i). Status/errors (flash) replace the action line while shown.
+  const t = flash || 'Double-click to pick a custom spot';
+  const tip = s ? (s.custom ? 'Your spot' : s.short) + ': 3D ground from ' + (res ? res + ' NASA LOLA terrain (PGDA 90)' : 'terrain (loading)') + ', a picture only. '
+    + (s.custom ? 'Its numbers are ' + s.label + '.' : 'Its numbers use its full terrain horizon.') : 'The 3D ground is a picture only; every number comes from the terrain horizon masks.';
+  const nt = note.querySelector('.nt'), tp = note.querySelector('.info-tip');
+  if (nt.textContent !== t) nt.textContent = t;
+  if (tp.textContent !== tip) tp.textContent = tip;
 }
 
 function updateScene(){
@@ -468,7 +471,7 @@ function legendText(out){
   if (lg !== lastLegend){ lastLegend = lg; $('#legend').innerHTML = lg; }   // only touch the DOM when the text changes
 }
 let lastLegend = '', labKey = '', labOut = [];
-const misShort = m => m.id === 'mip' ? 'Ch-1 impact est. 1' : m.id === 'mip_alt' ? 'Ch-1 impact est. 2' : m.name.replace(/ \(.*\)$/, '').replace(/ Endurance$/, '');
+const misShort = m => m.id === 'mip_alt' ? 'Chandrayaan-1 impact' :m.name.replace(/ \(.*\)$/, '').replace(/ Endurance$/, '');
 
 register('region', {
   build: buildScene,

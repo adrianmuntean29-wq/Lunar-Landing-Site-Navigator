@@ -41,7 +41,7 @@ checks the Sun and the Earth against the **real terrain horizon** computed from 
 - **Flat, smooth terrain and team sites (Tudor):** our teammate Tudor screened the pole in ArcGIS (LOLA slope and hillshade,
   PGDA 90 roughness, permanent shadow) and found 16 flat, smooth areas. Terrain screening alone finds flat ground, but most of
   it is dark (zone medians 15-41% sun). Our light engine on top found flat spots with 60-72% sun (2 m mast, 2027-2031): sites TZ3, TZ13, TZ9, plus
-  Tudor's proposed site TP1, all in the site list (14 sites). TZ13 and TZ3 are upper bounds at the 2 m mast.
+  the team's proposed site POL1, all in the site list (14 sites). TZ13 and TZ3 are upper bounds at the 2 m mast.
 - **Missions (fly it), the mission page by Adrian:** pick a day in the calendar and press **Fly it robotic** or **Fly it with a crew**
   (or the top-left ☰ MISSIONS button) to open the mission view for that site and day; the launch and flight play by themselves: launch dates
   from Spaceport Nova Scotia (Canada), the flight to the Moon (simplified model), touchdown, the sky above the site during

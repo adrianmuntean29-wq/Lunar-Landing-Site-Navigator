@@ -7,7 +7,6 @@
   root.innerHTML = `
     <div class="tabs" id="ptabs"><span class="vt" id="vTitle"></span><span class="info-wrap psrc"><button type="button" class="info-i" aria-label="Where the numbers in this panel come from" aria-describedby="pSrcTip">i</button><span class="info-tip" id="pSrcTip" role="tooltip"></span></span><button class="x" id="closeP" type="button" aria-label="Close panel">×</button></div>
     <div class="scroll" id="pSystem" hidden>
-      <div class="sitepick"><span>Date and time (UTC)</span><h2 id="oDate"></h2></div>
       <section class="facts">
         <div><span>Moon phase</span><b id="oPhase"></b></div>
         <div><span>Earth to Moon</span><b id="oEM"></b><small id="oEMr"></small></div>
@@ -181,7 +180,6 @@
   }
   function orbit(){
     const st = App.state, j = st.jd0 + st.t, m = App.moonInfo(j), x = App.stateAt(App.sites[st.site], j);
-    $('#oDate').textContent = App.iso(j);
     $('#oPhase').textContent = m.phase + ', ' + Math.round(m.lit*100) + '% lit';
     $('#oEM').textContent = km(m.earthKm);
     $('#oEMr').textContent = 'Closest ' + km(m.closest.km) + ' on ' + dShort(m.closest.jd) + ' · farthest ' + km(m.farthest.km) + ' on ' + dShort(m.farthest.jd) + ' (within 15 days)';
@@ -257,14 +255,19 @@
       /* Eren ~21:45: "nobody should need more than 1 second". Row = number, name, good days + bar; one ⚠ only when something is off.
          Selected row = now (Sun/Earth), 4 big numbers, mission warning, plan button; everything else under "More detail". */
       // Tudor's sites (2026-11-15): a short kind tag in the row, the full kind on hover and under More detail
-      const KSHORT = {'best-lit flat point in team terrain zone (Tudor)': 'flat + lit (Tudor)', 'team proposed site (Tudor)': "Tudor's site"}, ks = KSHORT[s.kind];
+      // Team sites (Eren 2026-11-15: "POL proposed site" with an (i)). Old and new kind strings both map, so the row works before and after the data rename.
+      const POL_TIP = 'Our proposed landing site. Peaks of Light picked this spot from what we found: flat, smooth ground in our own terrain analysis, then checked with the same sunlight and Earth-contact engine as every other site on this list.';
+      const FLAT_TIP = 'The best-lit point inside one of our flat, smooth terrain areas (team analysis). Numbers from the same engine as every other site.';
+      const KSHORT = {'team proposed site (Tudor)': ['POL proposed site', POL_TIP], 'team proposed site (Peaks of Light)': ['POL proposed site', POL_TIP],
+        'best-lit flat point in team terrain zone (Tudor)': ['POL flat + lit', FLAT_TIP], 'best-lit flat point in team terrain zone (Peaks of Light)': ['POL flat + lit', FLAT_TIP]}, ks = KSHORT[s.kind];
       const le = s.truncated ? '≤ ' : '', warns = [];
       if (m && !m.ok) warns.push('another mission plans to land nearby');
       if (hist) warns.push('historic target, for comparison only');   // ⚠ only for things a planner must act on; "best case" is the ≤ sign, your spot is the ★
       const wn = warns.length ? '<span class="wn" title="' + warns.join('; ') + '" aria-label="Warning: ' + warns.join('; ') + '">⚠</span>' : '';
       const ddTip = s.truncated ? ' title="Best case: part of the horizon is outside our map, so the real number can only be lower"' : s.custom ? ' title="Your spot: ' + s.label + ', approximate"' : '';
       let h = '<div class="srow' + (sel ? ' sel' : '') + (out ? ' out' : '') + '" data-i="' + r.i + '" role="button" tabindex="0" aria-pressed="' + sel + '">' +
-        '<div class="rh"><span class="num">' + (s.custom ? '★' : r.i + 1) + '</span><span class="nm">' + s.name + (ks ? ' <em class="kindtag ktud" title="' + s.kind + '">' + ks + '</em>' : '') + '</span>' + wn + '<span class="dd"' + ddTip + '><b>' + (s.custom ? '~ ' : le) + r.ok + '</b> good days</span></div>' +
+        '<div class="rh"><span class="num">' + (s.custom ? '★' : r.i + 1) + '</span><span class="nm">' + s.name + (ks && s.name.indexOf(ks[0]) < 0 ? ' <em class="kindtag ktud">' + ks[0] + '</em>' : '') + '</span>' + wn + '<span class="dd"' + ddTip + '><b>' + (s.custom ? '~ ' : le) + r.ok + '</b> good days</span></div>' +
+        (ks ? '<div class="kline">' + tip('About ' + ks[0], ks[1]) + '<span>' + (ks[0] === 'POL proposed site' ? 'our pick' : 'our analysis') + '</span></div>' : '') +
         '<div class="gbar" title="' + r.ok + ' of ' + r.n + ' landing days in ' + y0 + ' work"><i style="width:' + (r.n ? r.ok/r.n*100 : 0).toFixed(1) + '%"></i></div>';
       if (sel){ const poleKm = 2*1737.4*Math.tan((90 + raw.lat)/2*Math.PI/180), cut = m ? m.text.indexOf('. ') : -1;
         h += '<div class="rx">' +

@@ -60,4 +60,14 @@
   }
   $('#panelBtn').onclick =() => App.set({panelOpen: !App.state.panelOpen}, 'shell');
   App.ready.then(() => { top(); theme(); });
+  /* loading screen (Eren 15 Nov): hide when App.ready has resolved AND view-moon.js says the Moon is ready
+     (flag first: 'moon-ready' may already have fired). Hard stop after 20 s, also in CSS, so a WebGL failure never traps the page. */
+  const loader = document.getElementById('loader');
+  if (loader){
+    let gone = false;
+    const hide = () => { if (gone) return; gone = true; loader.classList.add('done'); setTimeout(() => { loader.hidden = true; }, 400); };
+    const moon = new Promise(res => { if (window.__moonReady) return res(); document.addEventListener('moon-ready', res, {once: true}); });
+    Promise.all([App.ready, moon]).then(hide, hide);
+    setTimeout(hide, 20000);
+  }
 })();

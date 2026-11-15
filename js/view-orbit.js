@@ -155,7 +155,7 @@ function updateSpace(){
     at.setXYZ(0, u.x, u.y, u.z); at.setXYZ(1, -u.x, -u.y, -u.z); at.needsUpdate = true; sSiteAx.geometry.computeBoundingSphere(); }
   const sp = sMoon.localToWorld(llv(s.lat, s.lon, 1.01)), facing = sp.clone().sub(moonW).dot(sCam.position.clone().sub(sp)) > 0;
   // tag = short name + the angle between the site line and the spin axis (= 90 deg - |latitude|), Eren 14 Nov
-  const stag = s.short + ' · ' + (90 - Math.abs(s.lat)).toFixed(1) + '° from the pole';
+  const stag = 'Selected: ' + s.short + ' · ' + (90 - Math.abs(s.lat)).toFixed(1) + '° from the pole';
   if (olab.site.textContent !== stag){ olab.site.textContent = stag; olab.site.title = 'Angle between the blue site line and the Moon\'s spin axis (orange) = 90° minus the site\'s latitude'; }
   put(olab.site, sp, facing && ang(1, dM) > 40);
 }
