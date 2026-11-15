@@ -256,7 +256,11 @@ window.App = (function(){
     const [e, s, p] = await Promise.all([fetch(DATA + 'subpoints.json'), fetch(DATA + 'sites.json'), fetch(DATA + 'psr.json')].map(x => x.then(r => r.json())));
     EPH = e; eph = {generated_utc: e.generated_utc, versions: e.versions, start: date(e.jd0), end: date(e.jd0 + (e.n - 3)*e.step_hours/24)};
     sj = s; psr = p;
-    sites = s.sites.map((o, i) => ({i, id: o.id, name: o.name.replace(/ \(.*\)/, ''), short: (o.name.match(/\((.*)\)/) || [, o.name])[1], lat: o.lat, lon: o.lon_e, masks: o.masks, psr_km: o.psr_km, kind: o.kind || 'published study point', truncated: !!o.truncated, edge_rays: o.edge_rays || 0, raw: o}));
+    sites = s.sites.map((o, i) => ({i, id: o.id, name: o.name.replace(/ \(.*\)/, ''), short: (o.name.match(/\((.*)\)/) || [, o.name])[1], lat: o.lat, lon: o.lon_e, masks: o.masks, psr_km: o.psr_km, kind: o.kind || 'published study point', raw: o,
+      // upper bound follows the SELECTED mast (engine 15 Nov: a taller mast sees farther, so more rays reach the map edge).
+      // edge_rays_by_mast missing (old files) -> the file's single 2 m flag.
+      get edge_rays(){ const e = o.edge_rays_by_mast; return e && e[state.mast] != null ? e[state.mast] : (o.edge_rays || 0); },
+      get truncated(){ const e = o.edge_rays_by_mast; return e && e[state.mast] != null ? e[state.mast] > 0 : !!o.truncated; }}));
     // 50 m ranges (engine-2, Eren 2026-11-14 ~20:00): optional file; missing = no range shown
     try {
       const rj = await fetch(DATA + 'site_ranges.json').then(r => r.ok ? r.json() : null);

@@ -25,9 +25,10 @@ available or OSI-licensed, with its licence listed here.
 | Source | Used for | Link | Licence / terms |
 |---|---|---|---|
 | Open-Meteo forecast API and historical weather API (ERA5 reanalysis) | Launch-site weather in the mission view (loaded live, not stored) | https://open-meteo.com/ | Data CC BY 4.0, attribution "Weather data by Open-Meteo.com" |
-| Wikipedia, "List of artificial objects on the Moon" and "Mons Mouton" | Coordinates of past landings shown for reference | https://en.wikipedia.org/wiki/List_of_artificial_objects_on_the_Moon | CC BY-SA 4.0 (facts cited, no text copied) |
+| NASA NSSDCA, Apollo landing site coordinates (from LRO images, Wagner et al. 2017, Icarus 283) | Apollo 11, 15, 17 positions in the mission view | https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html | NASA content |
+| LROC (LRO Camera team, ASU) image pages with measured lander positions | Chandrayaan-3, Chang'e 4, Chang'e 6, SLIM, Blue Ghost M1 and IM-2 Athena positions in the mission view | https://lroc.im-ldi.com/images/1314 · /1100 · /1374 · /1358 · /1407 · /1408 | LROC/ASU, NASA mission data |
 | LROC image page of the IM-2 target | Site J (IM-2 Athena target) | https://lroc.im-ldi.com/images/1401 | LROC/ASU, NASA mission data |
-| Space Odyssey Hub, Spaceport Nova Scotia | Launch-site coordinates | https://spaceodysseyhub.com/compare/spaceports/spaceport-nova-scotia | Facts cited |
+| Maritime Launch Services, Spaceport Nova Scotia (Canso, NS) | Launch-site location; the coordinates (about 45.35 N, 61.02 W) are approximate, the operator does not publish them | https://maritimelaunch.com/ | Facts cited |
 | Flat, smooth terrain zones (`data/zones.json`) | Team analysis by Tudor in ArcGIS from LOLA slope and hillshade, PGDA 90 roughness and permanently shadowed regions; drawn as "Flat, smooth terrain (team analysis)", not NASA regions and not chosen for sunlight | this repository | MIT (our work) |
 
 ## Images and textures

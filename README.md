@@ -38,9 +38,10 @@ checks the Sun and the Earth against the **real terrain horizon** computed from 
 - **Other missions:** past and planned landers shown as pins, with a keep-out filter based on NASA's
   2011 non-binding recommendations (2.0 km from landers and historic sites, 0.5 km from impact sites).
 - **Provenance bar:** which data versions were used and when they were computed.
-- **Flat, smooth terrain (team analysis):** 11 areas a teammate drew in ArcGIS from LOLA slope and hillshade, PGDA 90
-  roughness and permanent shadow, with the distance from each site to the nearest zone. They are flat and smooth, but our
-  engine finds most of them poorly lit (the best point reaches about 51% sunlight), which shows why terrain alone is not enough.
+- **Flat, smooth terrain and team sites (Tudor):** our teammate Tudor screened the pole in ArcGIS (LOLA slope and hillshade,
+  PGDA 90 roughness, permanent shadow) and found 16 flat, smooth areas. Terrain screening alone finds flat ground, but most of
+  it is dark (zone medians 15-41% sun). Our light engine on top found flat spots with 60-72% sun (2 m mast, 2027-2031): sites TZ3, TZ13, TZ9, plus
+  Tudor's proposed site TP1, all in the site list (14 sites). TZ13 and TZ3 are upper bounds at the 2 m mast.
 - **Missions (fly it), the mission page by Adrian:** pick a day in the calendar and press **Fly it robotic** or **Fly it with a crew**
   (or the top-left ☰ MISSIONS button) to open the mission view for that site and day; the launch and flight play by themselves: launch dates
   from Spaceport Nova Scotia (Canada), the flight to the Moon (simplified model), touchdown, the sky above the site during

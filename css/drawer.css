@@ -110,3 +110,4 @@
 #drawer .cbot .flyb{height:18px;padding:0 8px;font:500 11px "IBM Plex Sans";line-height:16px;border-color:var(--sel);color:var(--sel)}
 #drawer .cbot .flyb:hover{background:var(--sel);color:var(--bg)}
 #drawer .cbot .b1 .cleg{flex:0 1 auto;min-width:0;overflow:hidden}   /* narrow: the legend gives way, the Fly it buttons stay */
+#drawer .dtabs .dsrc{margin-right:8px;align-self:center}   /* source (i) for every number in the drawer */

@@ -63,4 +63,5 @@ body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "IBM Plex San
 .info-i:focus-visible{outline:2px solid var(--earth);outline-offset:2px}
 .info-tip{position:absolute;right:-4px;top:calc(100% + 8px);z-index:20;width:300px;max-width:min(300px,90vw);background:var(--tip);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font:500 11.5px "IBM Plex Mono";color:var(--muted);display:none;gap:3px;box-shadow:0 4px 16px var(--shadow);cursor:default;white-space:normal;text-align:left}
 .info-tip.left{left:-4px;right:auto}
+.info-tip.up{top:auto;bottom:calc(100% + 8px)}   /* for (i) near the bottom of the screen, e.g. the drawer */
 .info-i:hover + .info-tip,.info-i:focus + .info-tip{display:grid}

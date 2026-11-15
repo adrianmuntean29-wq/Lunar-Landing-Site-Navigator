@@ -59,6 +59,12 @@ const POLAR_GLSL = `
 // three r160 lights_fragment_begin: the directional shadow term, softened by sEdge (checked against the 0.160.0 build)
 const LIGHTS_EDGE = THREE.ShaderChunk.lights_fragment_begin.replace('? getShadow( directionalShadowMap', '? sEdge + (1.0 - sEdge) * getShadow( directionalShadowMap');
 if (LIGHTS_EDGE === THREE.ShaderChunk.lights_fragment_begin) console.warn('Moon view: shadow edge fade not applied (three.js chunk changed)');
+function halfGrid(M, H){   // 2x2 block mean (NaN-aware) -> a grid with half the points per side, same extent
+  const nx = Math.floor(M.nx/2), ny = Math.floor(M.ny/2), out = new Float32Array(nx*ny);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++){ let s = 0, n = 0;
+    for (const [a, b] of [[0, 0], [1, 0], [0, 1], [1, 1]]){ const v = H[(2*j + b)*M.nx + 2*i + a]; if (isFinite(v)){ s += v; n++; } }
+    out[j*nx + i] = n ? s/n : NaN; }
+  return [Object.assign({}, M, {nx, ny, pixel_m: M.pixel_m*2}), out]; }
 async function buildOuter(){   // 3D terrain ring 57 km -> 80.3 S, so the real shadows reach out to where the flat globe takes over
   OMETA = await (await fetch('assets/site_outer_meta.json')).json();
   OHGT = new Float32Array(await (await fetch('assets/site_outer_heights.bin')).arrayBuffer());
@@ -68,7 +74,8 @@ async function buildOuter(){   // 3D terrain ring 57 km -> 80.3 S, so the real s
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vLoc;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvLoc = position;');
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vLoc;\nuniform sampler2D polarNrm;')
       .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>' + POLAR_GLSL).replace('#include <lights_fragment_begin>', LIGHTS_EDGE); };
-  gOut = buildTerrain(OMETA, OHGT, rho => rho >= RIN && rho <= ROUT, outTaper, mat);
+  const [M2, H2] = halfGrid(OMETA, OHGT);   // mesh at 2.4 km (262k -> 66k points); the relief image keeps the shading detail, capH() keeps the full grid
+  gOut = buildTerrain(M2, H2, rho => rho >= RIN && rho <= ROUT, outTaper, mat); gShadowDirty = true;
   capColored = false; gsl.forEach(g => { g.p = null; g.boxSel = null; }); buildZones();   // recolour both meshes; markers beyond the fine cap move onto the new ground
 }
 function colorCap(){   // sample the NASA colour map at each terrain vertex (sRGB -> linear)
@@ -120,7 +127,7 @@ function buildSunEarth(){
   globe.add(gEarth);
   const mk = (cls, txt) => { const e = document.createElement('div'); e.className = 'sky ' + cls; e.textContent = txt; e.dataset.name = txt; $('#glabels').appendChild(e); return e; };
   gSunLab = mk('sun', 'Sun'); gEarthLab = mk('earth', 'Earth');
-  [[gSunLab, 'sun'], [gEarthLab, 'earth']].forEach(([e, k]) => { e.onclick = () => gFocus(k); e.title = 'Turn the camera to see the ' + (k === 'sun' ? 'Sun' : 'Earth') + ' past the Moon'; });
+  [[gSunLab, 'sun'], [gEarthLab, 'earth']].forEach(([e, k]) => { e.onclick = () => gFocus(k); e.title = 'Turn the camera to see the ' + (k === 'sun' ? 'Sun' : 'Earth') + ' past the Moon.\nPosition: NASA JPL Horizons.'; });
 }
 // site markers (Eren ~21:30, 3rd version: "too small", "moves choppy"): a big bright numbered square ON each site point, never nudged.
 // Sites closer than ~30 px on screen share ONE marker ("5 | 10"), each number its own button; a pair joins below JOIN px and only splits
@@ -132,6 +139,7 @@ const PIN_CSS = 'position:absolute;left:0;top:0;display:flex;gap:1px;pointer-eve
   'box-shadow:0 0 0 2px rgba(0,0,0,.8),0 2px 10px rgba(0,0,0,.65);will-change:transform;z-index:1';
 const numCss = (sel, spot) => `min-width:${MK}px;height:${MK}px;padding:0 4px;box-sizing:border-box;border:0;margin:0;font:700 14px/${MK}px "IBM Plex Mono";` +
   `text-align:center;cursor:pointer;color:#111315;background:${sel ? 'var(--c-sel)' : '#F2F1EC'};` + (spot ? 'outline:2px dashed #111315;outline-offset:-5px;' : '');
+const SRC_SITE = 'Sun and Earth positions: NASA JPL Horizons. Terrain horizon: NASA LOLA (PGDA 90, Barker et al. 2023).', SRC_SPOT = 'Your own spot: coarse terrain, approximate.';
 let gClus = null, gStem = null, gPins = new Map(), gPrev = new Map();   // gPins: group key -> {el, w}; gPrev: site index -> last group key
 function boxLine(s){   // 1 km box in polar stereographic metres around the site, draped on the terrain (lifted ~60 m before exaggeration)
   const r0 = rhoOf(s.lat), x0 = r0*Math.sin(s.lon*D2R), y0 = r0*Math.cos(s.lon*D2R), h = BOX_KM/2, pts = [], N = 8;
@@ -192,7 +200,8 @@ function pinFor(key, members, sel){   // one marker element per group; rebuilt o
   v.id = id; v.el.innerHTML = '';
   members.forEach(i => { const s = App.sites[i], b = document.createElement('button'); b.type = 'button';
     b.style.cssText = numCss(i === sel, s.custom); b.textContent = s.custom ? '★' : String(i + 1);
-    b.title = (s.custom ? 'Your spot (' + s.label + ')' : (i + 1) + '. ' + s.name) + ': click to select'; b.setAttribute('aria-label', b.title);
+    b.title = (s.custom ? 'Your spot (' + s.label + ')' : (i + 1) + '. ' + s.name) + ': click to select.\n' + SRC_SITE + (s.custom ? '\n' + SRC_SPOT : '');   // source on hover (Eren 2026-11-15)
+    b.setAttribute('aria-label', b.title);
     b.onclick = () => pickSite(i); v.el.appendChild(b); });
   v.w = members.length*MK + (members.length - 1); return v; }
 // camera presets: whole Moon, the south pole (default), or one site; glides over 0.9 s, never through the Moon
@@ -219,15 +228,24 @@ function gFocus(kind, i, now){
   if (now){ gCtl.target.copy(tgt); gCam.position.copy(pos); gCtl.minDistance = minD; gCtl.maxDistance = maxD; gCtl.minPolarAngle = minP; gAnim = null; }
   else { gCtl.enableDamping = false; gCtl.update(); gCtl.enableDamping = true; gAnim = {t0: performance.now(), t1: gCtl.target.clone(), p1: gCam.position.clone(), tgt, pos, minD, maxD, minP}; }
 }
+let gShadow = {}, gShadowDirty = true, gShadowDraws = 0;
 function updateGlobe(){
   const st = App.state, j = st.jd0 + st.t, p = App.ephAt(j), sunD = me2t(p.sun).normalize(), P0 = new THREE.Vector3(0, -1, 0);
   // light from the real Sun; the shadow box follows what the camera looks at and shrinks with zoom (close-ups keep sharp shadows;
   // the pole view covers the whole 3D terrain to 80 S). Snapped in steps so the shadow map does not shimmer while zooming.
   const camD = gCam.position.distanceTo(gCtl.target), half = Math.min(0.18, Math.max(0.025, Math.pow(2, Math.ceil(Math.log2(camD*1.6)*2)/2)));
   if (gCam.position.length() < 1.6) P0.copy(gCtl.target);
-  const sc = gSun.shadow.camera; if (sc.right !== half){ sc.left = sc.bottom = -half; sc.right = sc.top = half; sc.updateProjectionMatrix();
-    gSun.shadow.normalBias = half*0.00055; gSun.shadow.bias = -half*0.00022; }   // biases scale with the texel size (0.0001 / -0.00004 at the full 0.18)
-  gSun.position.copy(P0).addScaledVector(sunD, 1.5); gSun.target.position.copy(P0);
+  // Shadows are drawn ONCE and reused (Eren 2026-11-15: "laggy"; MEASURED 1.95 M triangles/frame, half of it the shadow pass). The shadow
+  // map and the light are only redrawn/moved when the Sun turns > 0.02 deg, the zoom step changes, the shadow centre moves > 1/4 box,
+  // or the terrain changed. Dragging the camera reuses the map.
+  const sc = gSun.shadow.camera, sh = gShadow;
+  const moveSun = gShadowDirty || !sh.sun || sh.half !== half || sh.sun.angleTo(sunD) > 0.02*D2R || sh.p0.distanceTo(P0) > half*0.25;
+  if (moveSun){
+    if (sc.right !== half){ sc.left = sc.bottom = -half; sc.right = sc.top = half; sc.updateProjectionMatrix();
+      gSun.shadow.normalBias = half*0.00055; gSun.shadow.bias = -half*0.00022; }   // biases scale with the texel size (0.0001 / -0.00004 at the full 0.18)
+    gSun.position.copy(P0).addScaledVector(sunD, 1.5); gSun.target.position.copy(P0); gSun.target.updateMatrixWorld();
+    renderer.shadowMap.needsUpdate = true; gShadowDirty = false; gShadowDraws++;
+    gShadow = {sun: sunD.clone(), half, p0: P0.clone()}; }
   const MT = moonTex(); if (!capColored && MT.image && MT.image.complete && MT.image.width) colorCap();
   if (gAnim){ const k0 = Math.min(1, (performance.now() - gAnim.t0)/900), k = k0*k0*(3 - 2*k0);
     gCtl.target.copy(gAnim.t1).lerp(gAnim.tgt, k); gCam.position.copy(gAnim.p1).lerp(gAnim.pos, k);
@@ -285,13 +303,19 @@ function updateGlobe(){
     if (Math.hypot(A.x - B.x, A.y - B.y) < lim) par[find(a)] = find(b); }
   const groups = new Map(); if (!clus) vis.forEach((g, k) => { const r = find(k); if (!groups.has(r)) groups.set(r, []); groups.get(r).push(g); });
   const used = new Set(); gPrev.clear();
+  // pass 1: single sites sit on their points (these rectangles are taken); pass 2: strips try above, below, then further out,
+  // and take the first spot that covers no other marker (14 sites, 2026-11-15: a strip covered marker 14)
+  const taken = [], hits = (x, y, wd) => taken.some(r => x < r.x + r.w + 3 && r.x < x + wd + 3 && y < r.y + MK + 3 && r.y < y + MK + 3);
+  const strips = [];
   groups.forEach(gs => { gs.sort((a, b) => a.i - b.i); const members = gs.map(g => g.i), key = members.join(','), v = pinFor(key, members, st.site);
     used.add(key); members.forEach(i => gPrev.set(i, key)); S(v.el, 'display', '');
-    if (gs.length === 1){ const g = gs[0]; at(v.el, g.x - MK/2, g.y - MK/2); return; }   // single site: the marker sits on its point
-    // strip just above the group (below it near the top edge); a line from each number to its own dot
-    const cx = gs.reduce((a, g) => a + g.x, 0)/gs.length, top = Math.min(...gs.map(g => g.y)), bot = Math.max(...gs.map(g => g.y));
-    const up = top - 22 - MK > 48, sy = up ? top - 22 - MK : bot + 22, left = cx - v.w/2;
-    at(v.el, left, sy);
+    if (gs.length === 1){ const g = gs[0]; at(v.el, g.x - MK/2, g.y - MK/2); taken.push({x: g.x - MK/2, y: g.y - MK/2, w: MK}); return; }
+    strips.push([gs, v]); });
+  strips.forEach(([gs, v]) => {   // a line from each number in the strip to its own dot
+    const cx = gs.reduce((a, g) => a + g.x, 0)/gs.length, top = Math.min(...gs.map(g => g.y)), bot = Math.max(...gs.map(g => g.y)), left = cx - v.w/2;
+    const cand = [[top - 22 - MK, true], [bot + 22, false], [top - 54 - MK, true], [bot + 54, false]].filter(([y]) => y > 48 && y + MK < h - 8);
+    const [sy, up] = cand.find(([y]) => !hits(left, y, v.w)) || cand[0] || [top - 22 - MK, true];
+    at(v.el, left, sy); taken.push({x: left, y: sy, w: v.w});
     gs.forEach((g, k) => { const bx = left + k*(MK + 1) + MK/2, by = up ? sy + MK : sy;
       S(g.ld, 'display', ''); S(g.ld, 'background', g.i === st.site ? 'var(--c-sel)' : 'rgba(242,241,236,.55)'); line(g.ld, bx, by, g.x, g.y); }); });
   gPins.forEach((v, key) => { if (!used.has(key)) S(v.el, 'display', 'none'); });
@@ -299,12 +323,17 @@ function updateGlobe(){
 
 // draw only when something changed (Eren ~21:20: page laggy). Redraw when: the camera moved (drag, damping, glide), app state changed,
 // the canvas resized, or once a second anyway (textures and terrain load in the background). Idle = ~1 frame per second, not 60.
-let gDirty = true, gLastDraw = 0, gSize = '', gHot = 0;
+let gDirty = true, gLastDraw = 0, gSize = '', gHot = 0, gSaved = null;
 let gDraws = 0;
 function drawGlobe(){ updateGlobe(); renderer.render(globe, gCam); gDirty = false; gLastDraw = performance.now(); gDraws++; }
 register('globe', {
   build: buildGlobe,
-  show(on){ $('#glabels').hidden = !on; $('#gBar').hidden = !on; gCtl.enabled = on; gDirty = true; },
+  show(on){ $('#glabels').hidden = !on; $('#gBar').hidden = !on; gCtl.enabled = on; gDirty = true;
+    // shared renderer: while the Moon view is on, shadows update only on demand (see updateGlobe) and use the standard PCF filter
+    // (was PCFSoft: per-pixel cost); both restored for the other views when it hides
+    const smap = renderer.shadowMap;
+    if (on){ gSaved = {auto: smap.autoUpdate, type: smap.type}; smap.autoUpdate = false; smap.type = THREE.PCFShadowMap; gShadowDirty = true; }
+    else if (gSaved){ smap.autoUpdate = gSaved.auto; smap.type = gSaved.type; gSaved = null; } },
   frame(){ const moved = gCtl.update(), size = root.clientWidth + 'x' + root.clientHeight;
     if (moved || gAnim || gDirty || size !== gSize) gHot = 30;   // keep drawing ~0.5 s after the last change: the damping tail ends smoothly
     if (gHot > 0 || performance.now() - gLastDraw > 1000){ gHot = Math.max(0, gHot - 1); gSize = size; drawGlobe(); } },
@@ -317,5 +346,5 @@ register('globe', {
 });
 // test hook (only with ?debug in the URL): draw Moon-view frames on demand, e.g. while the browser pane is hidden and rAF is paused
 if (new URLSearchParams(location.search).has('debug')){ window.__moonFrames = (n = 1) => { for (let i = 0; i < n; i++){ gCtl.update(); updateGlobe(); renderer.render(globe, gCam); } };
-  window.__moonCam = () => ({d: +gCam.position.distanceTo(gCtl.target).toFixed(4), pos: gCam.position.toArray().map(v => +v.toFixed(4)), tgt: gCtl.target.toArray().map(v => +v.toFixed(4)), anim: !!gAnim, draws: gDraws,
+  window.__moonCam = () => ({d: +gCam.position.distanceTo(gCtl.target).toFixed(4), pos: gCam.position.toArray().map(v => +v.toFixed(4)), tgt: gCtl.target.toArray().map(v => +v.toFixed(4)), anim: !!gAnim, draws: gDraws, shadowDraws: gShadowDraws,
     sites: gsl.map((g, i) => { const q = g.p ? g.p.clone().project(gCam) : null; return q ? [i + 1, +q.x.toFixed(2), +q.y.toFixed(2), +q.z.toFixed(3)] : [i + 1]; })}); }

@@ -235,3 +235,5 @@
 #pSites .gmore[open]{display:grid;gap:6px} #pSites .gmore .q{font-size:12px;color:var(--muted);line-height:1.45}
 #pMission .plZone{display:flex;align-items:center;gap:6px;font:500 11.5px "IBM Plex Mono";color:var(--muted);margin-top:-8px}
 #pSites .gzone{font-size:12px;color:var(--ink);margin-top:-6px} #pSites .gzone .info-wrap{vertical-align:-3px}
+#pSites .srow .nm .ktud{margin:0 0 0 4px;vertical-align:1px;color:color-mix(in srgb,var(--zone-3d) 55%,var(--ink));border-color:color-mix(in srgb,var(--zone-3d) 55%,var(--ink))}
+#panel .psrc{margin-left:8px;align-self:center}   /* source (i) next to the view title */

@@ -5,7 +5,7 @@
 (function(){
   const $ = s => document.querySelector('#panel ' + s), root = document.querySelector('#panel');
   root.innerHTML = `
-    <div class="tabs" id="ptabs"><span class="vt" id="vTitle"></span><button class="x" id="closeP" type="button" aria-label="Close panel">×</button></div>
+    <div class="tabs" id="ptabs"><span class="vt" id="vTitle"></span><span class="info-wrap psrc"><button type="button" class="info-i" aria-label="Where the numbers in this panel come from" aria-describedby="pSrcTip">i</button><span class="info-tip" id="pSrcTip" role="tooltip"></span></span><button class="x" id="closeP" type="button" aria-label="Close panel">×</button></div>
     <div class="scroll" id="pSystem" hidden>
       <div class="sitepick"><span>Date and time (UTC)</span><h2 id="oDate"></h2></div>
       <section class="facts">
@@ -86,7 +86,7 @@
   root.querySelectorAll('.spotf').forEach(f => { f.innerHTML = '<div class="addspot"><label>Latitude<br><input class="sLat" type="number" step="0.01" value="-89.2" aria-label="Latitude, degrees (negative = south)"></label><label>Longitude E<br><input class="sLon" type="number" step="0.1" value="120" aria-label="East longitude, degrees"></label><button class="btn sAdd" type="button">Add</button><button class="btn sDel" type="button" hidden>Remove</button></div><p class="note sMsg">Any spot within 290 km of the pole. Its horizon is approximate.</p>'; });
   // Tudor's zones, relabelled by Eren 2026-11-15 "Flat, smooth terrain (team analysis)" (exact engine check: at most ~51% sun inside them).
   // One line for the selected site in Compare sites. Never "candidate", never "NASA zones", never "ice".
-  const zoneTip = () => ((App.zonesJson && App.zonesJson.label) || 'Flat, smooth terrain (team analysis)') + ': made by Tudor in ArcGIS (LOLA slope and hillshade, PGDA 90 roughness, permanently shadowed regions). Flat and smooth does not mean sunny: inside these areas our engine found at most about 51% sunlight. Not NASA regions.';
+  const zoneTip = () => 'Flat, smooth terrain (team analysis by Tudor). Most of it is dark most of the time.';   // coordinator wording 2026-11-15, same in every view
   const zoneLine = s => { const z = App.zoneAt && App.state.zones !== false ? App.zoneAt(s.lat, s.lon) : null; if (!z) return '';
     return '<div class="gzone">' + (z.inside ? 'Inside flat, smooth area ' + z.id : z.km.toFixed(1) + ' km from flat, smooth area ' + z.id) + ' ' + tip('About flat, smooth areas', zoneTip()) + '</div>'; };
   const tip = (label, text) => { const id = 'apxTip' + (tipN++); return '<span class="info-wrap"><button type="button" class="info-i" aria-label="' + label + '" aria-describedby="' + id + '">i</button><span class="info-tip left" id="' + id + '" role="tooltip">' + text + '</span></span>'; };
@@ -94,7 +94,7 @@
   const TRUNC_TXT = s => 'Part of the horizon is beyond our map: ' + s.edge_rays + ' of 360 directions reach the map edge before the terrain stops rising. Missing terrain can only hide the Sun or Earth more, so the true values can be lower, never higher.';
   /* 50 m ranges (Eren 14 Nov ~20:00, core site.range): exact horizons at 25 points, fixed at 2 m mast and 2027-2031. Custom spots: none. */
   const RANGE_TIP = s => 'Exact horizons at 25 points (the site, 8 at 25 m, 16 at 50 m), 2 m mast, 2027-2031. No slope check: some ring points may be too steep to land on.' +
-    (s.kind === 'best-lit point in NASA site box' ? ' This point was chosen as the best-lit one, so it sits at the top of its range.' : '') +
+    (/^best-lit/.test(s.kind || '') ?' This point was chosen as the best-lit one, so it sits at the top of its range.' : '') +
     (s.range.upper ? ' Part of the horizon is beyond our map, so these are upper bounds.' : '');
   function rangeLine(s){ const t = rangeText(s); return t ? '<span>' + t + '</span>' + (s.range.upper ? ' <span class="ub">Upper bound</span>' : '') + ' ' + tip('About this range', RANGE_TIP(s)) : ''; }
   function rangeText(s){
@@ -217,12 +217,13 @@
     // site (i): where the point comes from, its 25/50 m range, distance to permanent shadow
     const rt = rangeText(s);
     $('#plInfo').innerHTML = tip('About this site', (s.custom ? 'Your own spot (' + s.label + ').' : (s.kind ? s.kind.charAt(0).toUpperCase() + s.kind.slice(1) + '.' : '')) +
-      (rt ? ' ' + rt + ' ' + RANGE_TIP(s) : '') + (s.psr_km != null ? ' ' + s.psr_km.toFixed(1) + ' km to the nearest permanently shadowed area.' : ''));
+      (rt ? ' ' + rt + ' ' + RANGE_TIP(s) : '') + (s.psr_km != null ? ' ' + s.psr_km.toFixed(1) + ' km to the nearest permanently shadowed area.' : '') +
+      (!s.custom && s.short === 'C1' && st.mast === '0' ? ' ' + 'At ground level this point is very sensitive: a 0.7° slope within 100 m blocks the low Sun in our 20 m terrain, so it reads 55.8% (5 years) where Gläser et al. 2018 report 76%. At 2 m (a panel on a mast) it clears: 85.6% vs 88.0%. Use the 2 m value.' : ''));
     // candidate zones (Tudor's team analysis; App.zoneAt from core.js once data/zones.json lands): one line + (i). Never "NASA" regions, never "ice".
     const zEl = $('#plZone'), za = typeof App.zoneAt === 'function' && st.zones !== false ? App.zoneAt(s.lat, s.lon) : null;
     zEl.hidden = !za; if (za){ const zn = za.zone || za, nm = 'flat, smooth area ' + zn.id, km = za.km ?? za.dist_km ?? za.distance_km;
       zEl.innerHTML = '<span>' + (za.inside ? 'Inside ' + nm : (km != null ? km.toFixed(1) + ' km from ' : 'Nearest: ') + nm) + '</span> ' +
-        tip('About flat, smooth terrain zones', 'Flat, smooth terrain (team analysis): drawn by Tudor in ArcGIS from LOLA slope and hillshade, PGDA 90 roughness and permanently shadowed regions. Not NASA regions. Not chosen for sunlight: our engine finds at most about 51% sun inside them (C1: 86%), 2 m mast, 2027-2031.'); }
+        tip('About flat, smooth terrain zones', 'Flat, smooth terrain (team analysis by Tudor). Most of it is dark most of the time. Drawn in ArcGIS from LOLA slope and hillshade, PGDA 90 roughness and permanently shadowed regions; not NASA regions.'); }
   }
   function others(){
     const box = $('#others');
@@ -240,6 +241,8 @@
     /* Red team 17:54 item 5: no bare one-decimal site %. Whole %, the mast height on the label, and the 0/2/10 m spread from the same data.
        A published value that disagrees by > 5 points (C1 at 0 m: 76 vs 56) gets an (i) on why bare-surface values are fragile. */
     const P = v => Math.round(v) + '%';
+    // Connecting Ridge at 0 m (Eren 15 Nov, via Competitor Research): note, never hide. Engine logs 2026-11-14-1400 + 2026-11-15-1040 (MEASURED).
+    const C1_TIP = 'At ground level this point is very sensitive: a 0.7° slope within 100 m blocks the low Sun in our 20 m terrain, so it reads 55.8% (5 years) where Gläser et al. 2018 report 76%. At 2 m (a panel on a mast) it clears: 85.6% vs 88.0%. Use the 2 m value.', c1 = s => !s.custom && s.short === 'C1';
     const SPREAD_TIP = 'Share of 2027 hours with the Sun (or Earth) in view at this exact point, from a mast of that height. Moving 20-40 m can change it by tens of points (our test at the studied sites), so read it as a guide, not an exact value.';
     const refBit = raw => { const all = raw.reference || [], ref = all.find(x => String(x.mast_m) === st.mast);
       if (!ref) return all.length ? 'published value only at ' + all.map(x => x.mast_m + ' m').join(', ') : 'no published value';
@@ -253,13 +256,15 @@
       const m = misOn ? Missions.summary(s) : null, hist = /^historic/.test(s.kind || '');
       /* Eren ~21:45: "nobody should need more than 1 second". Row = number, name, good days + bar; one ⚠ only when something is off.
          Selected row = now (Sun/Earth), 4 big numbers, mission warning, plan button; everything else under "More detail". */
+      // Tudor's sites (2026-11-15): a short kind tag in the row, the full kind on hover and under More detail
+      const KSHORT = {'best-lit flat point in team terrain zone (Tudor)': 'flat + lit (Tudor)', 'team proposed site (Tudor)': "Tudor's site"}, ks = KSHORT[s.kind];
       const le = s.truncated ? '≤ ' : '', warns = [];
       if (m && !m.ok) warns.push('another mission plans to land nearby');
       if (hist) warns.push('historic target, for comparison only');   // ⚠ only for things a planner must act on; "best case" is the ≤ sign, your spot is the ★
       const wn = warns.length ? '<span class="wn" title="' + warns.join('; ') + '" aria-label="Warning: ' + warns.join('; ') + '">⚠</span>' : '';
       const ddTip = s.truncated ? ' title="Best case: part of the horizon is outside our map, so the real number can only be lower"' : s.custom ? ' title="Your spot: ' + s.label + ', approximate"' : '';
       let h = '<div class="srow' + (sel ? ' sel' : '') + (out ? ' out' : '') + '" data-i="' + r.i + '" role="button" tabindex="0" aria-pressed="' + sel + '">' +
-        '<div class="rh"><span class="num">' + (s.custom ? '★' : r.i + 1) + '</span><span class="nm">' + s.name + '</span>' + wn + '<span class="dd"' + ddTip + '><b>' + (s.custom ? '~ ' : le) + r.ok + '</b> good days</span></div>' +
+        '<div class="rh"><span class="num">' + (s.custom ? '★' : r.i + 1) + '</span><span class="nm">' + s.name + (ks ? ' <em class="kindtag ktud" title="' + s.kind + '">' + ks + '</em>' : '') + '</span>' + wn + '<span class="dd"' + ddTip + '><b>' + (s.custom ? '~ ' : le) + r.ok + '</b> good days</span></div>' +
         '<div class="gbar" title="' + r.ok + ' of ' + r.n + ' landing days in ' + y0 + ' work"><i style="width:' + (r.n ? r.ok/r.n*100 : 0).toFixed(1) + '%"></i></div>';
       if (sel){ const poleKm = 2*1737.4*Math.tan((90 + raw.lat)/2*Math.PI/180), cut = m ? m.text.indexOf('. ') : -1;
         h += '<div class="rx">' +
@@ -267,7 +272,7 @@
           '<div class="stline"><span class="ic earthc">⊕</span><div><b id="gEarth"></b><small id="gEarthS"></small></div></div></div>' +
           '<div class="gnums g4"><div class="t-sun"><span>Sunlight</span><b>' + le + P(r.rs.sun_pct) + '</b></div><div class="t-earth"><span>Earth in view</span><b>' + le + P(r.rs.earth_pct) + '</b></div>' +
           '<div class="t-night"><span>Longest night</span><b>' + r.rs.longest_night_h + ' h</b></div><div class="t-psr"><span>To permanent shadow</span><b>' + (s.psr_km != null ? s.psr_km.toFixed(1) + ' km' : 'unknown') + '</b>' + (out ? '<small>outside your shadow filter</small>' : '') + '</div></div>' +
-          '<div class="gfor">' + st.mast + ' m mast · ' + y0 + (s.custom ? ' · approximate' : '') + (s.truncated ? ' · best case' : '') + '</div>' +
+          '<div class="gfor">' + st.mast + ' m mast · ' + y0 + (s.custom ? ' · approximate' : '') + (s.truncated ? ' · best case' : '') + (c1(s) && st.mast === '0' ? ' ' + tip('About Connecting Ridge at ground level', C1_TIP) : '') + '</div>' +
           zoneLine(s) +
           (m && !m.ok ? '<div class="gmis warn"><b>⚠ ' + (cut > 0 ? m.text.slice(0, cut + 1) : m.text) + '</b></div>' : '') +
           '<button class="go" type="button" id="gPlan">Plan a landing here <span aria-hidden="true">→</span></button>' +
@@ -275,7 +280,7 @@
           (s.custom ? '' : '<div class="q"><em class="kindtag' + (hist ? ' hist' : '') + '">' + (s.kind || '') + '</em></div>') +
           '<div class="q">' + Math.abs(raw.lat).toFixed(4) + '° S, ' + raw.lon_e.toFixed(2) + '° E · ' + poleKm.toFixed(1) + ' km from the pole</div>' +
           (s.range && !s.custom ? '<div class="q">' + rangeLine(s) + '</div>' : '') +
-          '<div class="q">Sun in ' + y0 + ' with a 0 / 2 / 10 m mast: ' + ['0', '2', '10'].map(k => Math.round(bm[k].sun_pct)).join(' / ') + '% ' + tip('About these percentages', SPREAD_TIP) + '</div>' +
+          '<div class="q">Sun in ' + y0 + ' with a 0 / 2 / 10 m mast: ' + ['0', '2', '10'].map(k => Math.round(bm[k].sun_pct)).join(' / ') + '% ' + tip('About these percentages', SPREAD_TIP) + (c1(s) ? ' ' + tip('About Connecting Ridge at ground level', C1_TIP) : '') + '</div>' +
           '<div class="q">' + (s.custom ? s.label + ' ' + tip('About approximate numbers', s.why || APX_TIP) : refBit(raw)) + (s.truncated ? ' · ' + truncBit(s) : '') + '</div>' +
           (m ? '<div class="q">' + (m.ok ? 'Other missions: none too close. ' : (cut > 0 ? m.text.slice(cut + 2) + ' ' : '')) + Missions.LABEL + '</div>' : '') +
           '</details></div>'; }
@@ -285,11 +290,18 @@
     $('#prov').innerHTML = 'Terrain masks: ' + sj.versions.dem + '; near field ' + sj.versions.dem_near + '; computed ' + sj.generated_utc + '<br>Sun/Earth: JPL Horizons DE441 table, computed ' + App.eph.generated_utc + '<br>Permanent shadow: PGDA 90 outlines, ' + App.psr.polygons.length + ' regions ≥ 1 km²<br>All numbers are precomputed by our engine; this page does not run new terrain calculations for the named sites.';
   }
   // One panel section per scene view (Eren 14 Nov): the view tabs on the Moon decide what the panel answers.
+  /* source (i) next to the panel title (Eren 15 Nov, via coordinator): one per view, every number cited from the vault logs */
+  const SRC = {
+    system: '<span><b>Where these numbers come from</b> (date, Moon phase, distances, Sun and Earth at the site):</span>' + '<span><b>Sun and Earth positions</b>: NASA JPL Horizons, a 6-hour table for 2026-2035.</span>' + '<span><b>Distances and Moon phase</b>: from the same JPL Horizons table.</span>' + '<span><b>Terrain horizon</b>: NASA LOLA south-pole elevation model (PGDA product 90, Barker et al. 2023), 20 m terrain within 10 km of a named site, 80 m beyond.</span>' + '<span><b>Checked (our tests)</b>: Sun within 0.0003° and Earth within 0.0055° of JPL Horizons computed for an observer at the site; page and our Python engine agree on 10,589 of 10,590 landing days (10 sites, 3 mast heights, 2027); Shackleton rim at ground level 79.1% sunlight vs 81.0% in Gläser et al. 2018, Connecting Ridge at 2 m 85.6% vs 88.0% (same paper).</span>',
+    globe: '<span><b>Where these numbers come from</b> (good days, sunlight %, Earth %, longest night, ranges, distance to shadow):</span>' + '<span><b>Sun and Earth positions</b>: NASA JPL Horizons, a 6-hour table for 2026-2035.</span>' + '<span><b>Terrain horizon</b>: NASA LOLA south-pole elevation model (PGDA product 90, Barker et al. 2023), 20 m terrain within 10 km of a named site, 80 m beyond.</span>' + '<span><b>25 m / 50 m ranges</b>: the same exact method at 25 points round the site, 2 m mast, 2027-2031, no slope check.</span>' + '<span><b>Permanent shadow</b>: NASA LOLA permanently shadowed regions map (PGDA product 90). A model of shadow, not a map of ice.</span>' + '<span><b>Flat, smooth terrain</b>: team analysis by Tudor, not NASA regions.</span>' + '<span><b>Checked (our tests)</b>: Sun within 0.0003° and Earth within 0.0055° of JPL Horizons computed for an observer at the site; page and our Python engine agree on 10,589 of 10,590 landing days (10 sites, 3 mast heights, 2027); Shackleton rim at ground level 79.1% sunlight vs 81.0% in Gläser et al. 2018, Connecting Ridge at 2 m 85.6% vs 88.0% (same paper).</span>' + '<span><b>Your own spot</b>: same method on coarse 240 m / 640 m terrain, approximate, can differ by up to about 20 points.</span>',
+    region: '<span><b>Where these numbers come from</b> (good days, why days fail, your limits):</span>' + '<span><b>Sun and Earth positions</b>: NASA JPL Horizons, a 6-hour table for 2026-2035.</span>' + '<span><b>Terrain horizon</b>: NASA LOLA south-pole elevation model (PGDA product 90, Barker et al. 2023), 20 m terrain within 10 km of a named site, 80 m beyond.</span>' + '<span><b>Limits</b>: Earth contact 25% is the visibility mask used in a 2024 NASA presentation (Dwyer Cianciolo, NTRS 20240009596); mission length, sunlight and darkness are example values.</span>' + '<span><b>Other missions and keep-out</b>: sources in the other-missions (i).</span>' + '<span><b>Checked (our tests)</b>: Sun within 0.0003° and Earth within 0.0055° of JPL Horizons computed for an observer at the site; page and our Python engine agree on 10,589 of 10,590 landing days (10 sites, 3 mast heights, 2027); Shackleton rim at ground level 79.1% sunlight vs 81.0% in Gläser et al. 2018, Connecting Ridge at 2 m 85.6% vs 88.0% (same paper).</span>' + '<span><b>Your own spot</b>: same method on coarse 240 m / 640 m terrain, approximate, can differ by up to about 20 points.</span>',
+    ground: '<span><b>Where these numbers come from</b> (Sun and Earth now, heights, next 14 days, next darkness):</span>' + '<span><b>Sun and Earth positions</b>: NASA JPL Horizons, a 6-hour table for 2026-2035.</span>' + '<span><b>Terrain horizon</b>: NASA LOLA south-pole elevation model (PGDA product 90, Barker et al. 2023), 20 m terrain within 10 km of a named site, 80 m beyond.</span>' + '<span><b>Permanent shadow</b>: NASA LOLA permanently shadowed regions map (PGDA product 90). A model of shadow, not a map of ice.</span>' + '<span><b>Checked (our tests)</b>: Sun within 0.0003° and Earth within 0.0055° of JPL Horizons computed for an observer at the site; page and our Python engine agree on 10,589 of 10,590 landing days (10 sites, 3 mast heights, 2027); Shackleton rim at ground level 79.1% sunlight vs 81.0% in Gläser et al. 2018, Connecting Ridge at 2 m 85.6% vs 88.0% (same paper).</span>' + '<span><b>Your own spot</b>: same method on coarse 240 m / 640 m terrain, approximate, can differ by up to about 20 points.</span>'
+  };
   const VIEWS = {system: ['#pSystem', 'Orbit'], globe: ['#pSites', 'Compare sites'], region: ['#pMission', 'Plan a landing'], ground: ['#pGround', 'On the ground']};
   function showView(){
     const v = VIEWS[App.state.view] ? App.state.view : 'region';
     Object.entries(VIEWS).forEach(([k, [sel]]) => $(sel).hidden = k !== v);
-    $('#vTitle').textContent = VIEWS[v][1];
+    $('#vTitle').textContent = VIEWS[v][1]; $('#pSrcTip').innerHTML = SRC[v];
   }
   let lastNow = 0;
   function render(keys, source){

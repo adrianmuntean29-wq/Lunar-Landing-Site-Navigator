@@ -18,7 +18,7 @@ const EX = 2;   // vertical exaggeration of the terrain (curvature drop stays tr
      patch (cap_heights.bin, 640 m, +/-PATCH_KM round the selected site, rebuilt on every site change)
      outer (assets/site_outer, 1.19 km, out to OUTER_KM from the pole: context). Display only: every number comes from core.js. */
 const PATCH_KM = 80, OUTER_KM = 300;
-const TILES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];   // site ids with data/tiles/<id>.bin + .json from engine-2 (log 1930); listed so the page never requests a missing file
+const TILES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];   // K-N: Tudor's sites (engine-3, 15 Nov); only requested once sites.json lists them   // site ids with data/tiles/<id>.bin + .json from engine-2 (log 1930); listed so the page never requests a missing file
 const T = {tile: null, inner: null, patch: null, outer: null};
 let showSites = true, capM = null, capH = null, tiles = {}, terrDirty = true, tv = 0, centreXYZ = [0, 0, 0];
 function layer(m, H, name){
@@ -64,8 +64,12 @@ function xzLatLon(x, z){ const X = x, Y = -z, rho = Math.hypot(X, Y);
   return {lat: -90 + 2*Math.atan(rho/(2*R))/D2R, lon: ((Math.atan2(X, Y)/D2R) + 360) % 360, km: rho}; }
 // label width from its text (no layout read: reading offsetWidth every frame forced a full-page layout per label)
 const estW = (s, cpx) => s.length*cpx + 12;
+// source lines for hover titles (Eren 15 Nov: every number says where it comes from)
+const SRC_DIST = '\n\nDistance: along the surface of the 1737.4 km Moon sphere, from published coordinates.';
+const SRC_SITE = s => s.custom ? '\n\nSource: your own spot. Its numbers use coarse terrain (240 m / 640 m grids), so they are approximate.'
+  : '\n\nSources: Sun and Earth positions from NASA JPL Horizons; terrain from NASA LOLA (PGDA 90, Barker et al. 2023), 20 m within 10 km, 80 m beyond.';
 // pin text (design A numbering, same as the Moon view + panel list): number = App.sites index + 1, custom spot = star; the selected site also shows its short name
-const pinTxt = (s, i, selI) => s.custom ? (i === selI ? '★ your spot' : '★') : (i === selI ? (i + 1) + ' ' + s.short : String(i + 1));
+const pinTxt = (s, i, selI) => s.custom ? (i === selI ? '★ your spot' : '★') : (i === selI ? (i + 1) + (s.short && s.short.length <= 12 ? ' ' + s.short : '') : String(i + 1));   // long names (Tudor's sites) stay number-only: full name in the hover + panel
 function siteXZ(s){ const rho = 2*R*Math.tan((90 + s.lat)*D2R/2); return [rho*Math.sin(s.lon*D2R), -rho*Math.cos(s.lon*D2R)]; }
 
 /* ---------- other missions (missions.js): circle of radius_km = position uncertainty, styled by precision ---------- */
@@ -102,7 +106,7 @@ function buildMissions(){
       const p = (r) => { const x = sx + r*Math.sin(bear), z = sz - r*Math.cos(bear), y = groundAt(x, z); return new THREE.Vector3(x, (y == null ? 0 : y) + 0.4, z); };
       const away = Math.min(...g.rows.map(m => Missions.distanceKm(sel.lat, sel.lon, m.lat, m.lon)));
       const short = g.names[0].replace(/ \((?!estimate).*\)$/, '') + (g.names.length > 1 ? ' +' + (g.names.length - 1) : '');   // short on the map; full names in the tooltip
-      const line = short + ' · ' + Math.round(away) + ' km', tip = g.names.join(', ') + ': ' + Math.round(away) + ' km from ' + (sel.custom ? 'your spot' : sel.short) + '\n\n' + g.rows.map(misTip).join('\n\n');
+      const line = short + ' · ' + Math.round(away) + ' km', tip = g.names.join(', ') + ': ' + Math.round(away) + ' km from ' + (sel.custom ? 'your spot' : sel.short) + SRC_DIST + '\n\n' + g.rows.map(misTip).join('\n\n');
       g.bear = bear;
       const same = misGroups.find(o => Math.abs(((o.g.bear - bear)/D2R + 540) % 360 - 180) < 10);   // same direction (within 10 deg): one arrow, stacked lines
       if (same){ if (same.lines.length < 2) same.lines.push(line); else same.more = (same.more || 0) + g.names.length; same.tip += '\n\n— — —\n\n' + tip; } else misGroups.push({g, a: p(48), b: p(55), lines: [line], tip});
@@ -326,7 +330,7 @@ function noteText(){
   const s = App.sites[App.state.site], [x, z] = s ? siteXZ(s) : [0, 0], L = s && layerAt(x, z);
   const res = !L ? null : L.res >= 1000 ? (L.res/1000).toFixed(1) + ' km' : Math.round(L.res) + ' m';
   let t = flash;
-  if (!t && s) t = (s.custom ? 'Your spot' : s.short) + ': 3D ground from ' + (res ? res + ' terrain' : 'terrain (loading)') + ', a picture only. '
+  if (!t && s) t = (s.custom ? 'Your spot' : s.short) + ': 3D ground from ' + (res ? res + ' NASA LOLA terrain (PGDA 90)' : 'terrain (loading)') + ', a picture only. '
     + (s.custom ? 'Its numbers are ' + s.label + '.' : 'Its numbers use its full terrain horizon.') + ' Double-click the ground to test any spot.';
   if (!t) t = 'Double-click the ground to test any spot.';
   if (note.textContent !== t) note.textContent = t;
@@ -357,7 +361,7 @@ function updateScene(){
      with an arrow toward them, stacked along the edge. Every site stays clickable (the map is a site picker). */
   const fitsP = (L, T, ew, eh) => !placed.some(p => Math.abs(p.L - L) < (p.w + ew)/2 + 3 && Math.abs(p.T - T) < (p.h + eh)/2 + 1);
   const mkPin = (s, i, txt, cls) => { const e = document.createElement('div'); e.className = 'pin' + (cls || '') + (i === st.site ? ' sel' : ''); e.textContent = txt;
-    e.title = (s.custom ? 'Your spot (' + s.label + ')' : s.name) + ': click to select';
+    e.title = (s.custom ? 'Your spot (' + s.label + ')' : s.name) + ': click to select' + SRC_SITE(s);
     if (s.custom){ e.style.background = 'var(--c-box)'; e.style.color = i === st.site ? 'var(--c-sel)' : 'var(--c-ink)';   // --c-*: on the dark 3D picture in both themes (scene.css); custom spot = hollow pin
       e.style.border = '1.5px solid ' + (i === st.site ? 'var(--c-sel)' : 'var(--c-muted)'); }
     e.onclick = () => App.set({site: i, selDay: -1}, 'scene'); return e; };
@@ -398,13 +402,13 @@ function updateScene(){
   // the true south pole (90 S): a tag over the cross on the ground, or an edge arrow when it is off the frame (placed before other edge pins)
   { const yp = groundAt(0, 0) ?? 0, v = P(0, yp + 3.2, 0).project(camera), px = (v.x*0.5 + 0.5)*w, py = (-v.y*0.5 + 0.5)*h;
     const e = document.createElement('div'); e.className = 'pin'; e.textContent = 'South pole'; e.style.cursor = 'default';
-    e.title = 'True south pole (90° S)' + (sel ? ', ' + Math.round(poleKm(sel)) + ' km from ' + from : '');
+    e.title = 'True south pole (90° S)' + (sel ? ', ' + Math.round(poleKm(sel)) + ' km from ' + from + SRC_DIST : '');
     const ew = estW('South pole', 7.2);
     if (v.z <= 1 && px >= 10 && px <= w - 10 && py >= 70 && py <= h - 10){ if (fitsP(px, py - 23, ew, 18)){ e.style.left = px + 'px'; e.style.top = (py - 14) + 'px'; lab.appendChild(e); placed.push({L: px, T: py - 23, w: ew, h: 18}); } }
     else { const slot = edgeSlot(v, px, py, ew + 14); if (slot){ e.classList.add('edge'); putEdge(e, slot, ew + 14); } } }
   for (const {s, i, v, px, py} of offFrame){
     const txt = pinTxt(s, i, -1), ew = estW(txt, 7.2) + 14, slot = edgeSlot(v, px, py, ew); if (!slot) continue;
-    const e = mkPin(s, i, txt, ' edge'); e.title = (s.custom ? 'Your spot' : s.name) + ', ' + Math.round(kmFrom(s)) + ' km from ' + from + ' (off this view): click to select';
+    const e = mkPin(s, i, txt, ' edge'); e.title = (s.custom ? 'Your spot' : s.name) + ', ' + Math.round(kmFrom(s)) + ' km from ' + from + ' (off this view): click to select' + SRC_DIST + SRC_SITE(s);
     putEdge(e, slot, ew); }
   const fits = (L, T, ew, eh) => !placed.some(p => Math.abs(p.L - L) < (p.w + ew)/2 + 4 && Math.abs(p.T - T) < (p.h + eh)/2 + 2);
   misGroups.forEach(G => { const a = G.a.clone().applyMatrix4(W).project(camera), b = G.b.clone().applyMatrix4(W).project(camera); if (a.z > 1 || b.z > 1) return;
@@ -437,7 +441,7 @@ function updateScene(){
       const v = P(x, y + 0.3, z).project(camera); if (v.z > 1) continue; const L = (v.x*0.5 + 0.5)*w, T = (-v.y*0.5 + 0.5)*h;
       if (L < 40 || L > w - 40 || T < 80 || T > h - 30 || !fits(L, T, 40, 14)) continue; if (!best || T > best[1]) best = [L, T]; }
     if (!best) continue;
-    const e = document.createElement('div'); e.textContent = lat + '° S'; e.title = 'Latitude ring: ' + lat + '° S, ' + rho.toFixed(0) + ' km from the pole';
+    const e = document.createElement('div'); e.textContent = lat + '° S'; e.title = 'Latitude ring: ' + lat + '° S, ' + rho.toFixed(0) + ' km from the pole (map distance, polar stereographic on the 1737.4 km Moon sphere)';
     Object.assign(e.style, {position: 'absolute', left: best[0] + 'px', top: best[1] + 'px', transform: 'translate(-50%,-50%)', font: '500 10px "IBM Plex Mono", monospace',
       color: 'var(--c-muted)', textShadow: '0 1px 3px var(--c-sh)', whiteSpace: 'nowrap', pointerEvents: 'auto', cursor: 'default'});
     lab.appendChild(e); placed.push({L: best[0], T: best[1], w: 40, h: 14}); }
@@ -447,7 +451,7 @@ function updateScene(){
   if (zn && zn.x != null){ const x = zn.x/1000, z = -zn.y/1000, y = groundAt(x, z);
     if (y != null){ const v = P(x, y + 0.3, z).project(camera), L = (v.x*0.5 + 0.5)*w, T = (-v.y*0.5 + 0.5)*h, txt = 'Flat, smooth area ' + zn.id, ew = estW(txt, 6.4);
       if (v.z <= 1 && L > ew/2 && L < w - ew/2 && T > 70 && T < h - 20 && fits(L, T, ew, 15)){ const e = document.createElement('div'); e.textContent = txt;
-        e.title = 'Flat, smooth terrain (team analysis by Tudor in ArcGIS). Not a NASA region, not chosen for sunlight (at most ~51% sun inside, engine).' +(za.inside ? ' The selected site is inside it.' : ' ' + za.km.toFixed(1) + ' km from the selected site.');
+        e.title = 'Flat, smooth terrain (team analysis by Tudor). Most of it is dark most of the time. Not a NASA region.' + (za.inside ? ' The selected site is inside it.' : ' ' + za.km.toFixed(1) + ' km from the selected site.' + SRC_DIST);
         Object.assign(e.style, {position: 'absolute', left: L + 'px', top: T + 'px', transform: 'translate(-50%,-50%)', font: '500 10.5px "IBM Plex Mono", monospace',
           color: 'var(--c-zone, #B49DDC)', textShadow: '0 1px 3px var(--c-sh)', whiteSpace: 'nowrap', pointerEvents: 'auto', cursor: 'help'});
         lab.appendChild(e); placed.push({L, T, w: ew, h: 15}); } } }

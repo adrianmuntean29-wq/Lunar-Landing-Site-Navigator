@@ -33,6 +33,17 @@ function buildSky(){
   addEventListener('pointerup', () => drag = null);
   cv.addEventListener('wheel', e => { if (view !== 'ground') return; e.preventDefault(); look.fov = Math.max(4, Math.min(80, look.fov*Math.exp(e.deltaY*0.001))); }, {passive: false});
   $('#lookSun').onclick = () => lookAt('sun'); $('#lookEarth').onclick = () => lookAt('earth');
+  // sources (i) for everything drawn here (shared .info-wrap pattern from base.css; opens upward, the bar sits at the bottom)
+  const w = document.createElement('span'); w.className = 'info-wrap';
+  w.innerHTML = '<button type="button" class="info-i" aria-label="Sources for this view" aria-describedby="gSrcTip">i</button><span class="info-tip up" id="gSrcTip" role="tooltip"></span>';
+  $('#sitebar').appendChild(w); srcTip();
+}
+function srcTip(){
+  const t = $('#gSrcTip'), s = App.sites[App.state.site]; if (!t || !s) return;
+  t.textContent = 'Sources. Sun and Earth positions: NASA JPL Horizons ephemeris (6-hour table), seen from this spot. ' +
+    'Terrain line: horizon computed by our engine from NASA LOLA terrain (PGDA product 90) at the chosen mast height' +
+    (s.custom ? ', approximate for your own spot (' + (s.label || 'coarse terrain') + ').' : '.') +
+    ' Earth image: NASA Blue Marble. Ground texture and its lighting: illustration only, not this site\'s measured ground.';
 }
 /* Ground surface: a generated regolith height field (tileable 512 px: soft multi-scale bumps, ~700 small craters with raised rims, scattered
    pebbles), turned into a normal map and LIT BY THE REAL SUN DIRECTION in the shader, so the low polar Sun brings out the relief. Looks only:
@@ -194,5 +205,5 @@ register('ground', {
   show(on){ $('#sitebar').hidden = !on; $('#skylabels').hidden = !on;
     if (on) aim(); },   // entering: face the Sun, zoomed on the horizon
   frame(){ updateSky(); renderer.render(sky, skyCam); },
-  onState(keys){ if (keys.has('site') && view === 'ground') aim(); },   // new site: face its Sun again
+  onState(keys){ if (keys.has('site') || keys.has('spot')) srcTip(); if (keys.has('site') && view === 'ground') aim(); },   // new site: face its Sun again
 });
