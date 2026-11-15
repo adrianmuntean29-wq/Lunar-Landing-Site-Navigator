@@ -2,7 +2,7 @@
    Areas style only inside their own container (#scene, #panel, #drawer) in their own css file. */
 /* PROJECT PALETTE (Eren 2026-11-14 ~20:20, "lunar mission control"; DECISIONS item 18, open until Eren approves the screenshots).
    Use these names everywhere; no hex in area css/js. --sun/--earth = text + lines; --cell-sun/--cell-earth = calm calendar fills;
-   --mis = other missions; --psr = permanent shadow; --zone = candidate landing zones (team analysis); --sel = selected site; --now = today/clock marker (neutral outline).
+   --mis = other missions; --psr = permanent shadow; --zone = flat, smooth terrain zones (team analysis); --sel = selected site; --now = today/clock marker (neutral outline).
    *-3d = fixed variants for marks drawn ON the dark 3D picture (same in both themes). */
 :root{--bg:#111315;--panel:#17191C;--panel2:#1D2024;--line:#2A2E33;--ink:#E8EAED;--muted:#8C939B;--sun:#D8B25C;--earth:#5E9CD3;--go:#5E9CD3;--ok:#C9A13B;--bad:#E0A35A;--psr:#6FA9A3;--warn:#E8743B;--mis:#D08770;--zone:#A58BCF;--sel:#4FC3F7;--now:#E6E8EB;--cell-sun:#A88443;--cell-earth:#3F6F99;--tagbg:#3A2A12;--tip:rgba(23,25,28,.96);--shadow:rgba(0,0,0,.5)}
 /* light theme for the projector (Eren 2026-11-14): same token names, darker accents for contrast on white. Set by shell.js on <html data-theme>. */

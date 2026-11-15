@@ -16,7 +16,7 @@ available or OSI-licensed, with its licence listed here.
 | NASA GSFC PGDA product 90: permanently shadowed regions `LPSR_80S_20MPP_ADJ` | `data/psr.json`, distance to permanent shadow | https://pgda.gsfc.nasa.gov/products/90 | NASA data; cite with the DEM |
 | NASA GSFC PGDA product 69, LOLA illumination and Earth-visibility maps (Mazarico et al.) | Validation: our sunlight and Earth-visibility percentages compared with these maps | https://pgda.gsfc.nasa.gov/products/69 | NASA data |
 | NASA GSFC PGDA product 78: High-Resolution LOLA Topography for Lunar South Pole Sites (Barker), site regions | The six boxes our engine searched for their best-lit point (sites E-I) | https://pgda.gsfc.nasa.gov/products/78 | NASA data |
-| NASA GSFC PGDA product 90: surface roughness `LDRM_80S_1000MPP_ADJ_ROUGH_100M` / `_200M` | Input to the team's candidate landing zones (`data/zones.json`) | https://pgda.gsfc.nasa.gov/products/90 | NASA data; cite with the DEM |
+| NASA GSFC PGDA product 90: surface roughness `LDRM_80S_1000MPP_ADJ_ROUGH_100M` / `_200M` | Input to the team's flat, smooth terrain zones (`data/zones.json`) | https://pgda.gsfc.nasa.gov/products/90 | NASA data; cite with the DEM |
 | LRO NAC south-pole mosaic (1 m) and LRO WAC south-pole mosaic (100 m), served by NASA Moon Trek (WMTS tiles) | "Seen from orbit", descent and ascent cameras in `mission.html` (loaded live, not stored) | https://trek.nasa.gov/moon/ | NASA data (LRO, LROC/ASU) |
 | NASA NTRS 20250011660, Artemis candidate regions and criteria | Background for the site list | https://ntrs.nasa.gov/citations/20250011660 | NASA document |
 | NASA, LRO images of the IM-1 Odysseus lander | IM-1 landing position | https://www.nasa.gov/missions/lro/nasas-lro-images-intuitive-machines-odysseus-lander/ | NASA content |
@@ -28,7 +28,7 @@ available or OSI-licensed, with its licence listed here.
 | Wikipedia, "List of artificial objects on the Moon" and "Mons Mouton" | Coordinates of past landings shown for reference | https://en.wikipedia.org/wiki/List_of_artificial_objects_on_the_Moon | CC BY-SA 4.0 (facts cited, no text copied) |
 | LROC image page of the IM-2 target | Site J (IM-2 Athena target) | https://lroc.im-ldi.com/images/1401 | LROC/ASU, NASA mission data |
 | Space Odyssey Hub, Spaceport Nova Scotia | Launch-site coordinates | https://spaceodysseyhub.com/compare/spaceports/spaceport-nova-scotia | Facts cited |
-| Candidate landing zones (`data/zones.json`) | Team analysis by Tudor in ArcGIS from LOLA slope and hillshade, PGDA 90 roughness and permanently shadowed regions; drawn as "Candidate zones (team analysis)", not NASA regions | this repository | MIT (our work) |
+| Flat, smooth terrain zones (`data/zones.json`) | Team analysis by Tudor in ArcGIS from LOLA slope and hillshade, PGDA 90 roughness and permanently shadowed regions; drawn as "Flat, smooth terrain (team analysis)", not NASA regions and not chosen for sunlight | this repository | MIT (our work) |
 
 ## Images and textures
 | File | Source | Credit |

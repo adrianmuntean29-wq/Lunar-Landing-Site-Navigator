@@ -84,10 +84,11 @@
   const APX_TIP = 'Horizon from coarse terrain grids, not the exact masks of the named sites. It misses nearby bumps, so sun and Earth % can be far off. Distance to permanent shadow is not computed.';
   let tipN = 0;
   root.querySelectorAll('.spotf').forEach(f => { f.innerHTML = '<div class="addspot"><label>Latitude<br><input class="sLat" type="number" step="0.01" value="-89.2" aria-label="Latitude, degrees (negative = south)"></label><label>Longitude E<br><input class="sLon" type="number" step="0.1" value="120" aria-label="East longitude, degrees"></label><button class="btn sAdd" type="button">Add</button><button class="btn sDel" type="button" hidden>Remove</button></div><p class="note sMsg">Any spot within 290 km of the pole. Its horizon is approximate.</p>'; });
-  // candidate zones (Tudor's team analysis, Eren approved ~21:55): one line for the selected site in Compare sites. Never "NASA zones", never "ice".
-  const zoneTip = () => ((App.zonesJson && App.zonesJson.label) || 'Candidate zones (team analysis)') + ': made by Tudor in ArcGIS (LOLA slope and hillshade, PGDA 90 roughness, permanently shadowed regions). Not NASA regions.';
+  // Tudor's zones, relabelled by Eren 2026-11-15 "Flat, smooth terrain (team analysis)" (exact engine check: at most ~51% sun inside them).
+  // One line for the selected site in Compare sites. Never "candidate", never "NASA zones", never "ice".
+  const zoneTip = () => ((App.zonesJson && App.zonesJson.label) || 'Flat, smooth terrain (team analysis)') + ': made by Tudor in ArcGIS (LOLA slope and hillshade, PGDA 90 roughness, permanently shadowed regions). Flat and smooth does not mean sunny: inside these areas our engine found at most about 51% sunlight. Not NASA regions.';
   const zoneLine = s => { const z = App.zoneAt && App.state.zones !== false ? App.zoneAt(s.lat, s.lon) : null; if (!z) return '';
-    return '<div class="gzone">' + (z.inside ? 'Inside candidate zone ' + z.id : z.km.toFixed(1) + ' km from candidate zone ' + z.id) + ' ' + tip('About candidate zones', zoneTip()) + '</div>'; };
+    return '<div class="gzone">' + (z.inside ? 'Inside flat, smooth area ' + z.id : z.km.toFixed(1) + ' km from flat, smooth area ' + z.id) + ' ' + tip('About flat, smooth areas', zoneTip()) + '</div>'; };
   const tip = (label, text) => { const id = 'apxTip' + (tipN++); return '<span class="info-wrap"><button type="button" class="info-i" aria-label="' + label + '" aria-describedby="' + id + '">i</button><span class="info-tip left" id="' + id + '" role="tooltip">' + text + '</span></span>'; };
   // truncated horizon (coordinator 14 Nov, core site.truncated + edge_rays): missing far terrain can only raise the horizon
   const TRUNC_TXT = s => 'Part of the horizon is beyond our map: ' + s.edge_rays + ' of 360 directions reach the map edge before the terrain stops rising. Missing terrain can only hide the Sun or Earth more, so the true values can be lower, never higher.';
@@ -219,9 +220,9 @@
       (rt ? ' ' + rt + ' ' + RANGE_TIP(s) : '') + (s.psr_km != null ? ' ' + s.psr_km.toFixed(1) + ' km to the nearest permanently shadowed area.' : ''));
     // candidate zones (Tudor's team analysis; App.zoneAt from core.js once data/zones.json lands): one line + (i). Never "NASA" regions, never "ice".
     const zEl = $('#plZone'), za = typeof App.zoneAt === 'function' && st.zones !== false ? App.zoneAt(s.lat, s.lon) : null;
-    zEl.hidden = !za; if (za){ const zn = za.zone || za, nm = zn.name || ('candidate zone ' + zn.id), km = za.km ?? za.dist_km ?? za.distance_km;
+    zEl.hidden = !za; if (za){ const zn = za.zone || za, nm = 'flat, smooth area ' + zn.id, km = za.km ?? za.dist_km ?? za.distance_km;
       zEl.innerHTML = '<span>' + (za.inside ? 'Inside ' + nm : (km != null ? km.toFixed(1) + ' km from ' : 'Nearest: ') + nm) + '</span> ' +
-        tip('About candidate zones', 'Candidate zones: team analysis by Tudor in ArcGIS (LOLA slope and hillshade, PGDA 90 roughness, permanently shadowed regions). Not NASA regions.'); }
+        tip('About flat, smooth terrain zones', 'Flat, smooth terrain (team analysis): drawn by Tudor in ArcGIS from LOLA slope and hillshade, PGDA 90 roughness and permanently shadowed regions. Not NASA regions. Not chosen for sunlight: our engine finds at most about 51% sun inside them (C1: 86%), 2 m mast, 2027-2031.'); }
   }
   function others(){
     const box = $('#others');

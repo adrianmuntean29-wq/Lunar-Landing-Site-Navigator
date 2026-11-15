@@ -141,7 +141,7 @@ function boxLine(s){   // 1 km box in polar stereographic metres around the site
       const lat = -90 + 2*Math.atan(rho/(2*R))/D2R, lon = Math.atan2(x, y)/D2R, v = surf(lat, lon); pts.push(v.setLength(v.length() + 0.06*CAPEX/R)); } }
   const ln = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color: tok('--sel-3d', '#4FC3F7')}));
   ln.renderOrder = 2; globe.add(ln); return ln; }
-// candidate landing zones (Tudor's team analysis, Eren approved ~21:55; data/zones.json via App.zones): thin outlines draped on the
+// Tudor's zones, label "Flat, smooth terrain (team analysis)" since 2026-11-15 (was "candidate zones"; data/zones.json via App.zones): thin outlines draped on the
 // terrain in --zone-3d, no fill. Hidden when App.state.zones === false. Rebuilt on key 'zones' and once the outer terrain has loaded.
 let gZones = null;
 function buildZones(){

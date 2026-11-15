@@ -38,7 +38,7 @@ checks the Sun and the Earth against the **real terrain horizon** computed from 
 - **Other missions:** past and planned landers shown as pins, with a keep-out filter based on NASA's
   2011 non-binding recommendations (2.0 km from landers and historic sites, 0.5 km from impact sites).
 - **Provenance bar:** which data versions were used and when they were computed.
-- **Candidate landing zones (team analysis):** 11 areas a teammate drew in ArcGIS from LOLA slope and hillshade, PGDA 90
+- **Flat, smooth terrain (team analysis):** 11 areas a teammate drew in ArcGIS from LOLA slope and hillshade, PGDA 90
   roughness and permanent shadow, with the distance from each site to the nearest zone. They are flat and smooth, but our
   engine finds most of them poorly lit (the best point reaches about 51% sunlight), which shows why terrain alone is not enough.
 - **Missions (fly it):** the top-left ☰ MISSIONS button opens the mission view for the selected site and day: launch dates

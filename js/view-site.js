@@ -445,9 +445,9 @@ function updateScene(){
   const zs = zoneData && (zoneData.zones || zoneData), za = st.zones !== false && Array.isArray(zs) && typeof App.zoneAt === 'function' && site ? App.zoneAt(site.lat, site.lon) : null;
   const zn = za && zs.find(q => q.id === za.id);
   if (zn && zn.x != null){ const x = zn.x/1000, z = -zn.y/1000, y = groundAt(x, z);
-    if (y != null){ const v = P(x, y + 0.3, z).project(camera), L = (v.x*0.5 + 0.5)*w, T = (-v.y*0.5 + 0.5)*h, txt = zn.name + ' · team analysis', ew = estW(txt, 6.4);
+    if (y != null){ const v = P(x, y + 0.3, z).project(camera), L = (v.x*0.5 + 0.5)*w, T = (-v.y*0.5 + 0.5)*h, txt = zn.name + ' · flat terrain', ew = estW(txt, 6.4);
       if (v.z <= 1 && L > ew/2 && L < w - ew/2 && T > 70 && T < h - 20 && fits(L, T, ew, 15)){ const e = document.createElement('div'); e.textContent = txt;
-        e.title = 'Candidate zone (team analysis by Tudor in ArcGIS). Not a NASA region.' + (za.inside ? ' The selected site is inside it.' : ' ' + za.km.toFixed(1) + ' km from the selected site.');
+        e.title = 'Flat, smooth terrain (team analysis by Tudor in ArcGIS). Not a NASA region, not chosen for sunlight (at most ~51% sun inside, engine).' +(za.inside ? ' The selected site is inside it.' : ' ' + za.km.toFixed(1) + ' km from the selected site.');
         Object.assign(e.style, {position: 'absolute', left: L + 'px', top: T + 'px', transform: 'translate(-50%,-50%)', font: '500 10.5px "IBM Plex Mono", monospace',
           color: 'var(--c-zone, #B49DDC)', textShadow: '0 1px 3px var(--c-sh)', whiteSpace: 'nowrap', pointerEvents: 'auto', cursor: 'help'});
         lab.appendChild(e); placed.push({L, T, w: ew, h: 15}); } } }
