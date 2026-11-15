@@ -488,7 +488,7 @@ details.fold#how > summary h2{display:inline}
   </details>
 
   <section class="section" aria-label="Year view" id="yearsec">
-    <div class="rank-head"><h2>The year after landing, <span id="yearWho">crewed</span> picks</h2><p class="caption">Yellow: sunlight · Blue: Earth in view · Mission colour: days you could land · Line: best window</p></div></div>
+    <div class="rank-head"><h2>The year after landing, <span id="yearWho">crewed</span> picks</h2><p class="caption">Yellow: sunlight · Blue: Earth in view · Mission colour: days you could land · Line: best window</p></div>
     <canvas class="chart" id="year"></canvas>
   </section>
 
@@ -3003,6 +3003,63 @@ requestAnimationFrame(frame);
 })();
 </script>
 <style>
+/* Missions tabs (team draft, 2026-11-15): the section bar shows one section at a time. Presentation only. */
+/* hidden tabs stay laid out at full size off screen: Adrian's canvases keep drawing and never measure 0 px */
+.tab-off{position:fixed!important;left:-300vw!important;top:0!important;width:min(1328px, calc(100vw - 32px))!important;visibility:hidden!important;pointer-events:none!important}
+.jump{gap:4px}
+.jump a{font-size:14px;padding:10px 12px}
+.jump a.on{color:var(--ink);background:var(--panel);box-shadow:inset 0 -3px 0 var(--ink);font-weight:600}
+details.fold.tab-on > summary{pointer-events:none}
+.section,details.fold{grid-template-columns:minmax(0,1fr)}   /* wide tables scroll inside their own box, not the page */
+details.fold.tab-on > summary h2::after{content:''}
+</style>
+<script>
+/* Missions tabs: each link in the section bar opens its own section instead of scrolling to it.
+   The replays that used to scroll to "Standing at" / the flight view now switch to that tab first. */
+(function(){
+  var bar = document.getElementById('jump'); if (!bar) return;
+  var links = Array.prototype.slice.call(bar.querySelectorAll('a[href^="#"]'));
+  var ids = links.map(function(a){ return a.getAttribute('href').slice(1); });
+  bar.setAttribute('role', 'tablist');
+  var current = null;
+  function show(id, scroll){
+    if (ids.indexOf(id) < 0) return;
+    var changed = current !== id; current = id;
+    ids.forEach(function(x){
+      var el = document.getElementById(x); if (!el) return;
+      var on = x === id;
+      el.classList.toggle('tab-off', !on); el.classList.toggle('tab-on', on);
+      if (on && el.tagName === 'DETAILS') el.open = true;
+    });
+    links.forEach(function(a){ var on = a.getAttribute('href') === '#' + id; a.classList.toggle('on', on); a.setAttribute('aria-selected', on ? 'true' : 'false'); a.setAttribute('role', 'tab'); });
+    if (changed) window.dispatchEvent(new Event('resize'));   /* canvases in the new tab size and redraw */
+    if (scroll && bar.getBoundingClientRect().top < 0) window.scrollTo(0, window.scrollY + bar.getBoundingClientRect().top);
+  }
+  /* a tab the user picks stays open; the autoplay may move between tabs only until then,
+     or right after the user presses a button elsewhere (Play, Watch the landing, ...) */
+  var userPicked = false, lastClick = 0;
+  links.forEach(function(a){
+    a.addEventListener('click', function(e){ e.preventDefault(); userPicked = true; show(a.getAttribute('href').slice(1), true); });
+  });
+  document.addEventListener('click', function(e){ if (!bar.contains(e.target)){ lastClick = Date.now(); } }, true);
+  /* keep the section bar's own highlight on the open tab (the page's scroll highlighter would move it) */
+  new MutationObserver(function(){ var a = bar.querySelector('a.on'); if (!a || a.getAttribute('href') !== '#' + current) show(current, false); })
+    .observe(bar, {attributes: true, subtree: true, attributeFilter: ['class']});
+  function follow(elId, tabId){
+    var el = document.getElementById(elId); if (!el) return;
+    var orig = el.scrollIntoView;
+    el.scrollIntoView = function(o){
+      if (Date.now() - lastClick < 1500) userPicked = false;   /* the user started a replay: follow it */
+      if (userPicked && current !== tabId) return;
+      show(tabId, false); return orig.call(el, o);
+    };
+  }
+  follow('surfWrap', 'surface');
+  follow('vp', 'flight');
+  show('flight', false);
+})();
+</script>
+<style>
 /* Planner hooks (not Adrian's design): only used when this page sits inside the South Pole Navigator's Missions panel */
 html.framed .top .pages{display:none}
 .spn-close{font:600 12.5px var(--f-mono);letter-spacing:.04em;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:8px 12px;cursor:pointer;white-space:nowrap;align-self:flex-start}
@@ -3026,8 +3083,8 @@ html.framed body{overflow-x:hidden}
     if (e.key !== 'Escape' || /^(INPUT|SELECT|TEXTAREA)$/.test((e.target || {}).tagName || '')) return;
     close();
   });
-  var top = document.querySelector('.top');
-  if (top){ var b = document.createElement('button'); b.type = 'button'; b.className = 'spn-close'; b.textContent = '✕ CLOSE'; b.title = 'Close the missions panel'; b.onclick = close; top.appendChild(b); }
+  /* No ✕ CLOSE button when framed (Eren 15 Nov, ~15:10: it floated large beside the title). The planner's
+     "Planner | Missions" switch closes the panel, and Esc still does. */
 })();
 </script>
 </body>
