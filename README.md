@@ -4,7 +4,7 @@
 
 **Team Peaks of Light** · NASA Space Apps Challenge 2026 · Alba Iulia, Romania · Challenge: *Lunar Landing Site Navigator*
 
-**Live demo:** https://erenhocoklu.github.io/Peaks-of-Light-Lunar-Landing-Site-Navigator/ · **Repository:** https://github.com/erenhocoklu/Peaks-of-Light-Lunar-Landing-Site-Navigator · **Demo video / slides:** [DEMO_MEDIA_URL]
+**Live demo:** https://erenhocoklu.github.io/Peaks-of-Light-Lunar-Landing-Site-Navigator/ · **Repository:** https://github.com/erenhocoklu/Peaks-of-Light-Lunar-Landing-Site-Navigator · **Demo (7 slides, video on slide 4):** https://canva.link/88yxsno9t7gcch7
 
 > The data is public, but using it takes expert tools and hours. We turn it into an answer you can check in seconds:
 > which spots and weeks work, and why.
