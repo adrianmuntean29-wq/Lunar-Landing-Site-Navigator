@@ -79,7 +79,7 @@
   function fly(){
     const st = S(), s = App.sites[st.site], el = $('#fly'); if (!el) return;
     if (st.selDay < 0 || !s || s.custom || !App.flyMission){ el.innerHTML = ''; return; }
-    const cw = App.wins(st.site, Object.assign({}, App.PRESETS.crew, {relay: st.lim.relay}))[st.selDay], crewOk = cw && !cw.fail.length;
+    const cw = App.wins(st.site, st.kind === 'crew' ? st.lim : Object.assign({}, App.PRESETS.crew, {relay: st.lim.relay}))[st.selDay], crewOk = cw && !cw.fail.length;
     el.innerHTML = crewOk
       ? '<button class="btn flyb" type="button" data-fly="robotic" title="Open this day on the mission page, robotic lander">Fly it robotic</button><button class="btn flyb" type="button" data-fly="crewed" title="Open this day on the mission page, crew of the crew preset (6 days, full sunlight)">Fly it with a crew</button>'
       : '<button class="btn flyb" type="button" data-fly="robotic" title="Open this day on the mission page (a crew cannot land this day under the crew preset)">Fly this mission from Canada</button>';

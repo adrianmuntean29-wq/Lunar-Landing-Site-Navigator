@@ -131,8 +131,7 @@
       const el = $('#' + id); el.value = st.lim[id]; el.style.setProperty('--p', (el.value - el.min)/(el.max - el.min)*100 + '%'); $('#' + out).textContent = f(+el.value); });
     $('#earth').disabled = st.lim.relay; $('#relay').checked = st.lim.relay;
     pressed('#mast', st.mast); pressed('#gMastSeg', st.mast); pressed('#psrf', st.psr);
-    const pre = Object.entries(App.PRESETS).find(([k, p]) => ['len', 'sun', 'earth', 'night'].every(q => p[q] === st.lim[q]));
-    pressed('#kindSeg', pre ? pre[0] : '');
+    pressed('#kindSeg', st.kind || 'robotic');   // the chosen type, not inferred from the sliders
     // folded options say their current values, so nothing hidden changes the answer unseen
     $('#plMoreS').textContent = 'More options: ' + st.mast + ' m mast' + (st.lim.relay ? ', relay' : '') + (st.psr ? ', within ' + st.psr + ' km of shadow' : '') + (st.spot ? ', your spot' : '');
   }
@@ -208,7 +207,7 @@
     if (!s || s.custom || !App.flyMission){ el.innerHTML = ''; return; }
     let d = st.selDay; if (d < 0){ d = App.wins(st.site).findIndex(o => !o.fail.length); }
     if (d < 0){ el.innerHTML = ''; return; }
-    const cw = App.wins(st.site, Object.assign({}, App.PRESETS.crew, {relay: st.lim.relay}))[d], crewOk = cw && !cw.fail.length;
+    const cw = App.wins(st.site, st.kind === 'crew' ? st.lim : Object.assign({}, App.PRESETS.crew, {relay: st.lim.relay}))[d], crewOk = cw && !cw.fail.length;
     el.innerHTML = '<small>Mission simulation, landing ' + App.dayDate(d) + (st.selDay < 0 ? ' (first good day)' : '') + '</small><div>' + (crewOk
       ? '<button class="btn flyb" type="button" data-fly="robotic" title="Open this day on the mission page, robotic lander">Fly it robotic</button><button class="btn flyb" type="button" data-fly="crewed" title="Open this day on the mission page, crew of the crew preset (6 days, full sunlight)">Fly it with a crew</button>'
       : '<button class="btn flyb" type="button" data-fly="robotic" title="Open this day on the mission page (a crew cannot land this day under the crew preset)">Fly this mission from Canada</button>') + '</div>';
@@ -339,7 +338,7 @@
     $('#earthTip').innerHTML = tip('About the Earth limit', 'Share of the stay with Earth above the terrain (direct radio possible). The 25% default is the map mask used in a 2024 NASA presentation. Sunlight, length and darkness defaults are example values.');
     $('#plFly').addEventListener('click', e => { const f = e.target.closest('[data-fly]'); if (f) App.flyMission(f.dataset.fly); });
     App.on(keys => { if (keys.has('selDay')) plFly(); });   // render() skips selDay-only changes
-    $('#kindSeg').onclick = e => { const b = e.target.closest('button'); if (b) App.set({lim: App.PRESETS[b.dataset.v]}, 'panel'); };
+    $('#kindSeg').onclick = e => { const b = e.target.closest('button'); if (b) App.set({lim: App.PRESETS[b.dataset.v], kind: b.dataset.v}, 'panel'); };
     ['len', 'sun', 'earth', 'night'].forEach(k => $('#' + k).oninput = e => App.set({lim: {[k]: +e.target.value}}, 'panel'));
     $('#relay').onchange = e => App.set({lim: {relay: e.target.checked}}, 'panel');
     $('#mast').onclick = e => { const b = e.target.closest('button'); if (b) App.set({mast: b.dataset.v}, 'panel'); };

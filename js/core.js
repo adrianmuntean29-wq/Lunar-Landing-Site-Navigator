@@ -75,6 +75,7 @@ window.App = (function(){
     t: 0, playing: false, speed: 1,                           // time since jd0 in days
     site: 0, mast: '2', selDay: -1, psr: 0,                   // selected site, mast height, chosen landing day, PSR filter km (0 = off)
     lim: {len: 13, sun: 70, earth: 25, night: 48, relay: false},
+    kind: 'robotic',   // mission type the user chose: 'robotic' | 'crew' (keys of PRESETS). Kept when sliders move (bug fix 15 Nov).
     panelOpen: true, drawerOpen: true,
     view: 'system',   // scene view: 'system' (Orbit) | 'globe' (Moon) | 'region' (Landing Site) | 'ground' (Ground Level); scene sets it, panel follows
     // other-missions layer (missions.js): on/off, caution radius for large landers (km, OUR assumption, Eren 2026-11-14), show Chang'e rows.

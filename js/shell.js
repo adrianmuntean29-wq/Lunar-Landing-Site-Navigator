@@ -44,8 +44,11 @@
   const missionBtn = $('#missionBtn'), mPanel = $('#missionPanel'), mFrame = $('#missionFrame');   // guard: a cached old index.html lacks them
   // fly (optional, from App.flyMission): {type: 'robotic' | 'crewed', d: landing day} -> adds &td=0, crewed uses App.PRESETS.crew
   function missionUrl(fly){
-    const st = App.state, s = App.sites[st.site], q = [], crew = fly && fly.type === 'crewed';
-    const lim = crew ? Object.assign({}, App.PRESETS.crew, {relay: st.lim.relay}) : st.lim, d = fly ? fly.d : Math.max(st.selDay, 0);
+    // type: the Fly button's choice, else the type chosen in the panel (App.state.kind). Same type as chosen -> the user's own limits;
+    // the other type -> that type's preset (bug fix 15 Nov: crew was inferred from the sliders and a 7-day crew reset to 6).
+    const st = App.state, s = App.sites[st.site], q = [], kind = st.kind || 'robotic';
+    const T = fly ? (fly.type === 'crewed' ? 'crew' : 'robotic') : kind, crew = T === 'crew';
+    const lim = T === kind ? st.lim : Object.assign({}, App.PRESETS[T], {relay: st.lim.relay}), d = fly ? fly.d : Math.max(st.selDay, 0);
     if (s && !s.custom){
       q.push('site=' + encodeURIComponent(s.short), 'land=' + App.iso(st.jd0 + d).slice(0, 10));
     }
