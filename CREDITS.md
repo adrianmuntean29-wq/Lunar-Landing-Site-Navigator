@@ -18,6 +18,8 @@ available or OSI-licensed, with its licence listed here.
 | NASA GSFC PGDA product 78: High-Resolution LOLA Topography for Lunar South Pole Sites (Barker), site regions | The six boxes our engine searched for their best-lit point (sites E-I) | https://pgda.gsfc.nasa.gov/products/78 | NASA data |
 | NASA GSFC PGDA product 90: surface roughness `LDRM_80S_1000MPP_ADJ_ROUGH_100M` / `_200M` | Input to the team's flat, smooth terrain zones (`data/zones.json`) | https://pgda.gsfc.nasa.gov/products/90 | NASA data; cite with the DEM |
 | LRO NAC south-pole mosaic (1 m) and LRO WAC south-pole mosaic (100 m), served by NASA Moon Trek (WMTS tiles) | "Seen from orbit", descent and ascent cameras in `mission.html` (loaded live, not stored) | https://trek.nasa.gov/moon/ | NASA data (LRO, LROC/ASU) |
+| NASA GSFC PGDA product 81: South Pole LOLA DEM Mosaic, 5 m/pixel (`ldem_87s_5mpp`; Barker et al. 2021, doi:10.1016/j.pss.2020.105119) | Base of the team's terrain maps and zones (elevation map; slope map derived by the team from this DEM) | https://pgda.gsfc.nasa.gov/products/81 | NASA data; cite paper |
+| USGS Astrogeology Science Center, Astropedia: LRO LOLA Shade SPole45 100 m v04 | Hillshade underlay of the team's zone map | https://astrogeology.usgs.gov/search (product "LRO LOLA Shade SPole45 100m v04") | USGS / NASA LOLA data, public domain; credit USGS Astrogeology and the LOLA team |
 | NASA NTRS 20250011660, Artemis candidate regions and criteria | Background for the site list | https://ntrs.nasa.gov/citations/20250011660 | NASA document |
 | NASA, LRO images of the IM-1 Odysseus lander | IM-1 landing position | https://www.nasa.gov/missions/lro/nasas-lro-images-intuitive-machines-odysseus-lander/ | NASA content |
 
@@ -49,7 +51,10 @@ No music, sound effects or voice. The only AI-generated image is the logo above.
 - De Rosa, D. et al. (2012). Characterisation of potential landing sites for the European Space Agency's Lunar Lander project.
   *Planetary and Space Science* 74. Site coordinates GR1 (de Gerlache rim) and MP1 (Malapert). https://arxiv.org/abs/1208.5587
 - Mazarico, E. et al. (2011). Illumination conditions of the lunar polar regions using LOLA topography. *Icarus* 211. Horizon method.
-- Barker, M. K. et al. (2023). LOLA south-pole DEM (PGDA product 90). *Planetary Science Journal*, doi:10.3847/PSJ/acf3e1.
+- Barker, M. K. et al. (2023). A New View of the Lunar South Pole from the Lunar Orbiter Laser Altimeter (LOLA). *Planetary Science
+  Journal* 4, 183. doi:10.3847/PSJ/acf3e1. Data: PGDA product 90, doi:10.60903/gsfcpgda-lola-spole.
+- Barker, M. K. et al. (2021). *Planetary and Space Science* 203, 105119. doi:10.1016/j.pss.2020.105119. Data: PGDA product 81
+  (South Pole LOLA DEM Mosaic, 5 m).
 - Dwyer Cianciolo, A. (2024). "Artemis Human Landing System Update", NASA presentation, NTRS 20240009596.
   The Earth-contact default (25%), quoted as listed there ("as listed in a NASA presentation (2024)").
 - NASA (2011). Recommendations to Space-Faring Entities: How to Protect and Preserve the Historic and Scientific Value of
