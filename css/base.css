@@ -98,17 +98,21 @@ body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 "IBM Plex San
 @media (max-width:1700px){#top .brand .btag{display:none}}
 @media (max-width:1400px){#top .dwhen{display:none}}
 @media (max-width:1180px){#top .dfull{display:none} #top .dshort{display:inline} #top .sitechip{max-width:190px}}
-/* narrow-screen card (Eren 15 Nov): under 860 px show one card, hide the tool (it needs a computer screen) */
-#narrow{display:none}
+/* phone card v2 (Eren 15 Nov "fix this for mobile"): logo header, one line on what it is, copy / share / GitHub, open anyway */
 @media (max-width:860px){
-  #narrow{display:grid;place-items:center;min-height:100vh;padding:24px 16px;box-sizing:border-box;background:var(--bg);color:var(--ink)}
-  #narrow .nbox{max-width:420px;display:grid;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px 20px}
+  #narrow{place-items:center;min-height:100vh;padding:24px 16px;box-sizing:border-box;background:var(--bg);color:var(--ink)}
+  #narrow .nbox{width:100%;max-width:400px;display:grid;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px 20px}
+  #narrow .nhead{display:flex;align-items:center;gap:14px;margin-bottom:4px}
+  #narrow .nhead img{width:56px;height:56px;border-radius:12px;flex:none}
   #narrow .nbrand{font:700 13px "IBM Plex Sans";letter-spacing:.3em;color:var(--muted)}
-  #narrow h1{margin:0;font:600 20px/1.3 "IBM Plex Sans"}
-  #narrow p{margin:0;font:400 15px/1.5 "IBM Plex Sans";color:var(--muted)}
-  #narrow .nlink{font:500 12px "IBM Plex Mono";color:var(--ink);word-break:break-all}
-  #narrow .btn{justify-self:start;text-decoration:none;padding:8px 12px}
-  .app,#loader,#missionPanel{display:none !important}
+  #narrow .nname{font:600 21px/1.2 "IBM Plex Sans";color:var(--ink)}
+  #narrow .nwhat{margin:0;font:500 16px/1.45 "IBM Plex Sans";color:var(--ink)}
+  #narrow .nwhy{margin:0 0 6px;font:400 14px/1.5 "IBM Plex Sans";color:var(--muted)}
+  #narrow .nbtn{display:block;width:100%;box-sizing:border-box;text-align:center;text-decoration:none;font:600 15px "IBM Plex Sans";padding:13px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);cursor:pointer}
+  #narrow .nprim{background:var(--sel);border-color:var(--sel);color:var(--bg)}
+  #narrow .nprim.ok{background:var(--go);border-color:var(--go)}
+  #narrow .nlinkbtn{justify-self:center;background:none;border:0;padding:8px;font:400 13px "IBM Plex Sans";color:var(--muted);text-decoration:underline;cursor:pointer}
+  html:not(.force-app) .app,html:not(.force-app) #loader,html:not(.force-app) #missionPanel{display:none !important}
 }
 /* top bar logo + tagline in an (i) (Eren 15 Nov ~15:10): logo left of ARIPI, vertically centred; tagline only in the tip */
 #top .brand{align-items:center}

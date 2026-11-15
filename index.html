@@ -8,21 +8,23 @@
 <!-- OWNER: coordinator. The three areas fill their own container; do not add area markup here. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <script>/* theme before first paint: ?theme=light|dark, else the saved choice */try{var q=new URLSearchParams(location.search).get("theme"),t=q||localStorage.getItem("spn-theme");if(t==="light")document.documentElement.dataset.theme="light"}catch(e){}</script>
-<style>/* phone card visibility lives in the page itself, so a stale cached base.css can never show it on a desktop */#narrow{display:none}@media (max-width:860px){#narrow{display:grid}}</style>
-<link rel="stylesheet" href="css/base.css?v=20261115g">
-<link rel="stylesheet" href="css/scene.css?v=20261115g">
-<link rel="stylesheet" href="css/panel.css?v=20261115g">
-<link rel="stylesheet" href="css/drawer.css?v=20261115g">
+<style>/* phone card visibility lives in the page itself, so a stale cached base.css can never show it on a desktop */#narrow{display:none}@media (max-width:860px){#narrow{display:grid}html.force-app #narrow{display:none!important}}</style>
+<script>/* "Open the full tool anyway" on a phone or tablet: remembered for this tab only */try{if(sessionStorage.getItem("spn-force-app")==="1")document.documentElement.classList.add("force-app")}catch(e){}</script>
+<link rel="stylesheet" href="css/base.css?v=20261115i">
+<link rel="stylesheet" href="css/scene.css?v=20261115i">
+<link rel="stylesheet" href="css/panel.css?v=20261115i">
+<link rel="stylesheet" href="css/drawer.css?v=20261115i">
 </head>
 <body>
 <!-- loading screen (shell.js hides it when App.ready + the Moon view are ready; CSS hides it after 20 s no matter what) -->
 <!-- narrow screens (< 860 px, Eren 15 Nov): one clean card instead of a squashed layout -->
-<div id="narrow"><div class="nbox"><div class="nbrand">ARIPI</div><h1>South Pole Navigator is built for a computer screen.</h1><p>Open this link on a laptop for the full tool.</p><p class="nlink">erenhocoklu.github.io/Peaks-of-Light-Lunar-Landing-Site-Navigator</p><a class="btn" href="https://github.com/erenhocoklu/Peaks-of-Light-Lunar-Landing-Site-Navigator">See the code and README on GitHub</a></div></div>
+<div id="narrow"><div class="nbox"><div class="nhead"><img src="favicon.svg?v=20261115i" width="56" height="56" alt="Aripi logo (AI-generated)" title="Logo drawn by AI (Claude)"><div><div class="nbrand">ARIPI</div><div class="nname">South Pole Navigator</div></div></div><p class="nai" style="margin:-6px 0 0;font:400 11px 'IBM Plex Sans',sans-serif;color:var(--muted);opacity:.75">Logo drawn by AI (Claude)</p><p class="nwhat">Find where and when to land at the lunar south pole, with real NASA terrain and Sun/Earth data.</p><p class="nwhy">It is built for a computer screen. Send yourself the link and open it on a laptop.</p><button class="nbtn nprim" id="nCopy" type="button">Copy link for your laptop</button><button class="nbtn" id="nShare" type="button" hidden>Share</button><a class="nbtn" href="https://github.com/erenhocoklu/Peaks-of-Light-Lunar-Landing-Site-Navigator">Code and README on GitHub</a><button class="nlinkbtn" id="nAnyway" type="button">Open the full tool anyway</button></div></div>
+<script>/* phone card (Eren 15 Nov): copy / share the link, or open the full tool anyway (this tab only) */(function(){var u=location.origin+location.pathname,c=document.getElementById("nCopy"),sh=document.getElementById("nShare"),a=document.getElementById("nAnyway");function done(t){c.textContent=t;c.classList.add("ok");setTimeout(function(){c.textContent="Copy link for your laptop";c.classList.remove("ok")},2500)}c.onclick=function(){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(u).then(function(){done("Copied")},function(){done(u)})}else done(u)};if(navigator.share){sh.hidden=false;sh.onclick=function(){navigator.share({title:"Aripi · South Pole Navigator",text:"Where and when to land at the lunar south pole",url:u}).catch(function(){})}}a.onclick=function(){try{sessionStorage.setItem("spn-force-app","1")}catch(e){}document.documentElement.classList.add("force-app");window.dispatchEvent(new Event("resize"))};})();</script>
 <div id="loader" role="status" aria-live="polite"><div class="ldbox"><img class="ldlogo" src="favicon.svg" width="72" height="72" alt="Aripi logo (AI-generated)"><div class="ldai" style="font:400 10.5px &quot;IBM Plex Sans&quot;;color:var(--muted);opacity:.75;margin-top:-6px">Logo drawn by AI (Claude)</div><div class="ldw">ARIPI</div><div class="ldt">Preparing the Moon…</div><div class="ldbar"><i></i></div><div class="lds">Loading real terrain and Sun/Earth data</div></div></div>
 <div class="app">
   <header class="top" id="top">
     <!-- top bar (Eren 15 Nov: ARIPI brand + view-orbit's three changes): brand, page switch, data line, site chip, theme icon, details -->
-    <span class="brand"><img class="blogo" src="favicon.svg?v=20261115g" width="22" height="22" alt="Aripi logo (AI-generated)"><b class="bw" aria-label="Aripi">ARIPI</b><span class="bd">SOUTH POLE NAVIGATOR</span><span class="info-wrap btagi"><button type="button" class="info-i" aria-label="What this tool is for" aria-describedby="tagTip">i</button><span class="info-tip left" id="tagTip" role="tooltip"><span>Where and when to land at the lunar south pole.</span></span></span></span>
+    <span class="brand"><img class="blogo" src="favicon.svg?v=20261115i" width="22" height="22" alt="Aripi logo (AI-generated)" title="Logo drawn by AI (Claude)"><b class="bw" aria-label="Aripi">ARIPI</b><span class="bd">SOUTH POLE NAVIGATOR</span><span class="info-wrap btagi"><button type="button" class="info-i" aria-label="What this tool is for" aria-describedby="tagTip">i</button><span class="info-tip left" id="tagTip" role="tooltip"><span>Where and when to land at the lunar south pole.</span><span>Logo drawn by AI (Claude).</span></span></span></span>
     <span class="pswitch" role="group" aria-label="Page"><button class="btn" id="plannerBtn" type="button" aria-pressed="true" title="The landing planner">Planner</button><button class="btn" id="missionBtn" type="button" aria-pressed="false" aria-expanded="false" aria-controls="missionPanel" title="Fly a mission: the selected site and landing day, from launch to the surface">Missions</button></span>
     <span class="sp"></span>
     <span class="dline"><span class="k">Data: <span class="dfull">NASA LOLA terrain + JPL Horizons</span><span class="dshort">LOLA + Horizons</span><span class="dwhen" id="dWhen"></span></span><span class="info-wrap"><button type="button" class="info-i" aria-label="About the data" aria-describedby="dataTip">i</button><span class="info-tip" id="dataTip" role="tooltip"></span></span></span>
@@ -41,11 +43,11 @@
   <aside id="missionPanel" aria-label="Missions" aria-hidden="true"><iframe id="missionFrame" title="Missions"></iframe></aside>
 </div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
-<script src="js/core.js?v=20261115g"></script>
-<script src="js/missions.js?v=20261115g"></script>   <!-- missions chat; App.ready waits for Missions.load() -->
-<script src="js/shell.js?v=20261115g"></script>
-<script src="js/panel.js?v=20261115g"></script>
-<script src="js/drawer.js?v=20261115g"></script>
-<script type="module" src="js/scene.js?v=20261115g"></script>
+<script src="js/core.js?v=20261115i"></script>
+<script src="js/missions.js?v=20261115i"></script>   <!-- missions chat; App.ready waits for Missions.load() -->
+<script src="js/shell.js?v=20261115i"></script>
+<script src="js/panel.js?v=20261115i"></script>
+<script src="js/drawer.js?v=20261115i"></script>
+<script type="module" src="js/scene.js?v=20261115i"></script>
 </body>
 </html>
