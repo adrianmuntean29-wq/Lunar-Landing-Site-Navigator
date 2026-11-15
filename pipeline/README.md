@@ -24,7 +24,7 @@ python build_sites.py
 python build_terrain.py
 python build_sites.py --only K,L,M,N   # add or rebuild some sites, keep the rest untouched
 python build_ranges.py; python build_tiles.py
-python build_zones.py    # needs Tudor's shapefile in ../data/zones_src/ (not in git)
+python build_zones.py    # needs Tudor's shapefile + the PGDA 90 roughness TIFF in data/zones_src/ (not committed)
 ```
 The 80 m DEM (181 MB) and caches live outside git, in `PEAKS_DATA_DIR` (default: the folder `data/` next to the repo checkout).
 20 m windows around each site and the 5-year Horizons table are fetched once and cached there.
