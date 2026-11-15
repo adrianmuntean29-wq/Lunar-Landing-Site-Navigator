@@ -297,6 +297,7 @@ function buildScene(){
   $('#lyElev').onchange = e => UNI.uElev.value = e.target.checked ? 1 : 0;
   $('#lySites').onchange = e => { showSites = e.target.checked; labKey = ''; if (view === 'region') updateScene(); };
   $('#lyFog').onchange = e => UNI.uFog.value = e.target.checked ? 1 : 0;
+  { const fb = $('#lyFold'); if (fb) fb.addEventListener('click', () => { labKey = ''; }); }   // layers box folded/unfolded (scene-core): re-place labels next frame
   // stars: decorative (not real star positions), on a big sphere round the scene; the ground hides the lower half
   { const N = 2500, a = new Float32Array(N*3), col = new Float32Array(N*3);
     for (let k = 0; k < N; k++){ const u = Math.random()*2 - 1, t = Math.random()*Math.PI*2, r = Math.sqrt(1 - u*u), b = 0.35 + 0.65*Math.random()**3;
@@ -351,7 +352,7 @@ function updateScene(){
   const key = camera.matrixWorld.elements.map(v => v.toFixed(3)).join() + '|' + w + 'x' + h + '|' + st.site + '|' + App.sites.length + '|' + tv + '|' + showSites + '|' + misIn.length + '|' + misGroups.length;
   if (key === labKey){ legendText(labOut); return; } labKey = key; labOut = out;   // labels only move with the camera: no DOM rebuild on still frames
   const lab = $('#labels'); lab.innerHTML = '';
-  const r0 = root.getBoundingClientRect(), placed = [...root.querySelectorAll('#layersBox, .zoom, .views, #siteNote')].map(e => e.getBoundingClientRect()).filter(b => b.width)
+  const r0 = root.getBoundingClientRect(), placed = [...root.querySelectorAll('#layersBox, #lyFold, .zoom, .views, #siteNote')].map(e => e.getBoundingClientRect()).filter(b => b.width)
     .map(b => ({L: (b.left + b.right)/2 - r0.left, T: (b.top + b.bottom)/2 - r0.top, w: b.width + 8, h: b.height + 8}));   // fixed UI boxes: labels keep clear
   const ui = placed.slice();
   // a site pin under a fixed UI box (layers, zoom, view tabs) moves just past that box's nearest side, so it stays visible and clickable
