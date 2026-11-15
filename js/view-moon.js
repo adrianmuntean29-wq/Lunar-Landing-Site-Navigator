@@ -181,9 +181,9 @@ function buildZones(){
   if (gZones){ globe.remove(gZones); gZones.traverse(o => o.geometry && o.geometry.dispose()); gZones = null; }
   gZoneTags.forEach(t => t.el.remove()); gZoneTags = []; if (gZoneKey){ gZoneKey.remove(); gZoneKey = null; }
   const Z = App.zones || []; if (!Z.length || App.state.zones === false) return;
-  for (const z of Z){ if (!isFinite(z.x) || !isFinite(z.y)) continue; const el = document.createElement('div'); el.style.cssText = ZTAG_CSS; el.textContent = 'Area ' + z.id;
+  for (const z of Z){ if (!isFinite(z.x) || !isFinite(z.y)) continue; const el = document.createElement('div'); el.style.cssText = ZTAG_CSS; el.textContent = 'flat, smooth area ' + z.id;
     $('#glabels').appendChild(el); const rho = Math.hypot(z.x, z.y)/1000;
-    gZoneTags.push({el, p: surf(-90 + 2*Math.atan(rho/(2*R))/D2R, Math.atan2(z.x, z.y)/D2R)}); }
+    gZoneTags.push({el, id: z.id, p: surf(-90 + 2*Math.atan(rho/(2*R))/D2R, Math.atan2(z.x, z.y)/D2R)}); }
   gZoneKey = document.createElement('div'); gZoneKey.style.cssText = ZKEY_CSS;
   gZoneKey.innerHTML = '<span style="display:inline-block;width:14px;height:9px;border:1.5px solid var(--c-zone);border-radius:3px"></span>' + ((App.zonesJson && App.zonesJson.label) || 'Flat, smooth terrain (team analysis)');
   $('#glabels').appendChild(gZoneKey);
@@ -240,7 +240,7 @@ function gFocus(kind, i, now){
     const up = P.clone().normalize();
     const sunH = sunD.clone().addScaledVector(up, -sunD.dot(up)).normalize();   // Sun direction along the ground
     const toward = llv(s ? -40 : -35, s ? s.lon : 0).sub(up.clone().multiplyScalar(up.dot(llv(s ? -40 : -35, s ? s.lon : 0)))).normalize();   // from the equator side of the site
-    const dir = up.clone().multiplyScalar(s ? 0.9 : 0.75).addScaledVector(toward, 0.75).addScaledVector(sunH, 0.35).normalize();   // oblique, a little from the Sun side
+    const dir = up.clone().multiplyScalar(s ? 0.9 : 2.0).addScaledVector(toward, 0.75).addScaledVector(sunH, 0.35).normalize();   // oblique, a little from the Sun side
     tgt = P; pos = P.clone().addScaledVector(dir, s ? 0.05 : far); minD = 0.017; maxD = 4; minP = (90 + 30)*D2R; }   // close-up limit: ~30 km and >= 30 deg above the horizon (240 m grid; detail = Landing Site view)
   gPreset = kind; root.querySelectorAll('#gBar button').forEach(b => b.setAttribute('aria-pressed', b.dataset.g === (kind === 'site' ? 'pole' : kind)));
   gCtl.minDistance = 0; gCtl.maxDistance = 100; gCtl.minPolarAngle = 0;
@@ -309,11 +309,7 @@ function updateGlobe(){
   // whole Moon: one tag on a stem, nothing else
   S(gClus, 'display', clus ? '' : 'none'); S(gStem, 'display', clus ? '' : 'none');
   if (clus){ const cx = (x0 + x1)/2, cy = (y0 + y1)/2, ty = cy - 46; line(gStem, cx, cy, cx, ty + 12); at(gClus, cx, ty, ' translate(-50%,-50%)'); }
-  gZoneTags.forEach(t => { const q = t.p.clone().project(gCam), on = !clus && gCam.position.distanceTo(gCtl.target) < 0.2 && gCam.position.clone().sub(t.p).dot(t.p) > 0 && q.z <= 1 && Math.abs(q.x) <= 0.97 && Math.abs(q.y) <= 0.97;
-    S(t.el, 'display', on ? '' : 'none'); if (on) S(t.el, 'transform', `translate3d(${((q.x*0.5 + 0.5)*w).toFixed(1)}px,${((-q.y*0.5 + 0.5)*h).toFixed(1)}px,0) translate(-50%,-50%)`); });
   if (gZoneKey) S(gZoneKey, 'display', clus ? 'none' : '');
-  if (gPoleTag){ const q = gPoleTop.clone().project(gCam), on = !clus && q.z <= 1 && Math.abs(q.x) <= 0.97 && Math.abs(q.y) <= 0.97;
-    S(gPoleTag, 'display', on ? '' : 'none'); if (on) S(gPoleTag, 'transform', `translate3d(${((q.x*0.5 + 0.5)*w).toFixed(1)}px,${((-q.y*0.5 + 0.5)*h).toFixed(1)}px,0) translate(-50%,-100%) translateY(-4px)`); }
   // dots: every visible site, true position (hidden at whole-Moon zoom)
   gsl.forEach(g => { const on = !clus && vis.includes(g); S(g.dot, 'display', on ? '' : 'none'); S(g.ld, 'display', 'none');
     if (on){ S(g.dot, 'background', g.i === st.site ? 'var(--c-sel)' : '#F2F1EC'); at(g.dot, g.x, g.y); } });
@@ -340,6 +336,26 @@ function updateGlobe(){
     gs.forEach((g, k) => { const bx = left + k*(MK + 1) + MK/2, by = up ? sy + MK : sy;
       S(g.ld, 'display', ''); S(g.ld, 'background', g.i === st.site ? 'var(--c-sel)' : 'rgba(242,241,236,.55)'); line(g.ld, bx, by, g.x, g.y); }); });
   gPins.forEach((v, key) => { if (!used.has(key)) S(v.el, 'display', 'none'); });
+  // Declutter (Eren ~11:50): every other label goes only where it touches no site marker or strip, else it is hidden.
+  const free = (x, y, wd, ht) => !taken.some(r => x < r.x + r.w + 4 && r.x < x + wd + 4 && y < r.y + MK + 4 && r.y < y + ht + 4);
+  const onScr = q => q.z <= 1 && Math.abs(q.x) <= 0.97 && Math.abs(q.y) <= 0.97, pxOf = q => [(q.x*0.5 + 0.5)*w, (-q.y*0.5 + 0.5)*h];
+  const tw = el => el.textContent.length*7 + 16;   // label width estimate (12 px mono + padding), no layout read per frame
+  // one area tag: the flat, smooth area nearest the selected site (same rule as Landing Site); the other areas keep outlines only
+  const sel = App.sites[st.site], zn = !clus && sel && App.zoneAt ? App.zoneAt(sel.lat, sel.lon) : null;
+  gZoneTags.forEach(t => { let on = false;
+    if (zn && t.id === zn.id && gCam.position.clone().sub(t.p).dot(t.p) > 0){ const q = t.p.clone().project(gCam);
+      if (onScr(q)){ const [x, y] = pxOf(q), wd = tw(t.el); on = free(x - wd/2, y - 8, wd, 16);
+        if (on){ S(t.el, 'transform', `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) translate(-50%,-50%)`); taken.push({x: x - wd/2, y: y - 8, w: wd}); } } }
+    S(t.el, 'display', on ? '' : 'none'); });
+  if (gPoleTag){ const q = gPoleTop.clone().project(gCam); let on = !clus && onScr(q);
+    if (on){ const [x, y] = pxOf(q), wd = tw(gPoleTag);   // above the line top, else to its right, else left, else below; hidden if all are taken
+      const c = [[x - wd/2, y - 26], [x + 8, y - 11], [x - wd - 8, y - 11], [x - wd/2, y + 6]].find(([cx, cy]) => free(cx, cy, wd, 22));
+      on = !!c; if (on){ S(gPoleTag, 'transform', `translate3d(${c[0].toFixed(1)}px,${c[1].toFixed(1)}px,0)`); taken.push({x: c[0], y: c[1], w: wd}); } }
+    S(gPoleTag, 'display', on ? '' : 'none'); }
+  // Sun / Earth sky tags (placed earlier by label()): hidden for this frame if they would sit on a marker
+  for (const el of [gSunLab, gEarthLab]){ if (el.style.display === 'none') continue;
+    const x = parseFloat(el.style.left), y = parseFloat(el.style.top), wd = tw(el), edge = el.classList.contains('edge');
+    if (!free(x - wd/2, edge ? y - 11 : y, wd, 22)) el.style.display = 'none'; }
 }
 
 // draw only when something changed (Eren ~21:20: page laggy). Redraw when: the camera moved (drag, damping, glide), app state changed,

@@ -4,7 +4,7 @@
 
 **Team Peaks of Light** · NASA Space Apps Challenge 2026 · Alba Iulia, Romania · Challenge: *Lunar Landing Site Navigator*
 
-**Live demo:** [DEMO_URL] · **Repository:** [REPO_URL] · **Demo video / slides:** [DEMO_MEDIA_URL]
+**Live demo:** https://erenhocoklu.github.io/Peaks-of-Light-Lunar-Landing-Site-Navigator/ · **Repository:** https://github.com/erenhocoklu/Peaks-of-Light-Lunar-Landing-Site-Navigator · **Demo video / slides:** [DEMO_MEDIA_URL]
 
 > The data is public, but using it takes expert tools and hours. We turn it into an answer you can check in seconds:
 > which spots and weeks work, and why.
@@ -51,7 +51,7 @@ checks the Sun and the Earth against the **real terrain horizon** computed from 
 
 ## How to use it
 
-1. Open [DEMO_URL] (no login, works in a desktop browser).
+1. Open https://erenhocoklu.github.io/Peaks-of-Light-Lunar-Landing-Site-Navigator/ (no login, works in a desktop browser).
 2. Pick a site, or press **Compare sites**.
 3. Choose the first landing date and the time span.
 4. Pick a preset (crew or robotic) or set your own limits with the sliders.

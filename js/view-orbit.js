@@ -77,7 +77,9 @@ function buildSpace(){
   sTrack = line(61, tok('--sel-3d', '#4FC3F7'), 0.95, 0.25, 1, eSys); sPast = line(61, tok('--sel-3d', '#4FC3F7'), 0.5, 0.12, 2.5, eSys);   // floor 0.12: the ring stays faintly visible under the closest/farthest marks   // the Moon's real path around Earth, +/-15 days
   eFut = line(366, '#9CCC65', 0.85, 0.25, 1, world); ePast = line(366, '#9CCC65', 0.45, 0.08, 2.5, world);   // Earth's real path around the Sun, +/-half a year
   const mk = (cls, txt, f) => { const e = document.createElement('div'); e.className = 'olab ' + cls; e.textContent = txt; $('#olabels').appendChild(e); if (f){ e.onclick = () => focusSpace(f); e.title = 'Focus the camera on the ' + txt; } return e; };
-  olab = {sun: mk('sun', 'Sun', 'sun'), earth: mk('earth', 'Earth', 'earth'), moon: mk('moon', 'Moon', 'moon'), pe: mk('apsis', '◆ closest'), ap: mk('apsis', '◆ farthest'), site: mk('site', '')};
+  olab = {sun: mk('sun', 'Sun', 'sun'), earth: mk('earth', 'Earth', 'earth'), moon: mk('moon', 'Moon', 'moon'), pe: mk('apsis', '◆ closest'), ap: mk('apsis', '◆ farthest'), site: mk('site', ''),
+    pole: mk('apsis', 'South pole'), send: mk('apsis', '')};   // tags at the outer (south) ends of the spin axis and the site line (Eren 15 Nov)
+  olab.pole.style.color = 'var(--c-sun)'; olab.send.style.color = 'var(--c-earth)';
   root.querySelectorAll('#obBar button').forEach(b => b.onclick = () => focusSpace(b.dataset.f));
   // click (not drag) on a body focuses the camera on it; small bodies get a 26 px catch radius
   const cv = renderer.domElement; let down = null;
@@ -158,6 +160,15 @@ function updateSpace(){
   const stag = 'Selected: ' + s.short + ' · ' + (90 - Math.abs(s.lat)).toFixed(1) + '° from the pole';
   if (olab.site.textContent !== stag){ olab.site.textContent = stag; olab.site.title = 'Angle between the blue site line and the Moon\'s spin axis (orange) = 90° minus the site\'s latitude'; }
   put(olab.site, sp, facing && ang(1, dM) > 40);
+  // line-end tags: south end of the spin axis + site end of the site line. Hidden when the Moon is small or the end is behind the disc.
+  // The two ends are only 0.2-6 deg apart, so the tag of the end further left on screen goes left, the other goes right (never overlap).
+  const pEnd = sMoon.localToWorld(new THREE.Vector3(0, -1.7, 0)), sEnd = sMoon.localToWorld(llv(s.lat, s.lon, 1.7)), mq = moonW.clone().project(sCam);
+  const hidden = v => { const q = v.clone().project(sCam), rpx = ang(1, dM); return Math.hypot((q.x - mq.x)*w/2, (q.y - mq.y)*h/2) < rpx && v.distanceTo(sCam.position) > dM; };
+  const stxt = s.custom ? 'your spot' : s.short; if (olab.send.textContent !== stxt) olab.send.textContent = stxt;
+  const big = ang(1, dM) > 40, pLeft = pEnd.clone().project(sCam).x <= sEnd.clone().project(sCam).x;
+  olab.pole.style.transform = pLeft ? 'translate(calc(-100% - 6px),-50%)' : 'translate(6px,-50%)';
+  olab.send.style.transform = pLeft ? 'translate(6px,-50%)' : 'translate(calc(-100% - 6px),-50%)';
+  put(olab.pole, pEnd, big && !hidden(pEnd)); put(olab.send, sEnd, big && !hidden(sEnd));
 }
 
 // ?debug: pixel distance from each apsis marker to the nearest drawn path vertex (should be ~0)
