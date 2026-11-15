@@ -7,9 +7,9 @@
 (function(){
   const root = document.querySelector('#drawer'), $ = s => root.querySelector(s);
   root.innerHTML = `
-    <div class="trow" id="trow"><button class="btn tplay" id="tPlay" type="button">▶ PLAY</button><select class="btn" id="tSpeed" aria-label="Playback speed"><option value="0.25">6 h/s</option><option value="1" selected>1 d/s</option><option value="5">5 d/s</option></select>
-      <span><span class="k">TIME</span> <b id="tNow">…</b></span><span class="tsun"><span class="k">SUN</span> <b id="tSunS">…</b></span><span class="tearth"><span class="k">EARTH</span> <b id="tEarthS">…</b></span>
-      <span class="period" title="First landing date of the period, and how many years to show">FROM <input class="tokd" id="start" type="date" min="2026-01-01" max="2030-12-31"> SPAN <select class="btn" id="span" aria-label="Span"><option value="1">1 y</option><option value="2">2 y</option><option value="3">3 y</option><option value="5">5 y</option></select></span></div>
+    <div class="trow" id="trow"><span class="tl"><button class="btn tplay" id="tPlay" type="button" aria-label="Play" title="Play (Space)">▶</button><select class="btn" id="tSpeed" aria-label="Playback speed"><option value="0.25">6 h/s</option><option value="1" selected>1 d/s</option><option value="5">5 d/s</option></select></span>
+      <span class="tclock" title="Time on the clock (UTC)"><b id="tDate">…</b> <span class="k" id="tTime">…</span></span>
+      <span class="period" title="The period the calendar covers: first month and length"><button class="btn pstep" id="pPrev" type="button" aria-label="Start one month earlier" title="Start one month earlier">◂</button><span class="plab" id="pLab">…</span><button class="btn pstep" id="pNext" type="button" aria-label="Start one month later" title="Start one month later">▸</button><select class="btn" id="span" aria-label="Length of the period"><option value="1">1 y</option><option value="2">2 y</option><option value="3">3 y</option><option value="5">5 y</option></select></span></div>
     <div class="tabs dtabs" role="tablist" id="dtabs"><button role="tab" data-d="price" aria-selected="true">CALENDAR</button><button role="tab" data-d="ms" aria-selected="false">YOUR MISSION</button><button role="tab" data-d="slip" aria-selected="false">LAUNCH SLIP</button><button role="tab" data-d="nx" aria-selected="false">NEXT EVENTS</button><span class="ctl" data-for="price"><span class="seg" id="cMode"><button type="button" data-c="all">ALL</button><button type="button" data-c="sun">SUN</button><button type="button" data-c="earth">EARTH</button><button type="button" data-c="mis">MISSIONS</button></span></span><span class="sp"></span><span class="ctl" data-for="price"><span class="yp"><button class="pnav" data-n="-12" aria-label="Earlier year">‹</button><b id="ylab"></b><button class="pnav" data-n="12" aria-label="Later year">›</button></span></span>
       <button class="btn" id="hide" type="button">HIDE</button></div>
     <div class="dbody" id="dbody">
@@ -185,14 +185,14 @@
     $('#nxSum').innerHTML = '<b class="site">' + siteName() + ':</b> now ' + (x.sunLit >= 0.5 ? '<span class="tsunc">Sun up</span>' : '<span class="mut">Sun behind terrain</span>') + ', ' + (x.earthVis ? '<span class="tearc">Earth in view</span>' : '<span class="mut">Earth below the horizon</span>') + ' · ' + dt(st.jd0 + st.t);
   }
 
-  /* ---------- time row: clock, play, speed, Sun/Earth now, period ---------- */
+  /* ---------- time row: play, speed, clock, period (Sun/Earth now: right panel) ---------- */
   function clock(){
-    const st = S(), jd = st.jd0 + st.t, x = App.stateAt(App.sites[st.site], jd);
-    $('#tNow').textContent = App.iso(jd) + ' UTC';
-    const su = $('#tSunS'), ea = $('#tEarthS');
-    su.textContent = x.sunLit >= 0.5 ? 'UP' : 'BEHIND TERRAIN'; su.title = 'Sun ' + x.su.el.toFixed(2) + '° high, terrain ' + x.sunHz.toFixed(2) + '° (azimuth ' + x.su.az.toFixed(0) + '°)';
-    ea.textContent = x.earthVis ? 'IN VIEW' : 'BELOW HORIZON'; ea.title = 'Earth ' + x.ea.el.toFixed(2) + '° high, terrain ' + x.earthHz.toFixed(2) + '° (azimuth ' + x.ea.az.toFixed(0) + '°)';
-    $('#tPlay').textContent = st.playing ? '❚❚ PAUSE' : '▶ PLAY'; $('#tPlay').classList.toggle('on', st.playing);
+    const st = S(), jd = st.jd0 + st.t;
+    // clock first (Eren 15 Nov, draft C): date + time only; Sun/Earth status lives in the right panel
+    $('#tDate').textContent = App.date(jd).toLocaleDateString('en-GB', {weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC'});
+    $('#tTime').textContent = App.iso(jd).slice(11) + ' UTC';
+    const pb = $('#tPlay'); pb.textContent = st.playing ? '❚❚' : '▶'; pb.classList.toggle('on', st.playing);
+    pb.setAttribute('aria-label', st.playing ? 'Pause' : 'Play'); pb.title = (st.playing ? 'Pause' : 'Play') + ' (Space)';
     $('#tSpeed').value = String(st.speed);
     nowMark();
   }
@@ -205,7 +205,15 @@
     c.classList.add('now'); const m = c.parentElement.previousElementSibling; if (m) m.classList.add('now');
     c.title = 'Today on the clock: ' + App.dayDate(d);
   }
-  function period(){ const st = S(); $('#start').value = App.date(st.jd0).toISOString().slice(0, 10); $('#span').value = String(Math.round(st.days/365));
+  // period = month stepper (Eren 15 Nov, draft C): starts on the 1st of a month, Jan 2026 .. Dec 2030 (ephemeris covers 2026-2035)
+  const P_MIN = Date.UTC(2026, 0, 1), P_MAX = Date.UTC(2030, 11, 1);
+  const fmM = d => d.toLocaleString('en-GB', {month: 'short', year: 'numeric', timeZone: 'UTC'});
+  function shiftStart(n){ const d = App.date(S().jd0), m = Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + n, 1);
+    App.set({jd0: App.jd(new Date(Math.min(P_MAX, Math.max(P_MIN, m)))), t: 0, selDay: -1}, 'drawer'); }
+  function period(){ const st = S(), a = App.date(st.jd0), b = App.date(st.jd0 + st.days - 1);
+    $('#pLab').innerHTML = fmM(a) + ' <span class="k">→</span> ' + fmM(b);
+    $('#pPrev').disabled = a.getTime() <= P_MIN; $('#pNext').disabled = a.getTime() >= P_MAX;
+    $('#span').value = String(Math.round(st.days/365));
     root.querySelectorAll('[data-site]').forEach(e => e.textContent = siteName() + ':');
     $('#hide').textContent = st.drawerOpen ? 'HIDE' : 'SHOW'; root.classList.toggle('hid', !st.drawerOpen); }
   function ctl(){ root.querySelectorAll('#dtabs .ctl').forEach(e => e.hidden = e.dataset.for !== view.tab); }
@@ -222,12 +230,20 @@
       clock(); period(); active();
       if (keys.has('theme')) setTimeout(active, 0); });   // shell flips <html data-theme> in its own listener: redraw canvases after it
     $('#tPlay').onclick = () => App.set({playing: !S().playing}, 'drawer');
+    // Space = play / pause anywhere on the page, except while typing in a field, on a focused button or link (Space acts on it),
+    // or with the Missions panel open (its own page has the keyboard). Eren 15 Nov.
+    document.addEventListener('keydown', e => {
+      if (e.code !== 'Space' || e.repeat || e.ctrlKey || e.altKey || e.metaKey) return;
+      const t = e.target; if (t && t.closest && t.closest('input, select, textarea, button, a, [contenteditable="true"]')) return;
+      const mp = document.getElementById('missionPanel'); if (mp && mp.classList.contains('open')) return;
+      e.preventDefault(); App.set({playing: !S().playing}, 'drawer');
+    });
     $('#tSpeed').onchange = e => App.set({speed: +e.target.value}, 'drawer');
     $('#dtabs').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (!b) return; view.tab = b.dataset.d;
       root.querySelectorAll('#dtabs [data-d]').forEach(c => c.setAttribute('aria-selected', c === b));
       root.querySelectorAll('[data-pane]').forEach(p => p.hidden = p.dataset.pane !== view.tab); ctl(); active(); });
     $('#span').onchange = e => App.set({days: 365*(+e.target.value), t: 0, selDay: -1}, 'drawer');
-    $('#start').onchange = e => { const d = new Date(e.target.value + 'T00:00:00Z'); if (!isNaN(d)) App.set({jd0: App.jd(d), t: 0, selDay: -1}, 'drawer'); };
+    $('#pPrev').onclick = () => shiftStart(-1); $('#pNext').onclick = () => shiftStart(1);
     $('#hide').onclick = () => App.set({drawerOpen: !S().drawerOpen}, 'drawer');
     // calendar
     $('#pcal').addEventListener('click', e => { const c = e.target.closest('.pd[data-d]'); if (c) pick(+c.dataset.d); });
