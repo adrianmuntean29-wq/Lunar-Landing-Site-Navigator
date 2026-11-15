@@ -22,6 +22,8 @@ import metrics
 BOX = "best-lit point in NASA site box"
 BOX_SRC = ("engine search (2 m mast, 2027-2031) inside PGDA product 78 site box {box}; filters from NASA 2024 HLS presentation "
            "(slope < 10 deg over 100 m, Earth >= 25%); vault log 2026-11-14 more-sites")
+TEAM = "best-lit flat point in team terrain zone (Tudor)"
+TEAM_SRC = "Tudor's ArcGIS terrain zones (slope, roughness, PSR) + team engine light search"
 SITES = [
     dict(id="A", name="Connecting Ridge (C1)", lat=-89.4505, lon_e=222.84, source="Glaser et al. 2018, site C1",
          kind="published study point",
@@ -47,6 +49,13 @@ SITES = [
     dict(id="J", name="IM-2 Athena target", lat=-84.78, lon_e=29.13, kind="historic target (comparison)",
          source="published IM-2 target point, LROC https://lroc.im-ldi.com/images/1401; the lander ended ~250 m away, "
                 "on its side in a crater (collectSPACE); inside IM-2's own keep-out", reference=[]),
+    # Added 2026-11-15 (Eren lifted the freeze 11:00; tudor-data session): points inside Tudor's new terrain zones, found with
+    # exact masks at 2 m (2027-2031) and slope-checked on PGDA 90 SLP_100M; vault log 2026-11-15-1054-tudor-data-new-set-tests
+    dict(id="K", name="de Gerlache rim, team zone 3 (TZ3)", lat=-88.6077, lon_e=291.965, kind=TEAM, source=TEAM_SRC, reference=[]),
+    dict(id="L", name="Haworth area, team zone 13 (TZ13)", lat=-86.9956, lon_e=335.673, kind=TEAM, source=TEAM_SRC, reference=[]),
+    dict(id="M", name="Shackleton area, team zone 9 (TZ9)", lat=-88.8440, lon_e=127.587, kind=TEAM, source=TEAM_SRC, reference=[]),
+    dict(id="N", name="Tudor's proposed site (TP1)", lat=-88.0453, lon_e=283.03, kind="team proposed site (Tudor)", source=TEAM_SRC,
+         reference=[]),
 ]
 MASTS_M = [0, 2, 10]
 NEAR_M = 10000.0
@@ -99,10 +108,11 @@ def main(out=Path(__file__).resolve().parents[1] / "data" / "sites.json"):
     out_sites = []
     for s in SITES:
         near = dem.load_near(s["lat"], s["lon_e"], radius_m=NEAR_M + 2000)
-        masks, stats_2027, stats_5y, info0 = {}, {}, {}, None
+        masks, stats_2027, stats_5y, info0, edge = {}, {}, {}, None, {}
         for mast in MASTS_M:
             m, info = horizon.horizon_mask(s["lat"], s["lon_e"], far, near, near_m=NEAR_M, mast_m=mast, dem_max_m=dem_max)
             info0 = info0 or info
+            edge[str(mast)] = info["edge_rays"]
             ser = metrics.site_series(m, sky, s["lat"], s["lon_e"], info["h0_m"], mast)
             masks[str(mast)] = [round(float(v), 2) for v in m]
             stats_2027[str(mast)] = metrics.stats({k: v[WINDOW_2027] for k, v in ser.items()})
@@ -117,7 +127,10 @@ def main(out=Path(__file__).resolve().parents[1] / "data" / "sites.json"):
             err_m=quality("LDEM_80S_20MPP_ADJ_ERR.TIF", s["lat"], s["lon_e"], 2),
             effres_m=quality("LDEM_80S_20MPP_ADJ_EFFRES.TIF", s["lat"], s["lon_e"], 1),
             psr_km=psr_distance(s["lat"], s["lon_e"]),
-            stop_km_max=round(info0["stop_km_max"], 1), edge_rays=info0["edge_rays"], truncated=info0["edge_rays"] > 0,
+            # Fixed 2026-11-15: edge rays depend on the mast (a higher eye sees farther, so more rays reach the map edge).
+            # The flag used to come from the 0 m mask only; it now follows the 2 m headline mast, with every mast listed.
+            stop_km_max=round(info0["stop_km_max"], 1), edge_rays=edge["2"], truncated=edge["2"] > 0,
+            edge_rays_by_mast=edge,
             masks=masks,
             reference_stats=dict(window="2027-01-01/2027-12-31T23:00Z hourly", **{"by_mast": stats_2027}),
             reference_stats_5y=dict(window="2027-01-01/2031-12-31T23:00Z hourly", **{"by_mast": stats_5y}),
@@ -145,5 +158,29 @@ def main(out=Path(__file__).resolve().parents[1] / "data" / "sites.json"):
     print(f"wrote {out} ({out.stat().st_size/1024:.0f} KB) in {time.time()-t_start:.0f} s")
 
 
+def merge_only(ids):
+    """Compute only `ids` and add/replace them in the existing sites.json, leaving every other site's entry untouched."""
+    out = Path(__file__).resolve().parents[1] / "data" / "sites.json"
+    tmp = out.with_name("sites_only.json")
+    global SITES
+    keep = SITES
+    SITES = [s for s in keep if s["id"] in ids]
+    main(tmp)
+    SITES = keep
+    old, new = json.loads(out.read_text()), json.loads(tmp.read_text())
+    byid = {s["id"]: s for s in old["sites"]}
+    byid.update({s["id"]: s for s in new["sites"]})
+    old["sites"] = [byid[s["id"]] for s in SITES if s["id"] in byid]
+    old["generated_utc"] = new["generated_utc"]
+    old["versions"]["code"] = new["versions"]["code"]
+    out.write_text(json.dumps(old, indent=1))
+    tmp.unlink()
+    print(f"merged {sorted(ids)} into {out}")
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+    if len(sys.argv) > 2 and sys.argv[1] == "--only":
+        merge_only(set(sys.argv[2].split(",")))
+    else:
+        main()

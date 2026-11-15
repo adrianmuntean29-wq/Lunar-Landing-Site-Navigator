@@ -8,6 +8,9 @@ Python precomputes; the static page reads the files in `data/`.
 | `data/heights.bin` + `terrain_meta.json` | +/-60 km at 240 m, 3D view only | `build_terrain.py` |
 | `data/cap_heights.bin` + `cap_meta.json` | whole cap at 640 m, approximate masks for clicked spots | `build_terrain.py` |
 | `data/psr.json` | 1,531 permanently shadowed regions >= 1 km^2, outlines for the map (LOLA model, not ice) | `build_psr.py` |
+| `data/site_ranges.json` | how each site's numbers move within 25 m / 50 m (exact masks, 2 m mast, 2027-2031) | `build_ranges.py` |
+| `data/tiles/<id>.bin` | 100 m terrain tile per site, Landing Site 3D view only | `build_tiles.py` |
+| `data/zones.json` | teammate Tudor's flat, smooth terrain zones (ArcGIS) + area, shadow share, roughness | `build_zones.py` |
 
 ## Run
 ```bash
@@ -19,6 +22,9 @@ python -m pytest -q tests
 python build_psr.py      # before build_sites (gives psr_km)
 python build_sites.py
 python build_terrain.py
+python build_sites.py --only K,L,M,N   # add or rebuild some sites, keep the rest untouched
+python build_ranges.py; python build_tiles.py
+python build_zones.py    # needs Tudor's shapefile in ../data/zones_src/ (not in git)
 ```
 The 80 m DEM (181 MB) and caches live outside git, in `PEAKS_DATA_DIR` (default: the folder `data/` next to the repo checkout).
 20 m windows around each site and the 5-year Horizons table are fetched once and cached there.
