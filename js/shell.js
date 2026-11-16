@@ -59,12 +59,7 @@
   }
   function missions(open, fly){
     if (!mPanel) return;
-    // Same URL as last time: no reload, but the page plays the launch again each time the panel opens (Adrian, 16 Nov)
-    if (open){
-      const u = missionUrl(fly), wasOpen = mPanel.classList.contains('open');
-      if (mFrame.getAttribute('src') !== u) mFrame.setAttribute('src', u);
-      else if ((fly || !wasOpen) && mFrame.contentWindow) mFrame.contentWindow.postMessage({spn: 'replay-launch'}, location.origin);
-    }
+    if (open){ const u = missionUrl(fly); if (mFrame.getAttribute('src') !== u) mFrame.setAttribute('src', u); }
     mPanel.classList.toggle('open', open); mPanel.setAttribute('aria-hidden', !open);
     // Planner | Missions switch (Eren 15 Nov): the active page is pressed; Missions keeps today's open/close behaviour
     missionBtn.setAttribute('aria-expanded', open); missionBtn.setAttribute('aria-pressed', open);

@@ -2700,28 +2700,10 @@ function startLaunch(fromPlay){
   if (fromPlay){
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     surfWrap.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'center'});
-    pinLaunchView();
+    /* the launch table above can still grow (weather arriving) and push the view down; centre it again once */
+    setTimeout(function(){ if (landAnim && landAnim.kind === 'launch') surfWrap.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'center'}); }, 1600);
   }
   dirty = true;
-}
-/* While the launch plays, the tables above it can still grow (weather and LRO data arriving) and push the launch view out of
-   sight. Keep it centred until the launch ends or the person scrolls themselves (Safari has no scroll anchoring to do this). */
-var launchPin = null;
-function pinLaunchView(){
-  if (launchPin) launchPin.stop();
-  var userMoved = false, ro = null, t0 = performance.now();
-  function moved(){ userMoved = true; }
-  function keep(){
-    if (userMoved || !landAnim || landAnim.kind !== 'launch' || performance.now() - t0 > LAUNCH.dur){ if (launchPin) launchPin.stop(); return; }
-    var r = surfWrap.getBoundingClientRect(), mid = r.top + r.height/2 - innerHeight/2;
-    if (Math.abs(mid) > 40) surfWrap.scrollIntoView({behavior: 'auto', block: 'center'});
-  }
-  ['wheel', 'touchmove', 'keydown'].forEach(function(ev){ addEventListener(ev, moved, {passive: true}); });
-  var iv = null, wait = setTimeout(function(){   // after the first smooth scroll has had time to finish
-    if (window.ResizeObserver){ ro = new ResizeObserver(keep); ro.observe(document.body); }
-    iv = setInterval(keep, 700);   // also catches a smooth scroll that ended short of the view
-  }, 1000);
-  launchPin = {stop: function(){ clearTimeout(wait); clearInterval(iv); if (ro) ro.disconnect(); ['wheel', 'touchmove', 'keydown'].forEach(function(ev){ removeEventListener(ev, moved); }); launchPin = null; }};
 }
 $('#watchLaunch').addEventListener('click', function(){ startLaunch(false); });
 function goSurface(){ var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; surfWrap.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'center'}); }
@@ -2892,7 +2874,6 @@ if (FROMCAL){
 } else {
   met = mission.tLand + 6*3600; syncMet();
   applyBest();
-  startLaunch(true);   // the page always opens on the launch (Adrian, 16 Nov)
 }
 window.__mission = {LRO: LRO, lroXY: lroXY, orbView: orbView, evalAt: evalAt, siteSeries: siteSeries, LIMITS: LIMITS, startLanding: startLanding, startLiftoff: startLiftoff, startLaunch: startLaunch, launchState: launchState, sunAltAz: sunAltAz, get landAnim(){ return landAnim; }, get mast(){ return mast; }, get target(){ return target; }, get active(){ return active; }, budgets: budgets, results: results, get mission(){ return mission; }, PROFILES: PROFILES, SITES: SITES, picks: picks,
   get windows(){ return lwRes; }, get wx(){ return wx; }, get launchMs(){ return launchMs; }, budget: budget, launchOpps: launchOpps, moonRADec: moonRADec, gmstDeg: gmstDeg};
@@ -2932,12 +2913,7 @@ html.framed body{overflow-x:hidden}
   try { theme(localStorage.getItem('spn-theme')); } catch (e) { theme('dark'); }
   window.addEventListener('storage', function(e){ if (e.key === 'spn-theme') theme(e.newValue); });
   function close(){ window.parent.postMessage({spn: 'close-missions'}, location.origin); }
-  window.addEventListener('message', function(e){
-    if (e.origin !== location.origin || !e.data) return;
-    if (e.data.spn === 'theme') theme(e.data.theme);
-    /* the planner reopened the Missions panel without reloading it: play the launch again, scrolled into view */
-    if (e.data.spn === 'replay-launch' && window.__mission) window.__mission.startLaunch(true);
-  });
+  window.addEventListener('message', function(e){ if (e.origin === location.origin && e.data && e.data.spn === 'theme') theme(e.data.theme); });
   document.addEventListener('keydown', function(e){
     if (e.key !== 'Escape' || /^(INPUT|SELECT|TEXTAREA)$/.test((e.target || {}).tagName || '')) return;
     close();
