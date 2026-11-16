@@ -1,0 +1,166 @@
+{
+ "answer_key": "data/windows_reference.json (2026-11-14T12:35Z)",
+ "cases": [
+  {
+   "site": "A",
+   "mast_m": 2,
+   "preset": "robotic",
+   "limits": {
+    "length_d": 13,
+    "min_sun_pct": 70,
+    "min_earth_pct": 50,
+    "max_night_h": 48,
+    "min_touchdown_deg": 0
+   },
+   "engine_passing": 146,
+   "calendar": {
+    "days": 365,
+    "verdicts_differ": 0,
+    "first_reason_differs": 0,
+    "max_abs_diff": {
+     "sun_pct": 0.002,
+     "earth_pct": 0.0,
+     "night_h": 0.0,
+     "touchdown_deg": 0.001
+    },
+    "examples": [],
+    "passing": 146
+   },
+   "mission": {
+    "days": 365,
+    "verdicts_differ": 0,
+    "first_reason_differs": 0,
+    "max_abs_diff": {
+     "sun_pct": 0.002,
+     "earth_pct": 0.0,
+     "night_h": 0.0,
+     "touchdown_deg": 0.001
+    },
+    "examples": [],
+    "passing": 146
+   }
+  },
+  {
+   "site": "B",
+   "mast_m": 2,
+   "preset": "crew",
+   "limits": {
+    "length_d": 6,
+    "min_sun_pct": 95,
+    "min_earth_pct": 50,
+    "max_night_h": 0,
+    "min_touchdown_deg": 0
+   },
+   "engine_passing": 109,
+   "calendar": {
+    "days": 365,
+    "verdicts_differ": 0,
+    "first_reason_differs": 0,
+    "max_abs_diff": {
+     "sun_pct": 0.005,
+     "earth_pct": 0.0,
+     "night_h": 0.0,
+     "touchdown_deg": 0.001
+    },
+    "examples": [],
+    "passing": 109
+   },
+   "mission": {
+    "days": 365,
+    "verdicts_differ": 0,
+    "first_reason_differs": 0,
+    "max_abs_diff": {
+     "sun_pct": 0.005,
+     "earth_pct": 0.0,
+     "night_h": 0.0,
+     "touchdown_deg": 0.001
+    },
+    "examples": [],
+    "passing": 109
+   }
+  },
+  {
+   "site": "C",
+   "mast_m": 0,
+   "preset": "robotic",
+   "limits": {
+    "length_d": 13,
+    "min_sun_pct": 70,
+    "min_earth_pct": 50,
+    "max_night_h": 48,
+    "min_touchdown_deg": 0
+   },
+   "engine_passing": 11,
+   "calendar": {
+    "days": 365,
+    "verdicts_differ": 0,
+    "first_reason_differs": 0,
+    "max_abs_diff": {
+     "sun_pct": 0.003,
+     "earth_pct": 0.0,
+     "night_h": 0.0,
+     "touchdown_deg": 0.001
+    },
+    "examples": [],
+    "passing": 11
+   },
+   "mission": {
+    "days": 365,
+    "verdicts_differ": 0,
+    "first_reason_differs": 0,
+    "max_abs_diff": {
+     "sun_pct": 0.003,
+     "earth_pct": 0.0,
+     "night_h": 0.0,
+     "touchdown_deg": 0.001
+    },
+    "examples": [],
+    "passing": 11
+   }
+  },
+  {
+   "site": "D",
+   "mast_m": 10,
+   "preset": "robotic",
+   "limits": {
+    "length_d": 13,
+    "min_sun_pct": 70,
+    "min_earth_pct": 50,
+    "max_night_h": 48,
+    "min_touchdown_deg": 0
+   },
+   "engine_passing": 192,
+   "calendar": {
+    "days": 365,
+    "verdicts_differ": 0,
+    "first_reason_differs": 0,
+    "max_abs_diff": {
+     "sun_pct": 0.003,
+     "earth_pct": 0.321,
+     "night_h": 0.0,
+     "touchdown_deg": 0.001
+    },
+    "examples": [],
+    "passing": 192
+   },
+   "mission": {
+    "days": 365,
+    "verdicts_differ": 0,
+    "first_reason_differs": 0,
+    "max_abs_diff": {
+     "sun_pct": 0.003,
+     "earth_pct": 0.321,
+     "night_h": 0.0,
+     "touchdown_deg": 0.001
+    },
+    "examples": [],
+    "passing": 192
+   }
+  }
+ ],
+ "summary": {
+  "landing_days": 1460,
+  "calendar_differs": 0,
+  "mission_differs": 0
+ }
+}

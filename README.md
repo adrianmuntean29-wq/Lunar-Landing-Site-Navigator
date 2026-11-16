@@ -52,8 +52,8 @@ Sun and the Earth against the **real terrain horizon** computed from NASA LOLA e
 - **Replays:** the launch at the pad (sky from the real Sun height there), the flight in 3D, the touchdown at the site under
   the real Sun and Earth over the LOLA horizon, the crew on the surface, and the liftoff of the ascent stage.
 - **Seen from orbit:** the site on the real LRO photo mosaic (2 m per pixel), with the directions to the Sun and Earth.
-- The same data and rules as the calendar: checked over a year at C1, S, GR1 and MP1, 1,411 of 1,412 landing days get the
-  same verdict on both pages.
+- The same data and the same rules as the calendar (one shared file, `js/sky.js`): over every landing day of 2027 in four
+  test cases, both pages give the Python engine's verdict on all 1,460 days.
 
 ## How to use it
 
@@ -99,6 +99,9 @@ Full list with licences: [CREDITS.md](CREDITS.md).
   - **night / sunset** = the Sun's centre below the terrain horizon;
   - **Earth contact** = any part of the Earth's disc above the terrain horizon (line of sight, not a radio link budget);
   - one landing per day at 00:00 UTC; values sampled every hour.
+- Both pages take these rules from one shared file, `js/sky.js`, and sample whole hours from 00:00 UTC, as the engine does.
+  Before the shared file, the calendar sampled at half past each hour with a simpler disc rule and was up to 1.3 points
+  of sunlight away from the engine; now both pages are within 0.005 points.
 - The 3D map computes each point's horizon in 64 directions out to 46 km, with the Moon's curvature.
 - Mission view: patched conics for the trajectory, Δv and mass (rocket equation), launch times from the alignment of the
   parking orbit with the Moon's position on arrival. These are simplified models, labelled on the page; they do not change
@@ -112,7 +115,7 @@ Full list with licences: [CREDITS.md](CREDITS.md).
 | **Shackleton rim S**, sunlight at the surface vs Gläser et al. 2018 | **79.1%** vs published 81.0% | ours 2027–2031; Gläser long-term average | MEASURED vs paper |
 | **Connecting Ridge C1**, sunlight at 2 m vs Gläser et al. 2018 | **85.6%** vs published 88.0% | ours 2027–2031; Gläser long-term average | MEASURED vs paper |
 | Engine vs a second, independently written horizon code | S 0 m 79.1%, S 2 m 83.4%, C1 2 m 85.6%, within 0.1 points | 2027–2031 | MEASURED |
-| Landing calendar vs mission view, same site and day | 1,411 of 1,412 landing days give the same verdict; the one difference is a grazing Sun at touchdown (0.02° vs −0.0°) | one year, C1, S, GR1, MP1, Earth limit 50% at the time | MEASURED |
+| Landing calendar and mission view vs the Python engine's answer key (`data/windows_reference.json`) | **0 of 1,460** landing days differ, on either page; sunlight within 0.005 points, Sun at touchdown within 0.001°, longest night the same | every landing day of 2027; C1 at 2 m, S at 2 m with crew limits, GR1 at 0 m, MP1 at 10 m | MEASURED (`pipeline/validation/pages_vs_engine.py`) |
 | Seen-from-orbit projection vs the LRO mosaic | Shackleton's permanently dark floor falls where our formula puts it | — | CHECKED |
 
 **What we learned while validating.**
@@ -144,13 +147,16 @@ Full list with licences: [CREDITS.md](CREDITS.md).
 |---|---|
 | `index.html` | Landing calendar and 3D map |
 | `mission.html` | Mission view |
+| `js/sky.js` | The Sun and Earth rules both pages share: Horizons table interpolation, azimuth and elevation, terrain horizon lookup, Sun disc share |
+| `js/theme.js` | Light / dark switch (the pages open dark) |
 | `data/` | Files the pages read: `subpoints.json`, `sites.json`, `zones.json`, `heights.bin`, `region_heights.bin`, and engine outputs (`psr.json`, `cap_heights.bin`, metadata) |
 | `Landing Zones Shapefile/`, `surface roughness/` | Tudor's ArcGIS export of the zones and the PGDA 90 roughness maps he used |
 | `pipeline/` | Python engine: DEM reading, horizon masks, statistics, permanent shadow, terrain grids, the Horizons table (`make_subpoints.py`), tests |
 | `docs/PLAN.md` | The team's working notes: deadlines, pitch plan, checklist |
 
 Rebuild the data: see [pipeline/README.md](pipeline/README.md). The DEM files (80 m: 181 MB; 20 m: 2.7 GB) come from PGDA
-and are not stored in git. Tests: `pytest pipeline/tests`.
+and are not stored in git. Tests: `pytest pipeline/tests` (engine) and `python pipeline/validation/pages_vs_engine.py`
+(both pages against the engine's answer key, headless Chromium, no network needed).
 
 ## Prior work and use of AI
 

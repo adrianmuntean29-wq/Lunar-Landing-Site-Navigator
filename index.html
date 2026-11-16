@@ -5,11 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- Peaks of Light · NASA Space Apps 2026 Alba Iulia · landing calendar and 3D map on LOLA terrain and JPL Horizons data -->
 <title>South Pole Navigator</title>
+<script>/* theme before the first paint: dark, unless this visitor chose light (js/theme.js remembers it) */
+(function(){ var t = 'dark'; try { if (localStorage.getItem('pol-theme') === 'light') t = 'light'; } catch (e) {} document.documentElement.setAttribute('data-theme', t); })();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Saira+Condensed:wght@500;600;700&display=swap">
 <style>
 .topright{display:grid;gap:10px;justify-items:end}
+.navrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.themebtn{display:inline-flex;align-items:center;gap:7px;font:500 13px/1 var(--f-body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:9px 12px;cursor:pointer}
+.themebtn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
+.themebtn svg path:only-child,.themebtn svg circle{fill:currentColor}
+.themebtn svg path:only-child{stroke:none}
+.themebtn:hover{background:var(--line)}
+.themebtn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 .pages{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--panel)}
 .pages a{font:500 13px/1 var(--f-body);color:var(--ink);text-decoration:none;padding:10px 14px}
 .pages a + a{border-left:1px solid var(--line)}
@@ -249,7 +258,7 @@ input[type=date]{font:500 13px var(--f-body);color:var(--ink);background:var(--p
       <p class="lede">At the Moon's south pole, the Sun circles 1–2° above the horizon, and Earth rises and sinks near the horizon. The terrain decides where you have power and where you can talk to Earth.</p>
     </div>
     <div class="topright">
-      <nav class="pages" aria-label="Pages"><a href="index.html" aria-current="page">Landing calendar</a><a href="mission.html">Mission</a></nav>
+      <div class="navrow"><nav class="pages" aria-label="Pages"><a href="index.html" aria-current="page">Landing calendar</a><a href="mission.html">Mission</a></nav><button type="button" class="themebtn" id="themeBtn">Light</button></div>
       <p class="badge" id="terrainBadge">Sun and Earth: real positions (JPL Horizons). 3D terrain: loading…</p>
     </div>
   </header>
@@ -402,6 +411,7 @@ input[type=date]{font:500 13px var(--f-body);color:var(--ink);background:var(--p
   </section>
 </div>
 
+<script src="js/sky.js"></script>
 <script>
 /* ---------- ephemeris: real Sun and Earth directions from data/subpoints.json ----------
    The file holds Moon-centred x, y, z of the Earth (km) and the Sun (1000 km) in the
@@ -409,28 +419,9 @@ input[type=date]{font:500 13px var(--f-body);color:var(--ink);background:var(--p
    subtract the site's own position (parallax: ~0.26 deg for Earth) and project onto the
    site's local east / north / up. Azimuth is clockwise from north, as in Horizons. */
 var EPH = null;
-function ephAt(jd){
-  var f = (jd - EPH.jd0)/(EPH.step_hours/24), i = Math.floor(f), u = f - i;
-  if (i < 1){ i = 1; u = f - 1; } if (i > EPH.n - 3){ i = EPH.n - 3; u = f - i; }
-  // 4-point cubic Lagrange weights on rows i-1 .. i+2
-  var w = [-u*(u - 1)*(u - 2)/6, (u + 1)*(u - 1)*(u - 2)/2, -(u + 1)*u*(u - 2)/2, (u + 1)*u*(u - 1)/6];
-  var e = [0, 0, 0], s = [0, 0, 0];
-  for (var k = 0; k < 4; k++){
-    var r = (i - 1 + k)*3;
-    for (var c = 0; c < 3; c++){ e[c] += w[k]*EPH.earth_km[r + c]; s[c] += w[k]*EPH.sun_1000km[r + c]*1000; }
-  }
-  return {earth: e, sun: s};
-}
-function azel(latDeg, lonDeg, v){
-  var R = 1737.4, la = latDeg*Math.PI/180, lo = lonDeg*Math.PI/180;
-  var cla = Math.cos(la), sla = Math.sin(la), clo = Math.cos(lo), slo = Math.sin(lo);
-  var dx = v[0] - R*cla*clo, dy = v[1] - R*cla*slo, dz = v[2] - R*sla;   // parallax
-  var up = dx*cla*clo + dy*cla*slo + dz*sla;
-  var east = -dx*slo + dy*clo;
-  var north = -dx*sla*clo - dy*sla*slo + dz*cla;
-  var az = Math.atan2(east, north)*180/Math.PI;
-  return {az: (az + 360) % 360, el: Math.asin(up/Math.hypot(dx, dy, dz))*180/Math.PI};
-}
+/* The rules live in js/sky.js, shared with the mission view. The calendar clamps to the table instead of stopping. */
+function ephAt(jd){ var g = Sky.range(EPH); return Sky.interp(EPH, Math.min(Math.max(jd, g[0]), g[1])); }
+function azel(latDeg, lonDeg, v, direction){ return Sky.azel(latDeg, lonDeg, v, direction); }
 function jdFromDate(d){ return d.getTime()/86400000 + 2440587.5; }
 function dateFromJd(jd){ return new Date((jd - 2440587.5)*86400000); }
 
@@ -557,7 +548,7 @@ var HMINr = 1e9, HMAXr = -1e9;
 /* ---------- Sun & Earth seen from the pole (drives the 3D demo terrain) ----------
    At the pole, azimuth 0 points along longitude 0 (grid -z) and 90 along 90 E (grid +x).
    Points off the pole get the small-offset correction el + c*cos(az_body - az_point). */
-function sunAt(t){ return azel(-90, 0, ephAt(state.jd0 + t).sun); }
+function sunAt(t){ return azel(-90, 0, ephAt(state.jd0 + t).sun, true); }
 function earthAt(t){ return azel(-90, 0, ephAt(state.jd0 + t).earth); }
 function relAz(az){ var r = ((az + 180) % 360 + 360) % 360 - 180; return r; }
 
@@ -627,7 +618,7 @@ function maskFor(id){
 function makeSite(o){
   var s = {id: o.id, name: o.name, lat: o.lat, lon: o.lon, note: o.note, studied: !!o.studied, meta: (SITEDATA && SITEDATA[o.id]) || null};
   var m = maskFor(o.id);
-  s.flat = !m; s.prof = m ? Float32Array.from(m) : new Float32Array(360);
+  s.flat = !m; s.prof = m ? Float64Array.from(m) : new Float64Array(360);   // full precision, as the engine
   var lo = 1e9, hi = -1e9; for (var a = 0; a < 360; a++){ if (s.prof[a] < lo) lo = s.prof[a]; if (s.prof[a] > hi) hi = s.prof[a]; }
   s.pmin = lo; s.pmax = hi;
   computeSite(s);
@@ -639,7 +630,7 @@ function computeSite(s){
   var daySun = new Float32Array(DAYS), dayEarth = new Float32Array(DAYS), ps = [], pe = [];
   var sumS = 0, sumE = 0, sumB = 0, runs = [], runStart = -1;
   for (var h = 0; h < H; h++){
-    var t = (h + 0.5)/24, st = siteState(s, t);
+    var t = h/24, st = siteState(s, t);   // whole hours from 00:00 UTC, as the engine
     if (h % 6 === 0 && h < 365*24){ ps.push(st.sunAz, st.sunEl); pe.push(st.earthAz, st.earthEl); }   // first-year path for the chart
     var lit = st.sunLit, ev = st.earthVis > 0 ? 1 : 0;
     hs[h] = lit; he[h] = ev; hel[h] = st.sunEl - st.sunHz;
@@ -657,14 +648,11 @@ function computeSite(s){
   for (var r = 0; r < runs.length; r += 2){ var len = runs[r + 1] - runs[r]; if (len > longest){ longest = len; clipped = runs[r] === 0 || runs[r + 1] === H; } }
   s.pSun = sumS/H; s.pEarth = sumE/H; s.pBoth = sumB/H; s.night = longest/24; s.nightClipped = clipped;
 }
-function profAt(s, az){
-  var a = ((az - 0.5) % 360 + 360) % 360, i0 = Math.floor(a), fr = a - i0;   // bin k is centred on k + 0.5
-  return s.prof[i0 % 360]*(1 - fr) + s.prof[(i0 + 1) % 360]*fr;
-}
+function profAt(s, az){ return Sky.horizon(s.prof, az); }
 function siteState(s, t){
-  var ep = ephAt(state.jd0 + t), su = azel(s.lat, s.lon, ep.sun), ea = azel(s.lat, s.lon, ep.earth);
+  var ep = ephAt(state.jd0 + t), su = azel(s.lat, s.lon, ep.sun, true), ea = azel(s.lat, s.lon, ep.earth);
   var sHz = profAt(s, su.az), eHz = profAt(s, ea.az);
-  return {sunAz: su.az, sunEl: su.el, sunHz: sHz, sunLit: clamp((su.el - sHz + SUN_R)/(2*SUN_R), 0, 1),
+  return {sunAz: su.az, sunEl: su.el, sunHz: sHz, sunLit: Sky.sunFrac(su.el - sHz),   /* chord area of the visible disc, as the engine */
           earthAz: ea.az, earthEl: ea.el, earthHz: eHz, earthVis: clamp((ea.el - eHz + EARTH_R)/(2*EARTH_R), 0, 1)};
 }
 /* Time until the Sun centre (or any part of Earth) crosses the terrain horizon, up to 60 days ahead:
@@ -706,6 +694,22 @@ function evalSite(s){
   return out;
 }
 
+/* Test hook (pipeline/validation/pages_vs_engine.py): the calendar's own verdicts for one engine site, mast height and
+   set of limits, over nDays landings from an ISO start date. Restores the planner state afterwards. */
+window.__planner = {
+  evaluate: function(id, mastM, lim, startIso, nDays, withSeries){
+    var keep = {jd0: state.jd0, mast: state.mast, days: DAYS, lim: Object.assign({}, LIM)};
+    try {
+      state.jd0 = jdFromDate(new Date(startIso + 'T00:00:00Z')); state.mast = String(mastM);
+      Object.assign(LIM, lim); DAYS = nDays + LIM.len;
+      var o = SITE_LIST.filter(function(x){ return x.id === id; })[0]; if (!o) return null;
+      var s = makeSite(o), out = [];
+      for (var d = 0; d < nDays; d++){ var w = evalWindow(s, d); out.push(w && {pass: !w.fail.length, fails: w.fail, sun: w.sun, earth: w.earth, night: w.night, td: w.td}); }
+      if (withSeries) return {days: out, sun: Array.from(s.hSun), earth: Array.from(s.hEarth), sunAlt: Array.from(s.hSunEl)};
+      return out;
+    } finally { state.jd0 = keep.jd0; state.mast = keep.mast; DAYS = keep.days; Object.assign(LIM, keep.lim); }
+  }
+};
 function buildSites(){ sites = SITE_LIST.map(makeSite); if (custom) sites.push(makeSite(custom)); }
 var custom = null;
 buildSites();
@@ -1531,5 +1535,6 @@ fetch('data/subpoints.json').then(function(r){ if (!r.ok) throw new Error(r.stat
   document.getElementById('status').textContent = 'Could not load data/subpoints.json (' + err.message + '). Open the page through a web server, not as a local file.';
 });
 </script>
+<script src="js/theme.js"></script>
 </body>
 </html>

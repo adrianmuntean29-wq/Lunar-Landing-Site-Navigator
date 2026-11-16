@@ -6,6 +6,8 @@
 <!-- Peaks of Light · NASA Space Apps 2026 Alba Iulia · Mission simulator: Earth (Canada) → lunar south pole, crewed vs robotic.
      Everything editable lives in the CONFIG block at the top of the script. -->
 <title>Mission Simulator · Peaks of Light</title>
+<script>/* theme before the first paint: dark, unless this visitor chose light (js/theme.js remembers it) */
+(function(){ var t = 'dark'; try { if (localStorage.getItem('pol-theme') === 'light') t = 'light'; } catch (e) {} document.documentElement.setAttribute('data-theme', t); })();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Saira+Condensed:wght@500;600;700&display=swap">
@@ -46,6 +48,13 @@ h1{font-family:var(--f-display);font-weight:600;font-size:clamp(32px,4.6vw,50px)
 .lede{max-width:70ch;margin:10px 0 0;color:var(--muted)}
 .navlink{font:500 13px var(--f-mono);color:var(--ink);text-decoration:none;border:1px solid var(--line);padding:7px 11px;border-radius:3px;white-space:nowrap}
 .navlink:hover{border-color:var(--ink)}
+.navrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.themebtn{display:inline-flex;align-items:center;gap:7px;font:500 13px/1 var(--f-body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:9px 12px;cursor:pointer}
+.themebtn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
+.themebtn svg path:only-child,.themebtn svg circle{fill:currentColor}
+.themebtn svg path:only-child{stroke:none}
+.themebtn:hover{background:var(--line)}
+.themebtn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 .pages{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--panel)}
 .pages a{font:500 13px/1 var(--f-body);color:var(--ink);text-decoration:none;padding:10px 14px}
 .pages a + a{border-left:1px solid var(--line)}
@@ -252,9 +261,9 @@ details.fold{display:grid;gap:12px}
       <h1>Fly the mission</h1>
       <p class="lede">Take a landing day from the landing calendar and fly it: launch from Canada, the trip to the Moon, the touchdown, and the sky above the site while you are there. Site numbers use the same JPL Horizons table and LOLA terrain horizons as the calendar, so both pages give the same answer for the same site and day.</p>
     </div>
-    <nav class="pages" aria-label="Pages">
+    <div class="navrow"><nav class="pages" aria-label="Pages">
       <a href="index.html">Landing calendar</a><a href="mission.html" aria-current="page">Mission</a>
-    </nav>
+    </nav><button type="button" class="themebtn" id="themeBtn">Light</button></div>
   </header>
   <p class="fromcal" id="fromCal" hidden></p>
 
@@ -448,6 +457,7 @@ details.fold{display:grid;gap:12px}
   </section>
 </div>
 
+<script src="js/sky.js"></script>
 <script>
 /* the page boots after its two data files are in: embedded copies (offline build) or data/*.json next to the page */
 function __boot(){
@@ -767,27 +777,16 @@ if (MASKS) (function(){
       ref: box ? 'Our engine, inside NASA site box ' + (m ? m[1] : '') : hist ? 'IM-2 Athena target (LROC)' : (o.source || '')});
   });
 })();
-var mast = '2', relay = false, SUN_R = 0.2666, EARTH_R = 0.95;
+var mast = '2', relay = false, SUN_R = Sky.SUN_R, EARTH_R = Sky.EARTH_R;
 /* Moon-centred Earth and Sun position (km, MOON_ME frame) at time ms: 4-point cubic on the 6 h Horizons table */
-function horizonsAt(ms){
-  if (!HZD) return null;
-  var jdv = ms/86400000 + 2440587.5, f = (jdv - HZD.jd0)/(HZD.step_hours/24), i = Math.floor(f), u = f - i;
-  if (i < 1 || i > HZD.n - 3) return null;
-  var w = [-u*(u - 1)*(u - 2)/6, (u + 1)*(u - 1)*(u - 2)/2, -(u + 1)*u*(u - 2)/2, (u + 1)*u*(u - 1)/6], e = [0, 0, 0], sn = [0, 0, 0];
-  for (var k = 0; k < 4; k++){ var r = (i - 1 + k)*3; for (var c = 0; c < 3; c++){ e[c] += w[k]*HZD.earth_km[r + c]; sn[c] += w[k]*HZD.sun_1000km[r + c]*1000; } }
-  return {earth: e, sun: sn};
-}
+function horizonsAt(ms){ return HZD ? Sky.interp(HZD, ms/86400000 + 2440587.5) : null; }   // js/sky.js, shared with the calendar
 function maskOf(st){ var m = st.eng && MASKS && MASKS[st.eng] && MASKS[st.eng].masks; return m ? (m[mast] || null) : null; }
 /* terrain horizon (deg) toward azimuth az; mask bin k covers [k, k+1) deg and is looked up between bin centres */
-function hzAt(st, az){
-  var m = st._mask; if (!m) return st.horizon;
-  var a = ((az - 0.5) % 360 + 360) % 360, i0 = Math.floor(a), fr = a - i0;
-  return m[i0 % 360]*(1 - fr) + m[(i0 + 1) % 360]*fr;
-}
+function hzAt(st, az){ return st._mask ? Sky.horizon(st._mask, az) : st.horizon; }
 function prepSite(st){ st._mask = maskOf(st); st._mastKey = st._mask ? mast : '-'; return st; }
 function hzLabel(st){ prepSite(st); return st._mask ? 'LOLA horizon, ' + mast + ' m mast' : 'flat horizon ' + sgn(st.horizon, 1) + '° (assumed)'; }
 /* visible fraction of the Sun's disc when its centre is alt degrees above the terrain (chord area, as the engine) */
-function sunFrac(alt){ var u = clamp(-alt/SUN_R, -1, 1); return (Math.acos(u) - u*Math.sqrt(1 - u*u))/Math.PI; }
+function sunFrac(alt){ return Sky.sunFrac(alt); }
 /* a good landing: the same example limits as the landing calendar (not NASA requirements) */
 var LIMITS = {
   crewed: {sun: 95, earth: 25, night: 0, td: 0},   /* Earth 25%: the calendar's default, the value listed in a 2024 NASA presentation (NTRS 20240009596) */
@@ -2877,6 +2876,23 @@ if (FROMCAL){
 }
 window.__mission = {LRO: LRO, lroXY: lroXY, orbView: orbView, evalAt: evalAt, siteSeries: siteSeries, LIMITS: LIMITS, startLanding: startLanding, startLiftoff: startLiftoff, startLaunch: startLaunch, launchState: launchState, sunAltAz: sunAltAz, get landAnim(){ return landAnim; }, get mast(){ return mast; }, get target(){ return target; }, get active(){ return active; }, budgets: budgets, results: results, get mission(){ return mission; }, PROFILES: PROFILES, SITES: SITES, picks: picks,
   get windows(){ return lwRes; }, get wx(){ return wx; }, get launchMs(){ return launchMs; }, budget: budget, launchOpps: launchOpps, moonRADec: moonRADec, gmstDeg: gmstDeg};
+/* Test hook (pipeline/validation/pages_vs_engine.py): this page's verdicts for one engine site, mast height and set of
+   limits, landing at 00:00 UTC on nDays days from an ISO start date. Restores the page state afterwards. */
+window.__mission.check = function(eng, mastM, lim, startIso, nDays, withSeries){
+  var st = SITES.filter(function(x){ return x.eng === eng; })[0]; if (!st) return null;
+  var keep = {mast: mast, relay: relay, t0: TAB.t0, L: Object.assign({}, LIMITS.robotic)};
+  try {
+    mast = String(mastM); relay = !!lim.relay;
+    Object.assign(LIMITS.robotic, {sun: lim.sun, earth: lim.earth, night: lim.night, td: lim.td});
+    buildTable(Date.parse(startIso + 'T00:00:00Z'));
+    var Y = siteSeries(st), S = lim.len*24, out = [];
+    for (var d = 0; d < nDays; d++){ var ev = evalAt(Y, d*24, S, 'robotic'); out.push(ev && {pass: ev.ok, fails: ev.fail, sun: ev.sun, earth: ev.earth, night: ev.night, td: ev.td}); }
+    if (withSeries) return {days: out, sun: Array.from(Y.sunF), earth: Array.from(Y.earthOK), sunAlt: Array.from(Y.sunAlt)};
+    return out;
+  } finally {
+    mast = keep.mast; relay = keep.relay; Object.assign(LIMITS.robotic, keep.L); buildTable(keep.t0); seriesCache = {};
+  }
+};
 requestAnimationFrame(frame);
 })();
 }
@@ -2894,5 +2910,6 @@ requestAnimationFrame(frame);
   });
 })();
 </script>
+<script src="js/theme.js"></script>
 </body>
 </html>
