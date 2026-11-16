@@ -113,6 +113,7 @@ input[type=datetime-local]{font:500 13px var(--f-mono);color:var(--ink);backgrou
 #sc:active{cursor:grabbing}
 .hud{position:absolute;left:12px;top:12px;right:12px;display:flex;flex-wrap:wrap;gap:6px 8px;pointer-events:none;font:500 12px/1.3 var(--f-mono);color:var(--space-ink)}
 .hud span{background:var(--space-veil);border:1px solid rgba(228,232,236,.14);padding:4px 7px;border-radius:3px;white-space:nowrap}
+@media (max-width:600px){.hud span{white-space:normal}}   /* phones: long chips wrap instead of widening the page */
 .hud b{font-weight:600}
 .views{position:absolute;right:12px;bottom:12px}
 .surfbar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-top:10px}
@@ -242,72 +243,6 @@ details.fold{display:grid;gap:12px}
 #lwTable td small{display:block}
 #lwTable tr.on td{background:color-mix(in srgb, var(--ink) 6%, transparent)}
 </style>
-<style>
-/* Missions UI cleanup (team draft, 2026-11-15): presentation only. Same (i) markup as the planner's css/base.css,
-   copied here because base.css would override this page's own colour tokens. */
-:root{--tip:rgba(255,255,255,.98);--shadow:rgba(0,0,0,.18)}
-:root[data-theme="dark"]{--tip:rgba(20,26,32,.98);--shadow:rgba(0,0,0,.55)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--tip:rgba(20,26,32,.98);--shadow:rgba(0,0,0,.55)}}
-.info-wrap{position:relative;display:inline-flex;vertical-align:middle;margin-left:6px}
-.info-i{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--muted);background:none;color:var(--muted);font:italic 700 10px/1 Georgia,serif;cursor:help;padding:0;flex:none;text-transform:none;letter-spacing:0}
-.info-i:hover{border-color:var(--ink);color:var(--ink)}
-.info-i:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-.info-tip{position:absolute;right:-4px;top:calc(100% + 8px);z-index:40;width:320px;max-width:min(320px,80vw);background:var(--tip);border:1px solid var(--line);border-radius:6px;padding:9px 11px;font:400 12px/1.5 var(--f-body);color:var(--ink);display:none;gap:6px;box-shadow:0 4px 16px var(--shadow);cursor:default;white-space:normal;text-align:left;letter-spacing:0;text-transform:none}
-.info-tip.left{left:-4px;right:auto}
-.info-tip.up{top:auto;bottom:calc(100% + 8px)}
-.info-tip b{font-weight:600}
-.info-tip .src{font:500 11px/1.45 var(--f-mono);color:var(--muted);border-top:1px solid var(--line);padding-top:5px}
-.info-tip a{color:var(--earth)}
-.info-i:hover + .info-tip,.info-i:focus + .info-tip,.info-tip:hover{display:grid}
-/* best launch dates: answer first, details on demand */
-#lw .rank-head{align-items:center}
-#lw .lwctl{gap:8px 14px}
-.lwbest{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,2fr) auto;gap:14px 26px;align-items:center;padding:16px 18px;background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--crew-fill);border-radius:6px}
-.lwbest.robot{border-left-color:var(--robot-fill)}
-.lb-tag{font:600 11.5px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.lb-date{display:block;font:600 24px/1.15 var(--f-display);margin:6px 0 4px}
-.lb-sub{font-size:13.5px;color:var(--muted)}
-.lb-facts{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
-.lb-facts li{display:grid;gap:2px;min-width:0}
-.lb-facts small{font:500 11px/1.2 var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
-.lb-facts b{font:600 20px/1.1 var(--f-mono);font-variant-numeric:tabular-nums}
-.lb-facts i{font-style:normal;font-size:12px;color:var(--muted)}
-.lb-facts .go b{color:var(--ok)} .lb-facts .nogo b{color:var(--warn)}
-.lb-facts .s b{color:var(--sun)} .lb-facts .e b{color:var(--earth)}
-.lb-act .best{padding:11px 16px;font-size:13.5px;white-space:nowrap}
-@media (max-width:1100px){.lwbest{grid-template-columns:minmax(0,1fr)}}
-@media (max-width:620px){.lb-facts{grid-template-columns:repeat(3,minmax(0,1fr))}}
-.lwsub{display:flex;align-items:center;gap:6px;margin-top:4px}
-.lwsub h3{display:inline}
-#lw .tablewrap{overflow:visible}
-#lwTable td{vertical-align:middle}
-#lwTable td,#lwTable th{white-space:nowrap}
-/* narrow frames (1024-1280 px projectors): one column track so the table can't widen the section; cells may wrap */
-#lw{grid-template-columns:minmax(0,1fr)}
-#lw .lwctl,#lw .lwctl .opt{flex-wrap:wrap;min-width:0}
-#lw .lwctl select{max-width:100%;min-width:0}
-@media (max-width:1180px){
-  #lwTable td,#lwTable th{white-space:normal;padding:8px 6px}
-  #lwTable td:first-child,#lwTable th:first-child{padding-left:10px}
-  #lwTable .fly,#lwTable .more,#lwTable td .s,#lwTable td .e{white-space:nowrap}
-  #lwTable tr.det td{padding:10px 10px 12px 16px}
-  .lb-facts{gap:8px}
-  .lb-facts b{font-size:18px}
-}
-#lwTable th .info-wrap{margin-left:4px}
-#lwTable td.go{color:var(--ok);font:500 12.5px var(--f-mono)} #lwTable td.nogo{color:var(--warn);font:500 12.5px var(--f-mono)}
-#lwTable td.wxc{font:500 12.5px var(--f-mono);color:var(--muted)}
-#lwTable td .s{color:var(--sun)} #lwTable td .e{color:var(--earth)}
-#lwTable td.sc{font-weight:600}
-#lwTable .more{font:500 12px var(--f-mono);border:0;background:transparent;color:var(--muted);cursor:pointer;padding:4px 6px}
-#lwTable .more:hover{color:var(--ink)}
-#lwTable tr.det td{background:color-mix(in srgb, var(--ink) 4%, transparent);white-space:normal;padding:10px 14px 12px 40px}
-#lwTable tr.det dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px 22px;margin:0}
-#lwTable tr.det dt{font:500 11px/1.2 var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
-#lwTable tr.det dd{margin:2px 0 0;font:500 13px/1.4 var(--f-mono)}
-.lede .info-wrap,.limits .info-wrap{margin-left:4px}
-details.fold#how > summary h2{display:inline}
-</style>
 </head>
 <body>
 <div class="app">
@@ -315,7 +250,7 @@ details.fold#how > summary h2{display:inline}
     <div>
       <p class="eyebrow">Peaks of Light · NASA Space Apps 2026 · Lunar Landing Site Navigator</p>
       <h1>Fly the mission</h1>
-      <p class="lede">Take a landing day from the landing calendar and fly it: launch from Canada, the trip to the Moon, the touchdown, and the sky above the site while you are there.<span class="info-wrap"><button type="button" class="info-i" aria-label="About the data on this page" aria-describedby="tipLede">i</button><span class="info-tip left" id="tipLede" role="tooltip"><span>Site numbers use the same JPL Horizons table and LOLA terrain horizons as the calendar, so both pages give the same answer for the same site and day.</span><span class="src">Sources: JPL Horizons (DE441) · NASA LOLA via PGDA product 90 · trajectory and launch times: simplified model</span></span></span></p>
+      <p class="lede">Take a landing day from the landing calendar and fly it: launch from Canada, the trip to the Moon, the touchdown, and the sky above the site while you are there. Site numbers use the same JPL Horizons table and LOLA terrain horizons as the calendar, so both pages give the same answer for the same site and day.</p>
     </div>
     <nav class="pages" aria-label="Pages">
       <a href="index.html">Landing calendar</a><a href="mission.html" aria-current="page">Mission</a>
@@ -348,7 +283,7 @@ details.fold#how > summary h2{display:inline}
     <label class="opt" for="stay"><span id="stayLabel">Surface stay</span> <input id="stay" type="range" min="1" max="30" step="0.25"><output id="stayOut" for="stay"></output></label>
     <label class="opt" for="mastSel">Mast <select id="mastSel"><option value="0">0 m</option><option value="2" selected>2 m</option><option value="10">10 m</option></select></label>
     <label class="opt" for="relayChk"><input id="relayChk" type="checkbox"> Relay satellite available</label>
-    <p class="limits">A good landing uses the same limits as the landing calendar<span class="info-wrap"><button type="button" class="info-i" aria-label="About the landing limits" aria-describedby="limitsLine">i</button><span class="info-tip left" id="limitsLine" role="tooltip"></span></span></p>
+    <p class="limits" id="limitsLine"></p>
     <p class="landing" id="landingOut"></p>
   </section>
 
@@ -409,17 +344,21 @@ details.fold#how > summary h2{display:inline}
   </main>
 
   <section class="section" aria-label="Best launch dates" id="lw">
-    <div class="rank-head"><h2>Best launch dates for <span id="lwWho">the site</span></h2>
-      <div class="lwctl">
-        <label class="opt" for="lwSite">Landing site <select id="lwSite"></select></label>
-        <label class="opt" for="lwRange">Search <select id="lwRange"><option value="60">next 60 days</option><option value="120" selected>next 120 days</option><option value="180">next 180 days</option></select></label>
-      </div>
+    <div class="rank-head"><h2>Best launch dates for <span id="lwWho">the site</span></h2><p class="caption" id="wxStatus"></p></div>
+    <div class="lwctl">
+      <label class="opt" for="lwSite">Landing site <select id="lwSite"></select></label>
+      <label class="opt" for="lwRange">Search <select id="lwRange"><option value="60">next 60 days</option><option value="120" selected>next 120 days</option><option value="180">next 180 days</option></select></label>
+      <p class="caption" id="lwCaption"></p>
     </div>
-    <div class="lwbest" id="lwBest"></div>
-    <div class="lwsub"><h3>Next <span id="lwDays">120</span> days at a glance</h3><span class="info-wrap"><button type="button" class="info-i" aria-label="How to read the timeline" aria-describedby="tipLwChart">i</button><span class="info-tip left" id="tipLwChart" role="tooltip"><span><b>Site usable</b>: launching that day lands with the Sun (and for robotic, Earth) up as needed.</span><span><b>Weather GO</b>: darker blue = more likely GO; the line under it marks days with a real forecast.</span><span><b>Δv</b>: fuel need per day, lower is better. Dashed lines: the top 3 dates. Thick line: the launch you are flying.</span></span></span></div>
     <canvas class="chart" id="lwChart" aria-label="Launch days: when the site is usable at landing, chance of launch weather, and Δv per day"></canvas>
-    <div class="lwsub"><h3>Top dates</h3><p class="caption" id="lwCaption"></p><span class="info-wrap"><button type="button" class="info-i" aria-label="About this search" aria-describedby="tipLwSearch">i</button><span class="info-tip left" id="tipLwSearch" role="tooltip"><span id="lwCaptionLong"></span><span>Click <b>Details</b> on a row for local time, launch direction, Moon distance, Δv and mass.</span><span class="src">Launch site coordinates: Spaceport Nova Scotia near Canso, about 45.35° N, 61.02° W (approximate; Maritime Launch Services). No heavy-lift rocket is planned there today, so a lunar launch from Canada is hypothetical.</span></span></span></div>
     <div class="tablewrap"><table id="lwTable"></table></div>
+    <ul class="lwrule">
+      <li><b>Route.</b> Each day the rocket can leave only when its parking orbit lines up with where the Moon will be on arrival: two times a day, computed from the Moon's real position and Earth's rotation.</li>
+      <li><b>Fuel.</b> The Moon's distance changes from about 356,000 to 407,000 km. Arriving near perigee costs less Δv. The table shows the difference in m/s and the extra propellant in tonnes for the whole stack.</li>
+      <li><b>Landing site.</b> Only launches that land with the Sun up for the whole stay (crewed) or Sun and Earth up (robotic) are listed.</li>
+      <li><b>Weather.</b> GO if gusts ≤ 15 m/s, rain ≤ 1 mm, no thunderstorms, freezing rain or snow, and above −10 °C. Real forecast for the next 16 days, after that the share of GO days in 2015–2024.</li>
+      <li><b>Score.</b> 40% weather, 35% Earth (crewed) or Sun (robotic) at the site during the stay, 25% fuel: full points for the lightest stack, zero for one 5% heavier.</li>
+    </ul>
   </section>
 
   <section class="section" aria-label="Standing at the site" id="surface">
@@ -446,7 +385,7 @@ details.fold#how > summary h2{display:inline}
   </section>
 
   <section class="section" aria-label="Seen from orbit" id="orbit">
-    <div class="rank-head"><h2>Seen from orbit: <span id="orbWho">the site</span></h2><p class="caption" id="orbCaption">Drag to move, scroll to zoom<span class="info-wrap"><button type="button" class="info-i" aria-label="About the orbit images" aria-describedby="tipOrb">i</button><span class="info-tip" id="tipOrb" role="tooltip"><span>Real photo mosaics from NASA's Lunar Reconnaissance Orbiter: sharp 2 m per pixel where the ground was lit, softer 100 m per pixel inside shadows.</span><span class="src">Source: NASA LRO mosaics via NASA Moon Trek (needs an internet connection)</span></span></span></p></div>
+    <div class="rank-head"><h2>Seen from orbit: <span id="orbWho">the site</span></h2><p class="caption" id="orbCaption">Real photo mosaics from NASA's Lunar Reconnaissance Orbiter: sharp 2 m per pixel where the ground was lit, softer 100 m per pixel inside shadows. Drag to move, scroll to zoom.</p></div>
     <div class="orbit" id="orbWrap">
       <canvas id="orb" tabindex="0" aria-label="Real LRO image of the landing site seen from orbit, with the directions to the Sun and Earth at the time shown"></canvas>
       <div class="hud" id="orbHud"></div>
@@ -488,13 +427,12 @@ details.fold#how > summary h2{display:inline}
   </details>
 
   <section class="section" aria-label="Year view" id="yearsec">
-    <div class="rank-head"><h2>The year after landing, <span id="yearWho">crewed</span> picks</h2><p class="caption">Yellow: sunlight · Blue: Earth in view · Mission colour: days you could land · Line: best window</p></div>
+    <div class="rank-head"><h2>The year after landing, <span id="yearWho">crewed</span> picks</h2><p class="caption">Yellow: sunlight · Blue: Earth in view · Mission colour: days you could land · Line: best window</p></div></div>
     <canvas class="chart" id="year"></canvas>
   </section>
 
-  <details class="section fold" aria-label="Model and sources" id="how">
-    <summary><h2>How this works, sources and what is simplified</h2><p class="caption">Models, data sources and links. Click to open.</p></summary>
-    <div class="notes">
+  <section class="notes" aria-label="Model and sources" id="how">
+    <h2>How this works, and what is simplified</h2>
     <p class="prov" id="prov"></p>
     <dl>
       <div><dt>Trajectory</dt><dd>Patched conics. Launch due east into a 185 km parking orbit (inclination = launch latitude), translunar injection on a conic that reaches the Moon's distance in the chosen time, insertion into a 100 km polar lunar orbit, powered descent. The crewed mission also climbs back, leaves lunar orbit and returns on a mirrored conic. The 3D view is schematic: Earth's equator and the Moon's orbit are drawn in one plane.</dd></div>
@@ -507,8 +445,7 @@ details.fold#how > summary h2{display:inline}
       <div><dt>Sites</dt><dd>South pole: the the calendar's ten sites with LOLA terrain horizons (C1 and S from Gläser et al. 2018, MP1 and GR1 from De Rosa et al. 2012, the best-lit point our engine found in six NASA site boxes from PGDA product 78, and the IM-2 target), plus the IM-1 and IM-2 landing points. Elsewhere: past landings for reference. Every site except those ten uses a flat horizon you can edit in the table (assumed, not measured). Sites you add on the map also use a flat horizon.</dd></div>
     </dl>
     <p class="caption">Sources: <a href="https://ntrs.nasa.gov/citations/20250011660" target="_blank" rel="noopener">NASA NTRS 20250011660 (Artemis candidate regions and criteria)</a> · <a href="https://ssd.jpl.nasa.gov/horizons/" target="_blank" rel="noopener">JPL Horizons (validation)</a> · Landing coordinates from LRO images: <a href="https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html" target="_blank" rel="noopener">Apollo 11, 15, 17 (NSSDCA, Wagner et al. 2017)</a>, <a href="https://lroc.im-ldi.com/images/1314" target="_blank" rel="noopener">Chandrayaan-3 (LROC)</a>, <a href="https://lroc.im-ldi.com/images/1100" target="_blank" rel="noopener">Chang'e 4 (LROC)</a>, <a href="https://lroc.im-ldi.com/images/1374" target="_blank" rel="noopener">Chang'e 6 (LROC)</a>, <a href="https://lroc.im-ldi.com/images/1358" target="_blank" rel="noopener">SLIM (LROC)</a>, <a href="https://lroc.im-ldi.com/images/1407" target="_blank" rel="noopener">Blue Ghost M1 (LROC)</a> · <a href="https://www.nasa.gov/missions/lro/nasas-lro-images-intuitive-machines-odysseus-lander/" target="_blank" rel="noopener">IM-1 landing site (LRO)</a> · <a href="https://lroc.im-ldi.com/images/1408" target="_blank" rel="noopener">IM-2 Athena on Mons Mouton (LROC)</a> · <a href="https://maritimelaunch.com/" target="_blank" rel="noopener">Spaceport Nova Scotia, Canso (Maritime Launch Services; coordinates approximate)</a> · <a href="https://open-meteo.com/en/docs" target="_blank" rel="noopener">Open-Meteo forecast</a> · <a href="https://open-meteo.com/en/docs/historical-weather-api" target="_blank" rel="noopener">Open-Meteo historical (ERA5)</a></p>
-    </div>
-  </details>
+  </section>
 </div>
 
 <script>
@@ -2596,88 +2533,41 @@ function renderWindows(){
   var k = [active, target[active], launchIdx, PROFILES[active].tof, PROFILES[active].stay, lwRange, wx.version, TAB && TAB.t0, (siteById(target[active]) || {}).horizon, mast, relay, JSON.stringify(LIMITS[active])].join('|');
   if (k !== lwKey){ lwKey = k; lwRes = scanWindows(); }
   var R = lwRes, tb = $('#lwTable');
+  $('#wxStatus').textContent = wx.status;
   loadWeather();
   var opts = results[active].map(function(r){ return '<option value="' + r.site.id + '"' + (r.site.id === target[active] ? ' selected' : '') + '></option>'; }).join('');
   lwSiteSel.innerHTML = opts;
   Array.prototype.forEach.call(lwSiteSel.options, function(o, i){ o.textContent = results[active][i].site.name; });
-  var ub = $('#useBest'), b0 = R && R.top[0], hero = $('#lwBest');
+  var ub = $('#useBest'), b0 = R && R.top[0];
   ub.disabled = !b0 || Math.abs(b0.t - launchMs) < 60000;
   ub.textContent = !b0 ? 'No good launch found' : ub.disabled ? '✓ Best launch selected' : 'Use best launch: ' + fmtDate(b0.t);
-  $('#lwDays').textContent = lwRange;
-  if (!R){ $('#lwWho').textContent = '—'; hero.innerHTML = '<p class="caption">Pick a site first.</p>'; tb.innerHTML = '<tr><td>Pick a site first.</td></tr>'; drawLwChart(); return; }
+  if (!R){ $('#lwWho').textContent = '—'; tb.innerHTML = '<tr><td>Pick a site first.</td></tr>'; drawLwChart(); return; }
   $('#lwWho').textContent = (R.key === 'crewed' ? 'a crewed landing at ' : 'a robotic landing at ') + R.site.name;
-  var nOpp = R.days.reduce(function(a, d){ return a + d.n; }, 0);
-  $('#lwCaption').textContent = R.count + ' of ' + nOpp + ' launch opportunities give a usable landing';
-  $('#lwCaptionLong').textContent = R.count + ' of ' + nOpp + ' launch opportunities from ' + LAUNCH_SITES[launchIdx].name.split(' (')[0] + ' between ' + fmtDate(R.start, false) + ' and ' + fmtDate(R.start + (lwRange - 1)*86400000, false) + ' give a usable landing. The table lists the best 8, at least 2 days apart.';
-  /* (i) texts: Adrian's footnotes, plus the source of each number (team draft, presentation only) */
-  function tip(id, label, html, cls){ return '<span class="info-wrap"><button type="button" class="info-i" aria-label="About ' + label + '" aria-describedby="' + id + '">i</button><span class="info-tip' + (cls ? ' ' + cls : '') + '" id="' + id + '" role="tooltip">' + html + '</span></span>'; }
-  var TIP = {
-    launch: '<span><b>Route.</b> Each day the rocket can leave only when its parking orbit lines up with where the Moon will be on arrival: two times a day, computed from the Moon\'s real position and Earth\'s rotation.</span><span class="src">Simplified model: Meeus ephemeris for the Moon, IAU sidereal time. Spaceport Nova Scotia coordinates are approximate.</span>',
-    site: '<span><b>Landing site.</b> Only launches that land with the Sun up for the whole stay (crewed) or Sun and Earth up (robotic) are listed. Sun and Earth = share of the ' + (R.key === 'crewed' ? 'stay' : 'mission') + ' each one is above the terrain horizon.</span><span class="src">Sun and Earth: JPL Horizons table (DE441, every 6 h, interpolated hourly). Terrain: NASA LOLA horizon masks (PGDA product 90) at the chosen mast height. Sites outside the calendar\'s ten use an assumed flat horizon.</span>',
-    wx: '<span><b>Weather.</b> GO if gusts ≤ 15 m/s, rain ≤ 1 mm, no thunderstorms, freezing rain or snow, and above −10 °C. Real forecast for the next 16 days, after that the share of GO days in 2015–2024 (climate statistics, not a forecast).</span><span class="src">Open-Meteo (CC BY 4.0): forecast API + ERA5 historical archive. Now: ' + escH(wx.status) + '</span>',
-    fuel: '<span><b>Fuel.</b> The Moon\'s distance changes from about 356,000 to 407,000 km. Arriving near perigee costs less Δv. Extra Δv is compared with the cheapest date in this search; Details shows the extra propellant in tonnes for the whole stack.</span><span class="src">Simplified model: patched conics and the rocket equation per stage, with the vehicle assumptions under Numbers. Earth–Moon distance from the JPL Horizons table.</span>',
-    score: '<span><b>Score.</b> 40% weather, 35% Earth (crewed) or Sun (robotic) at the site during the stay, 25% fuel: full points for the lightest stack, zero for one 5% heavier. Unknown weather counts as 50%.</span><span class="src">The weights are this simulator\'s own choice, not a NASA rule.</span>'
-  };
-  function wxShort(w){
-    return w.src === 'forecast' ? (w.go ? ['go', 'GO', 'forecast'] : ['nogo', 'NO-GO', 'forecast']) : w.src === 'climate' ? ['wxc', Math.round(w.p*100) + '% GO', 'past years'] : ['wxc', 'not loaded', ''];
-  }
-  function wxLong(w){
-    return w.src === 'forecast' ? (w.go ? 'GO (forecast)' : 'NO-GO (forecast): ' + w.why.join(', ')) : w.src === 'climate' ? 'GO on ' + Math.round(w.p*100) + '% of days around this date, 2015–24' : 'not loaded';
-  }
-  function useBtn(c, on, big){ return on ? '<span class="flag ok">✓ Selected</span>' : '<button type="button" class="' + (big ? 'best' : 'fly') + '" data-t="' + c.t + '">Use this launch</button>'; }
-  /* the answer first: the best launch in one card */
-  hero.className = 'lwbest' + (R.key === 'crewed' ? '' : ' robot');
-  if (b0){
-    var w0 = wxShort(b0.w), on0 = Math.abs(b0.t - launchMs) < 60000, d0 = Math.round((b0.dvTot - R.dvMin)*1000);
-    hero.innerHTML = '<div><span class="lb-tag">Best launch</span><b class="lb-date">' + fmtDate(b0.t) + '</b><span class="lb-sub">Lands ' + fmtDate(tabTime(b0.iL)) + ' · from ' + escH(LAUNCH_SITES[launchIdx].name.split(' (')[0]) + '</span></div>' +
-      '<ul class="lb-facts">' +
-      '<li class="' + w0[0] + '"><small>Weather' + tip('tipHw', 'launch weather', TIP.wx, 'left') + '</small><b>' + w0[1] + '</b><i>' + w0[2] + '</i></li>' +
-      '<li class="s"><small>Sun' + tip('tipHs', 'Sun and Earth at the site', TIP.site, 'left') + '</small><b>' + pct(b0.sunStay) + '</b><i>of the ' + (R.key === 'crewed' ? 'stay' : 'mission') + '</i></li>' +
-      '<li class="e"><small>Earth</small><b>' + pct(b0.earthStay) + '</b><i>in view</i></li>' +
-      '<li><small>Fuel' + tip('tipHf', 'fuel', TIP.fuel) + '</small><b>' + (d0 ? '+' + d0 : '0') + '</b><i>' + (d0 ? 'm/s over the cheapest' : 'lowest Δv') + '</i></li>' +
-      '<li><small>Score' + tip('tipHsc', 'the score', TIP.score) + '</small><b>' + Math.round(b0.score) + '</b><i>of 100</i></li></ul>' +
-      '<div class="lb-act">' + useBtn(b0, on0, true) + '</div>';
-  } else {
-    hero.innerHTML = '<p class="caption">No launch in the next ' + lwRange + ' days gives a usable landing at this site. Try another site, a shorter stay, or a longer search.</p>';
-  }
-  /* the list: one line per date, the rest behind Details */
-  var rows = ['<tr><th>#</th><th>Launch (UTC)' + tip('tipTl', 'launch times', TIP.launch, 'left') + '</th><th>Lands (UTC)</th><th>Weather' + tip('tipTw', 'launch weather', TIP.wx, 'left') + '</th><th>At the site' + tip('tipTs', 'Sun and Earth at the site', TIP.site, 'left') + '</th><th class="num">Extra fuel' + tip('tipTf', 'fuel', TIP.fuel) + '</th><th class="num">Score' + tip('tipTsc', 'the score', TIP.score) + '</th><th></th><th></th></tr>'];
+  $('#lwCaption').textContent = R.count + ' of ' + R.days.reduce(function(a, d){ return a + d.n; }, 0) + ' launch opportunities from ' + LAUNCH_SITES[launchIdx].name.split(' (')[0] + ' between ' + fmtDate(R.start, false) + ' and ' + fmtDate(R.start + (lwRange - 1)*86400000, false) + ' give a usable landing.';
+  var rows = ['<tr><th>#</th><th>Launch</th><th>Landing</th><th class="num">Moon at arrival</th><th class="num">Δv · mass in Earth orbit</th><th>At the site</th><th>Launch weather</th><th class="num">Score</th><th></th></tr>'];
   R.top.forEach(function(c, i){
-    var dD = Math.round((c.dvTot - R.dvMin)*1000), w = c.w, ws = wxShort(w);
+    var dD = Math.round((c.dvTot - R.dvMin)*1000), w = c.w;
+    var wTxt = w.src === 'forecast' ? (w.go ? '<span class="flag ok">GO (forecast)</span>' : '<span class="flag bad">NO-GO: ' + w.why.join(', ') + '</span>')
+      : w.src === 'climate' ? 'GO on ' + Math.round(w.p*100) + '% of days<br>around this date, 2015–24' : 'not loaded';
     var near = c.dv.D < 370000 ? 'near perigee' : c.dv.D > 398000 ? 'near apogee' : '';
-    var on = Math.abs(c.t - launchMs) < 60000, open = lwOpen === c.t;
+    var on = Math.abs(c.t - launchMs) < 60000;
     rows.push('<tr' + (on ? ' class="on"' : '') + '><td class="num">' + (i + 1) + '</td>' +
-      '<td>' + fmtDate(c.t) + '</td>' +
+      '<td>' + fmtDate(c.t) + '<br><small>local ' + localTime(c.t) + '</small><small>azimuth ' + Math.round(c.o.az) + '°, orbit ' + c.o.inc.toFixed(1) + '°</small></td>' +
       '<td>' + fmtDate(tabTime(c.iL)) + '</td>' +
-      '<td class="' + ws[0] + '">' + ws[1] + '</td>' +
-      '<td><span class="s">Sun ' + pct(c.sunStay) + '</span> · <span class="e">Earth ' + pct(c.earthStay) + '</span></td>' +
-      '<td class="num">' + (dD ? '+' + dD + ' m/s' : 'lowest') + '</td>' +
-      '<td class="num sc">' + Math.round(c.score) + '</td>' +
-      '<td>' + useBtn(c, on) + '</td>' +
-      '<td><button type="button" class="more" data-more="' + c.t + '" aria-expanded="' + open + '">' + (open ? '▾' : '▸') + ' Details</button></td></tr>');
-    rows.push('<tr class="det"' + (open ? '' : ' hidden') + ' data-det="' + c.t + '"><td colspan="9"><dl>' +
-      '<div><dt>Local launch time</dt><dd>' + localTime(c.t) + '</dd></div>' +
-      '<div><dt>Launch direction</dt><dd>azimuth ' + Math.round(c.o.az) + '°, orbit ' + c.o.inc.toFixed(1) + '°</dd></div>' +
-      '<div><dt>Moon at arrival</dt><dd>' + Math.round(c.dv.D).toLocaleString('en-US') + ' km' + (near ? ' (' + near + ')' : '') + '</dd></div>' +
-      '<div><dt>Δv · mass in Earth orbit</dt><dd>' + c.dvTot.toFixed(3) + ' km/s · ' + (isFinite(c.dv.leo) ? t1(c.dv.leo) + ' t' : 'n/a') + '</dd></div>' +
-      '<div><dt>Versus the cheapest date</dt><dd>' + (dD ? '+' + dD + ' m/s' : 'lowest Δv') + (isFinite(c.dv.leo) && c.dv.leo - R.mMin > 0.05 ? ' · +' + t1(c.dv.leo - R.mMin) + ' t propellant' : '') + '</dd></div>' +
-      '<div><dt>Launch weather</dt><dd>' + escH(wxLong(w)) + '</dd></div>' +
-      '</dl></td></tr>');
+      '<td class="num">' + Math.round(c.dv.D).toLocaleString('en-US') + ' km<br><small>' + near + '</small></td>' +
+      '<td class="num">' + c.dvTot.toFixed(3) + ' km/s · ' + (isFinite(c.dv.leo) ? t1(c.dv.leo) + ' t' : 'n/a') + '<br><small>' + (dD ? '+' + dD + ' m/s' : 'lowest Δv') + (isFinite(c.dv.leo) && c.dv.leo - R.mMin > 0.05 ? ' · +' + t1(c.dv.leo - R.mMin) + ' t propellant' : '') + '</small></td>' +
+      '<td><small>Sun ' + pct(c.sunStay) + '</small><small>Earth ' + pct(c.earthStay) + '</small></td>' +
+      '<td><small>' + wTxt + '</small></td>' +
+      '<td class="num">' + Math.round(c.score) + '</td>' +
+      '<td>' + (on ? '<span class="flag ok">Selected</span>' : '<button type="button" class="fly" data-t="' + c.t + '">Use this launch</button>') + '</td></tr>');
   });
   if (!R.top.length) rows.push('<tr><td colspan="9">No launch in the next ' + lwRange + ' days gives a usable landing at this site. Try another site, a shorter stay, or a longer search.</td></tr>');
   tb.innerHTML = rows.join('');
-  Array.prototype.forEach.call(document.querySelectorAll('#lwTable button[data-t], #lwBest button[data-t]'), function(b){
+  Array.prototype.forEach.call(tb.querySelectorAll('button[data-t]'), function(b){
     b.addEventListener('click', function(){ useLaunch(+b.getAttribute('data-t')); });
-  });
-  Array.prototype.forEach.call(tb.querySelectorAll('button[data-more]'), function(b){
-    b.addEventListener('click', function(){
-      var t = +b.getAttribute('data-more'), det = tb.querySelector('tr[data-det="' + t + '"]'), open = det.hidden;
-      det.hidden = !open; b.setAttribute('aria-expanded', open); b.textContent = (open ? '▾' : '▸') + ' Details'; lwOpen = open ? t : null;
-    });
   });
   drawLwChart();
 }
-var lwOpen = null;
 var lwC = $('#lwChart');
 function drawLwChart(){
   var R = lwRes, dpr = Math.min(window.devicePixelRatio || 1, 2), w = lwC.clientWidth || 600, h = 98;
@@ -2810,6 +2700,8 @@ function startLaunch(fromPlay){
   if (fromPlay){
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     surfWrap.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'center'});
+    /* the launch table above can still grow (weather arriving) and push the view down; centre it again once */
+    setTimeout(function(){ if (landAnim && landAnim.kind === 'launch') surfWrap.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'center'}); }, 1600);
   }
   dirty = true;
 }
@@ -3003,163 +2895,6 @@ requestAnimationFrame(frame);
 })();
 </script>
 <style>
-/* Missions tabs (team draft, 2026-11-15): the section bar shows one section at a time. Presentation only. */
-/* hidden tabs stay laid out at full size off screen: Adrian's canvases keep drawing and never measure 0 px */
-.tab-off{position:fixed!important;left:-300vw!important;top:0!important;width:min(1328px, calc(100vw - 32px))!important;visibility:hidden!important;pointer-events:none!important}
-.jump{gap:4px}
-.jump a{font-size:14px;padding:10px 12px}
-.jump a.on{color:var(--ink);background:var(--panel);box-shadow:inset 0 -3px 0 var(--ink);font-weight:600}
-details.fold.tab-on > summary{pointer-events:none}
-.section,details.fold{grid-template-columns:minmax(0,1fr)}   /* wide tables scroll inside their own box, not the page */
-details.fold.tab-on > summary h2::after{content:''}
-</style>
-<script>
-/* Missions tabs: each link in the section bar opens its own section instead of scrolling to it.
-   The replays that used to scroll to "Standing at" / the flight view now switch to that tab first. */
-(function(){
-  var bar = document.getElementById('jump'); if (!bar) return;
-  var links = Array.prototype.slice.call(bar.querySelectorAll('a[href^="#"]'));
-  var ids = links.map(function(a){ return a.getAttribute('href').slice(1); });
-  bar.setAttribute('role', 'tablist');
-  var current = null;
-  function show(id, scroll){
-    if (ids.indexOf(id) < 0) return;
-    var changed = current !== id; current = id;
-    ids.forEach(function(x){
-      var el = document.getElementById(x); if (!el) return;
-      var on = x === id;
-      el.classList.toggle('tab-off', !on); el.classList.toggle('tab-on', on);
-      if (on && el.tagName === 'DETAILS') el.open = true;
-    });
-    links.forEach(function(a){ var on = a.getAttribute('href') === '#' + id; a.classList.toggle('on', on); a.setAttribute('aria-selected', on ? 'true' : 'false'); a.setAttribute('role', 'tab'); });
-    if (changed) window.dispatchEvent(new Event('resize'));   /* canvases in the new tab size and redraw */
-    if (scroll && bar.getBoundingClientRect().top < 0) window.scrollTo(0, window.scrollY + bar.getBoundingClientRect().top);
-  }
-  /* a tab the user picks stays open; the autoplay may move between tabs only until then,
-     or right after the user presses a button elsewhere (Play, Watch the landing, ...) */
-  var userPicked = false, lastClick = 0;
-  links.forEach(function(a){
-    a.addEventListener('click', function(e){ e.preventDefault(); userPicked = true; show(a.getAttribute('href').slice(1), true); });
-  });
-  document.addEventListener('click', function(e){ if (!bar.contains(e.target)){ lastClick = Date.now(); } }, true);
-  /* keep the section bar's own highlight on the open tab (the page's scroll highlighter would move it) */
-  new MutationObserver(function(){ var a = bar.querySelector('a.on'); if (!a || a.getAttribute('href') !== '#' + current) show(current, false); })
-    .observe(bar, {attributes: true, subtree: true, attributeFilter: ['class']});
-  function follow(elId, tabId){
-    var el = document.getElementById(elId); if (!el) return;
-    var orig = el.scrollIntoView;
-    el.scrollIntoView = function(o){
-      if (Date.now() - lastClick < 1500) userPicked = false;   /* the user started a replay: follow it */
-      if (userPicked && current !== tabId) return;
-      show(tabId, false); return orig.call(el, o);
-    };
-  }
-  follow('surfWrap', 'surface');
-  follow('vp', 'flight');
-  show('flight', false);
-})();
-</script>
-<style>
-/* Missions top cleanup (team draft, 2026-11-15 ~15:45): presentation only. Card + one compact settings row, then the tabs. */
-html.framed .top .eyebrow{display:none}
-.app{gap:14px}
-.top h1{font-size:clamp(26px,3vw,34px)}
-.top h1 .info-wrap{vertical-align:middle;margin-left:8px}
-.top .lede{display:none}
-.glance{padding:12px 16px;gap:10px 24px}
-.glance h2{font-size:22px}
-.g-from{margin:6px 0 0;font-size:12.5px;color:var(--muted);display:flex;align-items:center;flex-wrap:wrap;gap:2px}
-.g-from b{color:var(--ink);font-weight:600}
-.g-act{align-items:flex-start;gap:4px}
-.g-act button.primary{padding:11px 18px;font-size:14px}
-.g-act .g-links{display:flex;gap:4px 14px;flex-wrap:wrap;padding-left:2px}
-.g-act .g-links button{border:0;background:none;padding:4px 0;font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
-.g-act .g-links button:hover{color:var(--ink)}
-.setup{padding:8px 12px;gap:10px 16px}
-.adj-btn{font:500 13px/1 var(--f-body);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:4px;padding:9px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-.adj-btn:hover{border-color:var(--ink)}
-.adj-btn small{color:var(--muted);font-size:12.5px}
-.adj-btn .chev{display:inline-block;transition:transform .15s}
-.adj-btn[aria-expanded="true"] .chev{transform:rotate(90deg)}
-.adj-panel{flex-basis:100%;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding-top:10px;border-top:1px solid var(--line)}
-#landingOut{display:none}
-/* tabs first (Eren 15 Nov): the section bar is the first thing on the page */
-.app > .jump:first-child{margin-top:-14px}
-.app > .top{margin-top:10px;padding-top:14px;border-top:1px solid var(--line)}
-/* visuals first, data after: the readout chips sit under each view instead of on top of it */
-.hud.hud-below{position:static;margin-top:8px;color:var(--ink);pointer-events:auto}
-.hud.hud-below span{background:var(--panel);border:1px solid var(--line)}
-.hud.hud-below span.good{color:var(--ok)} .hud.hud-below span.bad{color:var(--warn)}
-.hud.hud-below span.crewtag{background:#2CC3B1;color:#05201C;border-color:transparent}
-@media (max-width:980px){.g-act{flex-direction:column}}
-</style>
-<script>
-/* Missions top cleanup: moves existing elements only (ids and listeners kept), so Adrian's code still finds everything. */
-(function(){
-  function $(s){ return document.querySelector(s); }
-  function tip(id, label, html, cls){
-    var w = document.createElement('span'); w.className = 'info-wrap';
-    w.innerHTML = '<button type="button" class="info-i" aria-label="' + label + '" aria-describedby="' + id + '">i</button><span class="info-tip' + (cls ? ' ' + cls : '') + '" id="' + id + '" role="tooltip"></span>';
-    w.querySelector('.info-tip').innerHTML = html; return w;
-  }
-  /* 1) header: the intro sentence goes into an (i) next to the title */
-  var lede = $('.top .lede'), h1 = $('.top h1');
-  if (lede && h1){
-    var src = lede.querySelector('.info-tip');
-    var first = lede.cloneNode(true); var old = first.querySelector('.info-wrap'); if (old) old.remove();
-    h1.appendChild(tip('tipIntro', 'About this page', '<span>' + first.innerHTML.trim() + '</span>' + (src ? src.innerHTML : ''), 'left'));
-  }
-  /* 2) the "From the landing calendar" sentence becomes one quiet line in the card; the full sentence goes in its (i) */
-  var fc = $('#fromCal'), head = $('#glance > div');
-  if (fc && head){
-    var line = document.createElement('p'); line.className = 'g-from'; line.hidden = true; head.appendChild(line);
-    var busy = false;
-    function sync(){
-      if (busy) return; busy = true;
-      var t = fc.textContent || '', m = /^From the landing calendar/.test(t) && t.match(/Launch worked back to (.+?) from /);
-      if (!fc.hidden && m){
-        line.innerHTML = 'From your landing calendar · launch worked back to <b></b>';
-        line.querySelector('b').textContent = m[1];
-        line.appendChild(tip('tipFromCal', 'About this mission', '<span></span>', 'left'));
-        line.querySelector('#tipFromCal span').textContent = t;
-        line.hidden = false; fc.style.display = 'none';
-      } else { line.hidden = true; fc.style.display = ''; }   /* errors (unknown site, no data) stay visible as before */
-      busy = false;
-    }
-    new MutationObserver(sync).observe(fc, {childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['hidden']});
-    sync();
-  }
-  /* 3) one primary action; launch and landing replays become small text links */
-  var gp = $('#gPlay'), gl = $('#gLaunch'), gd = $('#gLand');
-  if (gp && gl && gd){
-    gp.textContent = '▶ Play mission';
-    gl.textContent = 'Watch launch'; gd.textContent = 'Watch landing';
-    var links = document.createElement('div'); links.className = 'g-links'; links.appendChild(gl); links.appendChild(gd);
-    gp.parentNode.appendChild(links);
-  }
-  /* 5) tabs at the very top of the page */
-  var app = $('.app'), jump = $('#jump');
-  if (app && jump) app.insertBefore(jump, app.firstChild);
-  /* 5b) the open view comes right under the tabs; title, mission card and settings follow it (Eren 15 Nov) */
-  if (app) ['.top', '#fromCal', '#glance', '.setup'].forEach(function(sel){ var el = $(sel); if (el) app.appendChild(el); });
-  /* 6) visuals first, then data: move each readout row from on top of its view to just under it */
-  [['hud', 'vp'], ['surfHud', 'surfWrap'], ['orbHud', 'orbWrap']].forEach(function(x){
-    var h = document.getElementById(x[0]), v = document.getElementById(x[1]);
-    if (h && v && v.parentNode){ h.classList.add('hud-below'); v.parentNode.insertBefore(h, v.nextSibling); }
-  });
-  /* 4) settings: mission type stays visible, everything else folds under "Adjust mission" */
-  var setup = $('.setup'), seg = setup && setup.querySelector('.seg');
-  if (setup && seg){
-    var panel = document.createElement('div'); panel.className = 'adj-panel'; panel.id = 'adjPanel'; panel.hidden = true;
-    Array.prototype.slice.call(setup.children).forEach(function(ch){ if (ch !== seg) panel.appendChild(ch); });
-    var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'adj-btn'; btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', 'adjPanel');
-    btn.innerHTML = '<span class="chev">▸</span>Adjust mission <small>launch site, date, trip and stay, mast, relay</small>';
-    btn.addEventListener('click', function(){ var open = panel.hidden; panel.hidden = !open; btn.setAttribute('aria-expanded', open ? 'true' : 'false'); });
-    setup.appendChild(btn); setup.appendChild(panel);
-  }
-})();
-</script>
-<style>
 /* Planner hooks (not Adrian's design): only used when this page sits inside the South Pole Navigator's Missions panel */
 html.framed .top .pages{display:none}
 .spn-close{font:600 12.5px var(--f-mono);letter-spacing:.04em;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:8px 12px;cursor:pointer;white-space:nowrap;align-self:flex-start}
@@ -3183,8 +2918,8 @@ html.framed body{overflow-x:hidden}
     if (e.key !== 'Escape' || /^(INPUT|SELECT|TEXTAREA)$/.test((e.target || {}).tagName || '')) return;
     close();
   });
-  /* No ✕ CLOSE button when framed (Eren 15 Nov, ~15:10: it floated large beside the title). The planner's
-     "Planner | Missions" switch closes the panel, and Esc still does. */
+  var top = document.querySelector('.top');
+  if (top){ var b = document.createElement('button'); b.type = 'button'; b.className = 'spn-close'; b.textContent = '✕ CLOSE'; b.title = 'Close the missions panel'; b.onclick = close; top.appendChild(b); }
 })();
 </script>
 </body>
