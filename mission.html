@@ -2894,33 +2894,5 @@ requestAnimationFrame(frame);
   });
 })();
 </script>
-<style>
-/* Planner hooks (not Adrian's design): only used when this page sits inside the South Pole Navigator's Missions panel */
-html.framed .top .pages{display:none}
-.spn-close{font:600 12.5px var(--f-mono);letter-spacing:.04em;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:8px 12px;cursor:pointer;white-space:nowrap;align-self:flex-start}
-.spn-close:hover{border-color:var(--ink)}
-html.framed body{overflow-x:hidden}
-</style>
-<script>
-/* Planner hooks (added for the South Pole Navigator app, 2026-11-15). Adrian's page is unchanged above this line.
-   When framed by the planner (same origin): theme follows the planner, a CLOSE button and Esc close the panel, the page nav is hidden. */
-(function(){
-  var framed = false; try { framed = window.parent !== window && window.parent.location.origin === location.origin; } catch (e) {}
-  if (!framed) return;
-  var root = document.documentElement;
-  root.classList.add('framed');
-  function theme(t){ root.setAttribute('data-theme', t === 'light' ? 'light' : 'dark'); }
-  try { theme(localStorage.getItem('spn-theme')); } catch (e) { theme('dark'); }
-  window.addEventListener('storage', function(e){ if (e.key === 'spn-theme') theme(e.newValue); });
-  function close(){ window.parent.postMessage({spn: 'close-missions'}, location.origin); }
-  window.addEventListener('message', function(e){ if (e.origin === location.origin && e.data && e.data.spn === 'theme') theme(e.data.theme); });
-  document.addEventListener('keydown', function(e){
-    if (e.key !== 'Escape' || /^(INPUT|SELECT|TEXTAREA)$/.test((e.target || {}).tagName || '')) return;
-    close();
-  });
-  var top = document.querySelector('.top');
-  if (top){ var b = document.createElement('button'); b.type = 'button'; b.className = 'spn-close'; b.textContent = '✕ CLOSE'; b.title = 'Close the missions panel'; b.onclick = close; top.appendChild(b); }
-})();
-</script>
 </body>
 </html>
