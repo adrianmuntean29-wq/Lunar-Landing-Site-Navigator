@@ -63,6 +63,12 @@ def compare(ref_days, page_days):
 
 def main():
     from playwright.sync_api import sync_playwright
+    import subprocess
+    import sys
+
+    # the pages load the built scripts: make sure they match src/ before testing them
+    if subprocess.run([sys.executable, str(ROOT / "tools" / "build_js.py"), "--check"]).returncode:
+        raise SystemExit("js/calendar.js or js/mission.js is older than src/: run python tools/build_js.py first")
 
     ref = json.loads((ROOT / "data" / "windows_reference.json").read_text())
     srv, base = serve()

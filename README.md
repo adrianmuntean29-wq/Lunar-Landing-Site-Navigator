@@ -62,6 +62,9 @@ Sun and the Earth against the **real terrain horizon** computed from NASA LOLA e
 3. Read the calendar. Click a day to see why, then **Fly it with a crew** or **Fly it robotic**.
 4. In the mission view, press **Play the whole mission**.
 
+To change the code, edit the files in `src/`, then run `python tools/build_js.py`: it rebuilds `js/calendar.js` and
+`js/mission.js` and stamps new versions into the pages, so browsers do not mix old and new files. No other tools needed.
+
 To run locally, serve the folder over HTTP (the pages fetch their data files): `python -m http.server 8000`, then open
 `http://localhost:8000/`. Opening `index.html` by double-click does not work, because browsers block file reads from a
 local page.
@@ -145,8 +148,10 @@ Full list with licences: [CREDITS.md](CREDITS.md).
 
 | Path | What |
 |---|---|
-| `index.html` | Landing calendar and 3D map |
-| `mission.html` | Mission view |
+| `index.html`, `css/calendar.css` | Landing calendar and 3D map: the page and its styles |
+| `mission.html`, `css/mission.css` | Mission view: the page and its styles |
+| `src/calendar/`, `src/mission/` | The code of each page, one file per role (terrain, sites, WebGL, labels, planner; orbit, Sun and Earth, launch replay, LRO images, launch dates, ...), numbered in the order it runs |
+| `js/calendar.js`, `js/mission.js` | Built from `src/` by `tools/build_js.py`; the pages load these |
 | `js/sky.js` | The Sun and Earth rules both pages share: Horizons table interpolation, azimuth and elevation, terrain horizon lookup, Sun disc share |
 | `js/theme.js` | Light / dark switch (the pages open dark) |
 | `data/` | Files the pages read: `subpoints.json`, `sites.json`, `zones.json`, `heights.bin`, `region_heights.bin`, and engine outputs (`psr.json`, `cap_heights.bin`, metadata) |
